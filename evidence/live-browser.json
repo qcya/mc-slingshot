@@ -1,0 +1,22 @@
+[
+  {
+    "mobile": false,
+    "url": "http://192.168.1.4:8770/",
+    "physics": "Matter.js",
+    "screen": "play",
+    "previewPoints": 5,
+    "cancelledWithoutFiring": true,
+    "errors": [],
+    "failed": []
+  },
+  {
+    "mobile": true,
+    "url": "http://192.168.1.4:8770/",
+    "physics": "Matter.js",
+    "screen": "play",
+    "previewPoints": 5,
+    "cancelledWithoutFiring": true,
+    "errors": [],
+    "failed": []
+  }
+]

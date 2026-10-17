@@ -74,24 +74,45 @@ export function cropPixels(mask,width,indices){
 }
 
 export function circleClear(sample,x,y,r,step=1){
+  step=Math.min(1,step);
+  if(sample(x-r,y)||sample(x+r,y)||sample(x,y-r)||sample(x,y+r))return false;
   for(let dy=-r;dy<=r;dy+=step)for(let dx=-r;dx<=r;dx+=step){
     if(dx*dx+dy*dy<=r*r&&sample(x+dx,y+dy))return false;
   }
   return true;
 }
 
-export function findSafeExit(sample,start,direction,radius,maxThickness,step=1){
+export function findSafeExit(sample,start,direction,radius,maxThickness,step=1,normal=null){
   const length=Math.hypot(direction.x,direction.y);if(length<.001)return null;
-  const ux=direction.x/length,uy=direction.y/length;let entry=null,last=null;
-  const limit=maxThickness+radius*4+step*4;
-  for(let d=0;d<=limit;d+=step){
+  const ux=direction.x/length,uy=direction.y/length;
+  const normalLength=normal?Math.hypot(normal.x,normal.y):0;
+  const projection=normalLength?Math.abs((ux*normal.x+uy*normal.y)/normalLength):1;
+  if(projection<.25)return null;
+  // Measure the material's depth perpendicular to the contacted face, not the
+  // longer angled travel distance, and keep body clearance out of that budget.
+  // Backtrack beyond a solver's tiny penetration before finding the near face.
+  const solid=d=>sample(start.x+ux*d,start.y+uy*d);
+  let beginning=0;
+  if(solid(0)){
+    while(beginning> -radius*2-step*2&&solid(beginning))beginning-=step;
+    if(solid(beginning))return null;
+  }
+  const limit=(maxThickness+radius*2+step*4)/projection+radius*4;
+  const boundary=(a,b,state)=>{for(let i=0;i<16;i++){const mid=(a+b)/2;if(!!solid(mid)===state)b=mid;else a=mid;}return (a+b)/2;};
+  let entry=null,last=null,previous=beginning,wasSolid=false;
+  for(let d=beginning;d<=limit;d+=step){
     const x=start.x+ux*d,y=start.y+uy*d;
     if(sample(x,y)){
-      entry??=d;last=d;if(d-entry+step>maxThickness)return null;
+      if(entry===null)entry=wasSolid?d:boundary(previous,d,true);
+      last=d;wasSolid=true;
+      if((d-entry)*projection>maxThickness+.001)return null;
     }else if(entry!==null){
-      if(d-entry-radius>maxThickness)return null;
-      if(d-last>=radius+step&&circleClear(sample,x,y,radius,step))return {x,y,thickness:last-entry+step};
+      if(wasSolid)last=boundary(previous,d,false);wasSolid=false;
+      const thickness=(last-entry)*projection;
+      if(thickness>maxThickness+.001)return null;
+      if(d>=0&&circleClear(sample,x,y,radius,step))return {x,y,thickness};
     }
+    previous=d;
   }
   return null;
 }

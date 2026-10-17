@@ -4,18 +4,27 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
 const {createGameServer}=require('../scripts/serve.cjs');
 
-async function fixture(t,options={}) {
+async function fixture(t,options={},initialState) {
   const directory=await fs.mkdtemp(path.join(os.tmpdir(),'mc-ranking-'));
   const dataDir=path.join(directory,'private');
+  if(initialState){await fs.mkdir(dataDir);await fs.writeFile(path.join(dataDir,'leaderboard.json'),JSON.stringify(initialState));}
   let server;
   async function start() {
-    server=await createGameServer({dataDir,...options});
-    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-    return `http://127.0.0.1:${server.address().port}`;
+    // Windows may allocate a port which Fetch reserves (for example 10080).
+    // Retry that fixture port without weakening production or rate-limit checks.
+    for(let attempt=0;attempt<20;attempt++){
+      server=await createGameServer({dataDir,...options});
+      await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+      const base=`http://127.0.0.1:${server.address().port}`;
+      try{const response=await fetch(base);await response.body?.cancel();return base;}
+      catch(error){await stop();if(error.cause?.message!=='bad port')throw error;}
+    }
+    throw Error('No Fetch-compatible test port available.');
   }
   async function stop() {server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
   let base=await start();
@@ -32,54 +41,104 @@ async function fixture(t,options={}) {
   };
 }
 const create=(f,nickname)=>f.request('/api/profile',{method:'POST',body:{nickname}});
-const submit=(f,token,stage,shots,timeMs)=>f.request('/api/results',{method:'POST',token,body:{stage,shots,timeMs}});
+const stages=(timeMs=1000)=>Array.from({length:10},(_,stage)=>({stage,timeMs:typeof timeMs==='function'?timeMs(stage):timeMs}));
+const submit=(f,token,scores=stages())=>f.request('/api/results',{method:'POST',token,body:{stages:scores}});
 
 test('anonymous identity and personal bests survive restart without exposing credentials',async t=>{
   const f=await fixture(t),player=await create(f,'  方块勇士  ');
   assert.equal(player.status,201);assert.equal(player.data.profile.nickname,'方块勇士');
   assert.match(player.data.token,/^[a-zA-Z0-9_-]{40,}$/);
-  assert.equal((await submit(f,player.data.token,0,4,3000)).status,200);
+  assert.equal((await submit(f,player.data.token,stages(3000))).status,200);
   await f.restart();
   const rename=await f.request('/api/profile',{method:'PATCH',token:player.data.token,body:{nickname:'新名字'}});
   assert.equal(rename.status,200);assert.equal(rename.data.profile.id,player.data.profile.id);
   const board=await f.request('/api/leaderboard');
-  assert.equal(board.data.entries[0].nickname,'新名字');assert.equal(board.data.entries[0].totalShots,4);
+  assert.equal(board.data.entries[0].nickname,'新名字');assert.equal(board.data.entries[0].totalTimeMs,30000);
+  assert.deepEqual((await f.request('/api/profile',{token:player.data.token})).data,{profile:rename.data.profile,stages:stages(3000)});
   assert.equal(JSON.stringify(board.data).includes(player.data.token),false);
   const stored=await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8');
   assert.equal(stored.includes(player.data.token),false);
+  assert.equal(stored.includes('shots'),false);assert.equal(JSON.parse(stored).version,2);
 });
 
-test('best stage scores and ranking use completion, then shots, then time',async t=>{
+test('personal bests merge fastest times per stage and rank by their sum',async t=>{
   const f=await fixture(t),a=(await create(f,'A')).data,b=(await create(f,'B')).data,c=(await create(f,'C')).data;
-  await submit(f,a.token,0,5,2000);await submit(f,a.token,0,7,1000);await submit(f,a.token,0,5,1500);
-  await submit(f,b.token,0,2,1000);await submit(f,b.token,1,10,5000);
-  await submit(f,c.token,0,5,1400);
+  await submit(f,a.token,stages(2000));await submit(f,a.token,stages(s=>s===0?1000:3000));await submit(f,a.token,stages(1500));
+  await submit(f,b.token,stages(1000));
+  await submit(f,c.token,stages(1400));
   const board=(await f.request('/api/leaderboard')).data.entries;
   assert.deepEqual(board.map(x=>x.nickname),['B','C','A']);
-  assert.deepEqual(board[2].stages,[{stage:0,shots:5,timeMs:1500}]);
+  assert.deepEqual(board[2].stages,stages(s=>s===0?1000:1500));
+  assert.equal(board[2].totalTimeMs,14500);assert.equal(JSON.stringify(board).includes('shots'),false);
   assert.deepEqual(board.map(x=>x.rank),[1,2,3]);
 });
 
-test('profiles appear on the public leaderboard only after their first clear',async t=>{
+test('profiles appear only after a complete ten-stage bundle',async t=>{
   const f=await fixture(t),player=(await create(f,'Waiting')).data;
   assert.deepEqual((await f.request('/api/leaderboard')).data.entries,[]);
-  await submit(f,player.token,0,3,2000);
+  assert.deepEqual((await f.request('/api/profile',{token:player.token})).data.stages,[]);
+  assert.equal((await submit(f,player.token,stages().slice(0,9))).status,400);
+  assert.deepEqual((await f.request('/api/leaderboard')).data.entries,[]);
+  await submit(f,player.token,stages(2000));
   assert.equal((await f.request('/api/leaderboard')).data.entries[0].nickname,'Waiting');
 });
 
-test('concurrent submissions preserve every stage and profile',async t=>{
+test('concurrent complete bundles atomically preserve independent stage bests and profiles',async t=>{
   const f=await fixture(t),players=await Promise.all(Array.from({length:12},(_,i)=>create(f,`Player${i}`)));
-  await Promise.all(players.flatMap(p=>Array.from({length:10},(_,stage)=>submit(f,p.data.token,stage,stage+1,100+stage))));
+  const responses=await Promise.all(players.flatMap(p=>Array.from({length:10},(_,index)=>submit(f,p.data.token,stages(stage=>index===stage?100+stage:1000)))));
+  assert.ok(responses.every(r=>r.status===200));
   await f.restart();
   const entries=(await f.request('/api/leaderboard')).data.entries;
-  assert.equal(entries.length,12);assert.ok(entries.every(x=>x.completed===10&&x.totalShots===55&&x.totalTimeMs===1045));
+  assert.equal(entries.length,12);assert.ok(entries.every(x=>x.completed===10&&x.totalTimeMs===1045));
+});
+
+test('version one migration preserves identities, keeps full times and discards partial scores and shots',async t=>{
+  const token=crypto.randomBytes(32).toString('base64url'),partialToken=crypto.randomBytes(32).toString('base64url');
+  const legacyProfile=(name,credential,scores)=>({id:crypto.randomBytes(16).toString('base64url'),nickname:name,tokenHash:crypto.createHash('sha256').update(credential).digest('hex'),stages:Object.fromEntries(scores.map(score=>[score.stage,{...score,shots:1}]))});
+  const full=legacyProfile('Full',token,stages(2000)),partial=legacyProfile('Partial',partialToken,stages().slice(0,9));
+  const f=await fixture(t,{}, {version:1,profiles:[full,partial]});
+  assert.deepEqual((await f.request('/api/profile',{token})).data,{profile:{id:full.id,nickname:'Full'},stages:stages(2000)});
+  assert.deepEqual((await f.request('/api/profile',{token:partialToken})).data.stages,[]);
+  assert.deepEqual((await f.request('/api/leaderboard')).data.entries.map(p=>p.id),[full.id]);
+  let stored=JSON.parse(await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8'));
+  assert.equal(stored.version,2);assert.equal(JSON.stringify(stored).includes('shots'),false);assert.deepEqual(stored.profiles[1].stages,{});
+  await f.restart();
+  // Old shot count was one; a faster ten-stage run has no shot metadata at all.
+  assert.equal((await submit(f,token,stages(1000))).status,200);
+  assert.equal((await f.request('/api/profile',{token})).data.stages[0].timeMs,1000);
+  assert.equal((await f.request('/api/profile',{method:'PATCH',token:partialToken,body:{nickname:'Renamed'}})).status,200);
+  stored=JSON.parse(await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8'));
+  assert.equal(stored.profiles[0].tokenHash,full.tokenHash);assert.equal(stored.profiles[1].id,partial.id);
+});
+
+test('equal total times use stable identity order',async t=>{
+  const f=await fixture(t),a=(await create(f,'A')).data,b=(await create(f,'B')).data;
+  await submit(f,a.token);await submit(f,b.token);
+  const entries=(await f.request('/api/leaderboard')).data.entries;
+  assert.deepEqual(entries.map(entry=>entry.id),[a.profile.id,b.profile.id].sort((a,b)=>a.localeCompare(b)));
+});
+
+test('invalid or unsupported stored data fails without overwriting player identities',async t=>{
+  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'mc-ranking-corrupt-'));
+  t.after(()=>fs.rm(directory,{recursive:true,force:true,maxRetries:5,retryDelay:100}));
+  const filename=path.join(directory,'leaderboard.json');
+  const profile={id:crypto.randomBytes(16).toString('base64url'),tokenHash:'a'.repeat(64),nickname:'Preserve',stages:{0:{stage:0,timeMs:1000}}};
+  for(const state of [{version:3,profiles:[profile]},{version:2,profiles:[profile]},{version:1,profiles:[{...profile,stages:{0:{stage:0,timeMs:1000,shots:0}}}]}]){
+    const original=JSON.stringify(state);await fs.writeFile(filename,original);
+    await assert.rejects(createGameServer({dataDir:directory}));
+    assert.equal(await fs.readFile(filename,'utf8'),original);
+  }
 });
 
 test('API rejects malformed, unbounded and unauthorized input',async t=>{
   const f=await fixture(t),p=(await create(f,'合法_Name')).data;
   for(const nickname of ['', 'x'.repeat(17), '<script>', 'a\u202eb', 45, {name:'x'}])assert.equal((await create(f,nickname)).status,400);
-  for(const body of [{stage:-1,shots:1,timeMs:1},{stage:10,shots:1,timeMs:1},{stage:0,shots:0,timeMs:1},{stage:0,shots:1,timeMs:3600001},{stage:'0',shots:1,timeMs:1},{stage:0,shots:1.5,timeMs:1},{stage:0,shots:1,timeMs:1,extra:true},null])assert.equal((await f.request('/api/results',{method:'POST',token:p.token,body})).status,400);
-  assert.equal((await submit(f,'bad',0,1,1)).status,401);
+  const invalid=[null,{}, {stage:0,shots:1,timeMs:1000},{stages:null},{stages:stages().slice(0,9)},{stages:[...stages(),{stage:10,timeMs:1000}]},{stages:stages().map(()=>({stage:0,timeMs:1000}))},{stages:stages(),extra:true}];
+  for(const value of [{stage:-1,timeMs:1000},{stage:10,timeMs:1000},{stage:'0',timeMs:1000},{stage:0,timeMs:99},{stage:0,timeMs:3600001},{stage:0,timeMs:100.5},{stage:0,timeMs:'1000'},{stage:0,timeMs:1000,shots:50}])invalid.push({stages:[value,...stages().slice(1)]});
+  for(const body of invalid)assert.equal((await f.request('/api/results',{method:'POST',token:p.token,body})).status,400);
+  assert.equal((await submit(f,'bad')).status,401);
+  assert.equal((await f.request('/api/profile')).status,401);
+  assert.equal((await submit(f,p.token,stages(s=>s===0?100:3600000))).status,200);
   assert.equal((await f.request('/api/profile',{method:'PATCH',body:{nickname:'Hacker'}})).status,401);
   assert.equal((await f.request('/api/profile',{method:'POST',raw:'{broken'})).status,400);
   assert.equal((await f.request('/api/profile',{method:'POST',raw:'x'.repeat(5000)})).status,413);
@@ -105,9 +164,10 @@ test('client supports a server base URL and reports authorization failures',asyn
   const client=createOnlineClient({baseUrl:f.baseUrl});
   const player=await client.createProfile('Browser');
   await client.updateProfile(player.token,'手机玩家');
-  await client.submitResult(player.token,{stage:0,shots:2,timeMs:3000});
+  await client.submitResult(player.token,{stages:stages(3000)});
+  assert.deepEqual((await client.profile(player.token)).stages,stages(3000));
   assert.equal((await client.leaderboard()).entries[0].nickname,'手机玩家');
-  await assert.rejects(client.submitResult('bad',{stage:0,shots:2,timeMs:3000}),error=>error.status===401);
+  await assert.rejects(client.submitResult('bad',{stages:stages(3000)}),error=>error.status===401);
 });
 
 test('client profile and result requests work through a prefix-stripping trusted proxy',async t=>{
@@ -123,7 +183,8 @@ test('client profile and result requests work through a prefix-stripping trusted
   const {createOnlineClient}=await import('../src/online.mjs');
   const client=createOnlineClient({baseUrl:`http://127.0.0.1:${proxy.address().port}/mc-block-launch/`});
   const player=await client.createProfile('Prefix');await client.updateProfile(player.token,'Renamed');
-  await client.submitResult(player.token,{stage:0,shots:1,timeMs:900});
+  await client.submitResult(player.token,{stages:stages(900)});
+  assert.deepEqual((await client.profile(player.token)).stages,stages(900));
   assert.equal((await client.leaderboard()).entries[0].nickname,'Renamed');
 });
 
@@ -143,6 +204,17 @@ test('trusted reverse proxy rate limits the last forwarded client address separa
   }
   const responses=[];for(let i=0;i<241;i++)responses.push(await f.request('/api/health',{headers:{'X-Forwarded-For':`192.0.2.${i%200+1}, 198.51.100.1`}}));
   assert.equal(responses.at(-1).status,429);
+});
+
+test('direct LAN clients cannot spoof proxy headers when the trusted proxy peer is configured',async t=>{
+  const f=await fixture(t,{trustProxy:true,trustedProxyAddress:'192.0.2.10'});
+  let last;for(let i=0;i<241;i++)last=await f.request('/api/health',{headers:{'X-Forwarded-For':`198.51.100.${i%200+1}`}});
+  assert.equal(last.status,429);
+});
+
+test('configured trusted proxy peer keeps distinct forwarded clients independent',async t=>{
+  const f=await fixture(t,{trustProxy:true,trustedProxyAddress:'127.0.0.1'});
+  for(let i=0;i<241;i++)assert.equal((await f.request('/api/health',{headers:{'X-Forwarded-For':`198.51.100.${i%200+1}`}})).status,200);
 });
 
 test('chunked oversized requests return a usable 413 response',async t=>{

@@ -19,4 +19,9 @@ async function aim(page,dx,dy){
  await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+dx*b.width/1536,y+dy*b.height/864,{steps:12});return {x,y};
 }
 async function shot(page,slot=1,dx=128,dy=34){await page.keyboard.press(String(slot));await aim(page,-dx,dy);await page.mouse.up();}
-module.exports={ready,chooseLevel,restart,aim,shot};
+async function shotPlan(page,move){
+ const slot={cobble:1,tnt:2,ender:3,fire:4}[move.kind];
+ if(!move.input)return shot(page,slot,135*(move.pull??1)*Math.cos(move.angle),135*(move.pull??1)*Math.sin(move.angle));
+ await page.keyboard.press(String(slot));const home=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher);await aim(page,move.input.x-home.x,move.input.y-home.y);const launch=await page.evaluate(()=>({...MCBlockLaunch.getStatus().launcher,time:MCBlockLaunch.getStatus().time}));await page.mouse.up();return launch;
+}
+module.exports={ready,chooseLevel,restart,aim,shot,shotPlan};

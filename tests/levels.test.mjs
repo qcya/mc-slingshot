@@ -15,12 +15,17 @@ test('十个手工关卡从完整方块起步，装饰不参与承重，怪物�
     }
     assert.equal(scene.trees.length,1);assert.ok(scene.trees[0].x>28);
     const w=new SiegeWorld(Matter,{grid:g});
-    for(const e of scene.enemies)w.addEnemy(e.x,e.feet,e.skin);
+    for(const e of scene.enemies)w.addEnemy(e.x,e.feet,e.skin,e);
     const before=g.count();g.set(0,0,1);g.set(0,0,0);w.synchronize();
     for(let i=0;i<480;i++)w.step(1/120);
     assert.equal(g.count(),before,`initial terrain changed in level ${level}`);
     assert.equal(w.debris.length,0,`floating structure in level ${level}`);
     assert.equal(w.enemies.filter(e=>e.alive).length,scene.enemies.length,`enemy spawn overlaps floor in level ${level}`);
+    for(let i=0;i<scene.enemies.length;i++)if(scene.enemies[i].stationary){
+      const sentry=w.enemies[i];assert.equal(sentry.stationary,true,'level metadata must reach the production actor');
+      assert.ok(Math.abs(sentry.body.position.x-scene.enemies[i].x)<.01,'cap sentry must stay centered');
+      assert.equal(sentry.turns,0);assert.equal(sentry.walkDistance,0);assert.equal(sentry.behavior,'idle');assert.equal(sentry.pose.walkBlend,0);
+    }
   }
 });
 

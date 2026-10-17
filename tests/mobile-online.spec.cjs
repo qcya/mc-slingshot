@@ -12,22 +12,45 @@ test('开局昵称、共享排行榜和改名能实际往返服务器',async({pa
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
  await expect(page.locator('#profileMenu')).toBeVisible();await page.locator('#nickname').fill('在线测试玩家');await page.locator('#saveProfile').click();
  await expect(page.locator('#levelMenu')).toBeVisible();const p=await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.profile.v1')));expect(p.token).toBeTruthy();
- const submit=await page.request.post('/api/results',{headers:{Authorization:`Bearer ${p.token}`},data:{stage:0,shots:2,timeMs:4500}});expect(submit.ok()).toBe(true);
- await page.locator('#leaderboardBtn').click();await expect(page.locator('#rankingRows')).toContainText('在线测试玩家');await expect(page.locator('#rankingRows tr.self')).toContainText('1/10');
+ let reads=0;page.on('request',r=>{if(r.url().endsWith('/api/leaderboard'))reads++;});
+ await page.locator('#leaderboardBtn').click();await expect(page.locator('#leaderboardStatus')).toHaveText('全通关后展示');expect(reads).toBe(0);await expect(page.locator('#rankingTable')).toBeHidden();
+ const partial=await page.request.post('/api/results',{headers:{Authorization:`Bearer ${p.token}`},data:{stages:[{stage:0,timeMs:4500}]}});expect(partial.status()).toBe(400);
+ const submit=await page.request.post('/api/results',{headers:{Authorization:`Bearer ${p.token}`},data:{stages:Array.from({length:10},(_,stage)=>({stage,timeMs:4500}))}});expect(submit.ok()).toBe(true);
+ await page.reload();await page.waitForFunction(()=>window.MCBlockLaunch);await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1'))?.filter(Number.isInteger).length)).toBe(10);
+ await page.locator('#leaderboardBtn').click();await expect(page.locator('#rankingRows tr.self')).toContainText('在线测试玩家');await expect(page.locator('#rankingRows tr.self')).toContainText('00:45.000');
  await page.locator('#leaderboardBack').click();await page.locator('#profileBtn').click();await page.locator('#nickname').fill('改名玩家');await page.locator('#saveProfile').click();
  await page.locator('#leaderboardBtn').click();await expect(page.locator('#rankingRows tr.self')).toContainText('改名玩家');expect(errors).toEqual([]);
 });
 
+test('leaving nickname editing retries a discarded delayed full-record restore',async({page})=>{
+ const created=await page.request.post('/api/profile',{data:{nickname:'RestoreTester'}}),identity=await created.json();
+ await page.addInitScript(p=>localStorage.setItem('mc-block-launch.profile.v1',JSON.stringify({...p.profile,token:p.token})),identity);
+ let release,reads=0;await page.route('**/api/profile',async route=>{
+  if(route.request().method()!=='GET')return route.continue();reads++;if(reads===1)await new Promise(r=>release=r);
+  await route.fulfill({json:{profile:identity.profile,stages:Array.from({length:10},(_,stage)=>({stage,timeMs:3000}))}});
+ });
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await expect.poll(()=>reads).toBe(1);await page.locator('#profileBtn').click();
+ const response=page.waitForResponse(r=>r.url().endsWith('/api/profile')&&r.request().method()==='GET');release();await response;await page.waitForTimeout(50);
+ await page.locator('#profileBack').click();await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1'))?.filter(Number.isInteger).length)).toBe(10);
+ expect(reads).toBeGreaterThanOrEqual(2);
+});
+
 test.describe('Android 触屏布局与实际输入',()=>{
  test.use({viewport:{width:844,height:390},isMobile:true,hasTouch:true});
- test('触摸取消不消耗弹药，物品按钮唤回库存，暂停冻结物理',async({page,context})=>{
-  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('手机测试');await page.locator('#saveProfile').tap();await page.locator('#level-0').tap();
-  await expect(page.locator('#touchPause')).toBeVisible();const box=await page.locator('#stage').boundingBox(),p=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher);
+ test('one pause control, five-point aim, anywhere second-finger cancel and direct hotbar access',async({page,context})=>{
+  await page.addInitScript(()=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:10,completed:[]})));
+  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('MobileTester');await page.locator('#saveProfile').tap();await page.locator('#level-2').tap();
+  await expect(page.locator('.touch-controls button')).toHaveCount(1);await expect(page.locator('#touchPause')).toHaveText('\u6682\u505c\u83dc\u5355');
+  const box=await page.locator('#stage').boundingBox(),p=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),pause=await page.locator('#touchPause').boundingBox(),hint=await page.locator('#gamehint').boundingBox();
+  expect(pause.x).toBeLessThan(box.x+box.width/3);expect(hint.y+hint.height).toBeLessThan(box.y+box.height/3);
   const cdp=await context.newCDPSession(page),point={x:box.x+p.x*box.width/1536,y:box.y+p.y*box.height/864};
-  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:point.x-38,y:point.y+18,id:1}]});
-  await expect(page.locator('#touchCancel')).toBeVisible();const cancel=await page.locator('#touchCancel').boundingBox();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x-38,y:point.y+18,id:1},{x:cancel.x+cancel.width/2,y:cancel.y+cancel.height/2,id:2}]});
-  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(0);
-  await expect(page.locator('#inventory')).toHaveClass(/tucked/,{timeout:6000});await page.locator('#touchInventory').tap();await expect(page.locator('#inventory')).not.toHaveClass(/tucked/);
+  for(const second of [{x:box.x+box.width*.8,y:box.y+box.height*.3},{x:pause.x+pause.width/2,y:pause.y+pause.height/2}]){
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:point.x-38,y:point.y+18,id:1}]});
+   await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getDiagnostics().preview.length)).toBe(5);
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x-38,y:point.y+18,id:1},{...second,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+   expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(0);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().screen)).toBe('play');
+  }
+  await page.waitForTimeout(3600);await expect(page.locator('#inventory')).not.toHaveClass(/tucked/);await page.locator('#ballbar button').nth(1).tap();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('tnt');
   await page.locator('#touchPause').tap();const time=await page.evaluate(()=>MCBlockLaunch.getStatus().time);await page.waitForTimeout(200);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().time)).toBe(time);
   await page.locator('#resume').tap();await page.screenshot({path:'evidence/android-landscape.png'});
   await page.setViewportSize({width:390,height:844});await expect(page.locator('#rotateHint')).toBeVisible();await page.locator('#touchPause').tap();await page.locator('#levelMenuBtn').tap();

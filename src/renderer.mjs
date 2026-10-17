@@ -118,6 +118,10 @@ export class Renderer {
   }
   mob(e,world){
     this.mobSprites.draw(this.ctx,e,world);
+    if(e.alive&&e.burningUntil>world.time){
+      const w=e.dimensions.width+12,h=e.dimensions.height*.8,frame=Math.floor(world.time*12+e.id)%32,c=this.ctx;
+      c.save();c.globalAlpha=.85;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
+    }
   }
   ball(x,y,ammo,size=ammo.size){
     this.image(ammo.sprite,x-size/2,y-size/2,size,size);

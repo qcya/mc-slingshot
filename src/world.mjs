@@ -1,9 +1,9 @@
-import { AMMO, MATERIALS, clamp } from './config.mjs';
+import { AMMO, MATERIALS, TILE, clamp } from './config.mjs';
 import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDamage } from './pixels.mjs';
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
-import {igniteWood,advanceFire} from './fire.mjs';
+import {igniteWood,advanceFire,burnEnemy} from './fire.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -44,12 +44,13 @@ export class SiegeWorld {
     if(kind==='tnt')this.events.push({type:'fuse',x,y});
     this.projectiles.push(p);return p;
   }
-  addEnemy(x,feetY,skin='zombie'){
+  addEnemy(x,feetY,skin='zombie',options={}){
     const dimensions=skin==='warden'?{width:58,height:132}:{width:32,height:92},feetOffset=dimensions.height/2;
     const body=this.M.Bodies.rectangle(x,feetY-feetOffset,dimensions.width,dimensions.height,{friction:.85,frictionStatic:1,restitution:0,frictionAir:.01,slop:.025,inertia:Infinity,collisionFilter:{category:2,mask:0xfffffffd}});
     this.M.Body.setMass(body,skin==='warden'?3.6:1.2);
     const e=this.register({type:'enemy',skin,hp:skin==='warden'?300:100,dimensions,feetOffset,projectileHits:new Set(),alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);
-    Object.assign(e,actorState(e.id,this.time));this.enemies.push(e);return e;
+    Object.assign(e,actorState(e.id,this.time));e.stationary=!!options.stationary;
+    e.burnSources=new Set();e.burnTicks=[];e.burningUntil=0;this.enemies.push(e);return e;
   }
   patrol(dt){
     for(const e of this.enemies){
@@ -58,7 +59,7 @@ export class SiegeWorld {
       const influenced=this.time<e.externalUntil;
       const half=e.dimensions.width/2,ground=this.sample(x-half*.65,feet+3)||this.sample(x+half*.65,feet+3);
       const grounded=!!ground&&Math.abs(b.velocity.y)<.65&&Math.abs(b.velocity.x)<2.2&&!influenced;
-      const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded);
+      const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded)&&!e.stationary;
       if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:`${e.skin}_idle`});
       if(!grounded)continue;
       if(!walking){this.M.Body.setVelocity(b,{x:b.velocity.x*.7,y:b.velocity.y});continue;}e.walkDistance+=distance;
@@ -165,7 +166,7 @@ export class SiegeWorld {
     }
   }
   hurt(e,damage){
-    if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
+    if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;if(Math.abs(e.hp)<1e-8)e.hp=0;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
     this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:`${e.skin}_hurt`});
     if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setAngularVelocity(e.body,0);}
   }
@@ -212,13 +213,14 @@ export class SiegeWorld {
     if(ammo){
       const kind=ammo.ammo.id;
       if(kind==='fire'){
-        this.ignite(point.x,point.y,ammo.ammo.size/2+this.s*2);this.remove(ammo);return;
+        const sourceId=`ammo:${ammo.id}`;if(other?.type==='enemy')burnEnemy(this,other,sourceId);
+        this.ignite(point.x,point.y,ammo.ammo.size/2+this.s*2,sourceId);this.remove(ammo);return;
       }
       if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
       if(kind==='ender'&&ammo.uses===0&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
-        const exit=findSafeExit((x,y)=>!!this.sample(x,y),ammo.body.position,velocity,ammo.ammo.size/2,64,this.s/2);
+        const exit=findSafeExit((x,y)=>!!this.sample(x,y),ammo.body.position,velocity,ammo.ammo.size/2,TILE*2,this.s/2,n);
         if(exit){
           const old={...ammo.body.position};this.M.Body.setPosition(ammo.body,exit);this.M.Body.setVelocity(ammo.body,{x:velocity.x*.95,y:velocity.y*.95});
           this.M.Sleeping.set(ammo.body,false);ammo.uses++;this.stats.portals++;this.events.push({type:'portal',x:old.x,y:old.y,to:exit});return;
@@ -234,7 +236,7 @@ export class SiegeWorld {
       this.events.push({type:'impact',x:point.x,y:point.y,m:material,speed,sound:striker.type==='ammo'&&striker.ammo.id==='cobble'?'stone':MATERIALS[material]?.sound});
     }
   }
-  ignite(x,y,reach){return igniteWood(this,x,y,reach);}
+  ignite(x,y,reach,sourceId){return igniteWood(this,x,y,reach,sourceId);}
   shatterGlass(body,point,speed){
     const id=body.plugin.tileId,cols=Math.ceil(this.grid.width/16),tx=id%cols*16,ty=Math.floor(id/cols)*16;let count=0;
     for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.grid.set(x,y,0);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
@@ -257,7 +259,7 @@ export class SiegeWorld {
         // Rear walls intentionally have no Matter body. Sweep the projectile's
         // path so a fire charge can still touch and ignite those wooden pixels.
         const from=p.lastFirePosition||p.body.position,to=p.body.position,length=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(length/this.s));
-        for(let k=0;k<=steps;k++)if(this.ignite(from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2)){
+        for(let k=0;k<=steps;k++)if(this.ignite(from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2,`ammo:${p.id}`)){
           this.remove(p);break;
         }
         p.lastFirePosition={...to};
@@ -276,7 +278,7 @@ export class SiegeWorld {
     this.synchronize();
     if(this.cooldowns.size>1000)for(const [key,t] of this.cooldowns)if(this.time-t>1)this.cooldowns.delete(key);
   }
-  active(){return this.fires.length>0||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
+  active(){return this.fires.length>0||this.enemies.some(e=>e.alive&&e.burnTicks.length>0)||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,

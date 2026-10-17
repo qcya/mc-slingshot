@@ -15,22 +15,22 @@ function impact(w,projectile,enemy){
 test('fire consumes connected front and rear wood over time and includes each cardinal neighbor',()=>{
  const w=world();
  for(const [tx,ty,m] of [[5,5,4],[4,5,19],[6,5,21],[5,4,17],[5,6,18]])w.grid.tile(tx,ty,m);
- w.rear.grid.tile(6,6,23);w.rear.grid.tile(7,6,15);
+ w.rear.grid.tile(6,6,23);w.rear.grid.tile(5,7,15);
  const original=w.grid.count();assert.equal(typeof w.ignite,'function');
  assert.ok(w.ignite(5*48+24,5*48+24));assert.equal(w.grid.count(),original);
  assert.ok(w.fires.length>=7);assert.ok(w.active());
  step(w,1.1);assert.ok(w.grid.count()<original&&w.grid.count()>0,'wood visibly burns before disappearing');
  step(w,5);assert.equal(w.grid.count(),0);assert.equal(w.rear.grid.count(),0);assert.equal(w.fires.length,0);
- assert.ok(w.events.some(e=>e.type==='fire'&&e.sound==='fire_ignite'));
+ assert.ok(w.events.some(e=>e.type==='fire'&&e.sound==='fire_burn'));
  assert.equal(w.debris.length,0,'burning never detaches fixed buildings');
 });
 
-test('fire cannot cross nonwood gaps or exceed a three-block radius, and preserves mineral HP',()=>{
+test('fire stays within a five-block diameter, cannot cross nonwood gaps, and preserves mineral HP',()=>{
  const w=world();w.grid.fill(2*16,5*16,9*16,16,10);w.grid.tile(5,4,20);w.grid.tile(4,4,2);w.grid.tile(6,4,3);w.grid.tile(5,3,4);
  w.rear.grid.tile(5,4,5);const stoneHp=w.grid.hp[4*16*w.grid.width+6*16];
  assert.equal(typeof w.ignite,'function');w.ignite(5*48+24,5*48+24);step(w,6);
- for(const tx of [2,3,4,5,6,7,8])assert.equal(w.grid.get(tx*16+8,5*16+8),0,`connected tile ${tx}`);
- assert.equal(w.grid.get(9*16+8,5*16+8),10,'four blocks from seed stays intact');
+ for(const tx of [3,4,5,6,7])assert.equal(w.grid.get(tx*16+8,5*16+8),0,`connected tile ${tx}`);
+ for(const tx of [2,8,9])assert.equal(w.grid.get(tx*16+8,5*16+8),10,'three or more blocks from seed stays intact');
  assert.equal(w.grid.get(5*16+8,3*16+8),4,'furnace blocks disconnected wood');
  for(const [tx,m] of [[4,2],[5,20],[6,3]])assert.equal(w.grid.get(tx*16+8,4*16+8),m);
  assert.equal(w.grid.hp[4*16*w.grid.width+6*16],stoneHp);assert.equal(w.rear.grid.get(5*16+8,4*16+8),5);

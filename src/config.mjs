@@ -28,7 +28,7 @@ export const MATERIALS={
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:28,mass:4,detail:'实心方块 · 冲量撞击'},
   {id:'tnt',label:'TNT',sprite:'tnt_side',size:28,mass:2.4,detail:'四秒引信 · 碰撞仅碎玻璃'},
-  {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'只伤生物 · 无损穿薄墙'},
-  {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'点燃木材 · 最多蔓延三格'}
+  {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'只伤生物 · 无损穿两格墙'},
+  {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'}
 ];
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));

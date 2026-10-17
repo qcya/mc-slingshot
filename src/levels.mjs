@@ -22,7 +22,7 @@ export function buildLevel(number){
   const row=(x0,x1,y,m)=>{for(let x=x0;x<=x1;x++)grid.tile(x,y,m);};
   const column=(x,y0,y1,m)=>{for(let y=y0;y<=y1;y++)grid.tile(x,y,m);};
   const tile=(x,y,m)=>grid.tile(x,y,m);
-  const enemy=(x,y,skin='pillager')=>enemies.push({x:x*TILE,feet:y*TILE,skin,height:skin==='warden'?132:92});
+  const enemy=(x,y,skin='pillager',options={})=>enemies.push({x:x*TILE,feet:y*TILE,skin,height:skin==='warden'?132:92,...options});
   const roof=(x0,x1,y,m=10)=>{
     const sections=[];
     visual.attics.push({center:(x0+x1+1)*8,base:(y+1)*16,left:x0*16,right:(x1+1)*16});
@@ -84,6 +84,8 @@ export function buildLevel(number){
     row(23,28,13,16);column(23,5,12,5);column(28,5,12,5);
     row(24,27,9,10);row(22,29,4,5);for(const x of [22,24,27,29])tile(x,3,5);
     tile(23,7,6);tile(23,11,6);tile(28,6,6);
+    // An oak pier divides the lower room behind its fragile entry window.
+    column(24,10,12,4);
     enemy(25.5,4);enemy(26,9,'zombie');enemy(25.5,13);
     room(24,5,4,4,5,9,[23,4,29,10]);room(24,10,4,3,5,13,[23,9,29,14]);
   }else if(level===2){
@@ -95,9 +97,11 @@ export function buildLevel(number){
     room(20,7,9,3,10,10,[19,6,30,11]);room(20,11,9,2,10,13,[19,10,30,14]);
   }else if(level===3){
     column(22,6,13,12);column(27,6,13,12);row(20,29,10,13);
-    row(20,29,5,13);row(21,28,4,13);row(23,26,3,13);tile(21,9,12);tile(28,9,12);
+    roof(20,29,5,13);tile(21,9,12);tile(28,9,12);
+    // Corner piers carry the watch deck and enclose the open ground-floor bay.
+    rear.room(22,11,1,3,12);rear.room(27,11,1,3,12);
     for(const x of [22,27]){tile(x,8,6);tile(x,9,6);}
-    enemy(24,10);enemy(26,10);enemy(29.4,10);enemy(24.5,14,'zombie');
+    enemy(23.7,10);enemy(26.2,10);enemy(29.4,10,'pillager',{stationary:true});enemy(24.5,14,'zombie');
     room(23,6,4,4,13,10,[22,5,28,11]);
   }else if(level===4){
     row(19,30,13,5);for(const x of [19,21,28,30])column(x,7,12,5);
@@ -105,32 +109,40 @@ export function buildLevel(number){
     row(22,27,10,5);column(22,11,12,16);column(27,11,12,16);
     tile(19,10,6);tile(30,10,6);
     for(const x of [19,21]){tile(x,11,6);tile(x,12,6);}tile(22,11,17);tile(22,12,18);
-    enemy(20.5,6);enemy(29.5,6);enemy(25,10);enemy(24,13,'zombie');enemy(26,13,'zombie');
+    enemy(20.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(25,10);enemy(24,13,'zombie');enemy(26,13,'zombie');
     room(20,7,1,6,5,13,[19,6,22,14]);room(29,7,1,6,5,13,[28,6,31,14]);room(23,11,4,2,5,13,[22,10,28,14]);
   }else if(level===5){
     // Split hillside targets prevent one blast from clearing the entire camp.
     row(18,23,13,10);column(17,9,12,4);column(18,9,12,4);column(23,9,12,4);tile(18,11,6);roof(17,24,8,15);
-    // The open loading bay gives ordinary arcs a generous route to the low guard.
-    row(25,27,9,15);tile(30,9,15);column(26,10,11,14);column(30,10,13,14);
-    room(19,9,4,4,15);room(26,10,4,2,10);
+    // A continuous log-supported loading shelter opens toward the low guard.
+    row(25,30,9,15);column(25,10,13,14);column(30,10,13,14);
+    room(19,9,4,4,15);room(26,10,4,4,10);
+    // Stacked cut logs distinguish the loading yard from the dwelling.
+    rear.room(26,12,2,2,14);
     enemy(20,13,'zombie');enemy(22.5,13);enemy(26,9);enemy(29,14,'zombie');enemy(27.5,9);
   }else if(level===6){
     // A fixed timber bridge crosses the deep ravine; breaking it creates a hole.
     row(18,29,9,15);column(18,10,16,14);column(29,10,14,14);
-    column(22,6,8,4);column(27,6,8,4);row(22,27,5,15);tile(22,7,6);tile(27,7,6);
-    row(19,25,16,16);row(28,30,13,16);column(19,12,15,16);
+    column(22,6,8,4);column(27,6,8,4);roof(21,28,5,15);tile(22,7,6);tile(27,7,6);
+    // The bridge rests on timber abutments and a visible rear crossbeam.
+    rear.room(19,10,10,1,14);
+    row(19,25,16,16);row(28,30,13,16);column(19,12,15,16);tile(19,14,6);tile(19,15,6);
     room(23,6,4,3,15);room(19,12,7,4,3);
-    enemy(23.5,9);enemy(26,9);enemy(20.5,16,'zombie');enemy(24.5,16,'zombie');enemy(28.5,13);
+    enemy(23.5,9);enemy(26,9);enemy(20.5,16,'zombie');enemy(24.5,16,'zombie');enemy(28.5,13,'pillager',{stationary:true});
   }else if(level===7){
     // Open quarry ledges, a wooden machine room, and a low mine gallery.
-    row(18,21,10,5);column(21,11,13,5);row(25,30,7,16);column(30,8,13,5);
+    row(18,21,10,5);column(18,11,13,5);column(21,11,13,5);
+    row(25,30,7,16);column(25,8,8,16);column(29,8,15,3);column(30,8,13,5);
+    // A dressed quarry face carries the upper working ledge down to the mine.
+    rear.room(29,8,1,8,3);
     row(22,28,13,15);column(22,10,12,14);column(28,10,12,14);row(22,28,9,15);tile(22,11,6);
     row(18,29,16,3);column(18,14,15,5);tile(18,14,6);tile(18,15,6);
     room(23,10,5,3,15);
     enemy(19.5,10);enemy(26,7);enemy(29,7);enemy(25,13);enemy(21,16,'zombie');enemy(27,16,'zombie');
   }else if(level===8){
     // A roof sentry and cave guards protect the first three-hit guardian.
-    row(20,24,7,16);column(24,8,8,5);
+    row(20,24,7,16);column(20,8,8,5);column(24,8,8,5);
+    rear.room(21,8,3,1,5);
     enemy(21.5,7);enemy(27,9);enemy(20,16,'zombie');enemy(24.5,16,'warden');enemy(28.5,16);
   }else{
     // Stone towers cover a timber hall above a spacious three-block crypt.
@@ -143,7 +155,7 @@ export function buildLevel(number){
     // separate blast areas instead of making success depend on a patrol phase.
     column(30,13,15,11);for(const x of [20,24,25,29])column(x,14,15,11);
     room(19,7,3,5,5);room(23,8,4,4,13);room(28,7,2,5,5);
-    enemy(19.5,6);enemy(29.5,6);enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16,'zombie');enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
+    enemy(19.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16,'zombie');enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
   }
   // Furniture lives in the destructible rear layer, outside the firing plane.
   const furniture=[[[21,12,19],[22,12,20],[26,12,21]],[[24,12,20],[27,8,21]],[[20,12,19],[21,12,20],[28,12,21],[20,9,21],[27,9,19]],[[23,9,21],[26,9,19]],[[20,12,20],[29,12,21],[23,12,19],[26,12,20]],[[19,12,19],[22,12,20],[28,11,21]],[[23,8,21],[20,15,20]],[[23,12,19],[26,12,20],[28,15,9]],[[19,15,9],[29,15,9]],[[20,11,21],[25,11,19],[28,15,20]]][level];

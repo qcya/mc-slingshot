@@ -24,7 +24,8 @@ async function createGameServer(options={}){
   }
   const rates=new Map();
   function rate(req){
-    const trusted=options.trustProxy??process.env.MC_TRUST_PROXY==='1';
+    const proxyAddress=options.trustedProxyAddress||process.env.MC_PROXY_ADDRESS,peer=(req.socket.remoteAddress||'').replace(/^::ffff:/,'');
+    const trusted=(options.trustProxy??process.env.MC_TRUST_PROXY==='1')&&(!proxyAddress||peer===proxyAddress);
     const forwarded=trusted?String(req.headers['x-forwarded-for']||'').split(',').at(-1).trim():'';
     const key=forwarded&&require('node:net').isIP(forwarded)?forwarded:req.socket.remoteAddress||'unknown',now=Date.now();let bucket=rates.get(key);
     if(!bucket||now-bucket.start>=60000){bucket={start:now,count:0};rates.delete(key);if(rates.size>=8192)rates.delete(rates.keys().next().value);rates.set(key,bucket);}
@@ -37,7 +38,7 @@ async function createGameServer(options={}){
       if(!pathname.startsWith('/')||pathname.includes('\\')||pathname.includes('\0'))throw httpError(400,'Bad URL.');
       if(pathname==='/api'||pathname.startsWith('/api/')){
         rate(req);
-        const methods={'/api/health':['GET'],'/api/profile':['POST','PATCH'],'/api/leaderboard':['GET'],'/api/results':['POST']};
+        const methods={'/api/health':['GET'],'/api/profile':['GET','POST','PATCH'],'/api/leaderboard':['GET'],'/api/results':['POST']};
         if(!Object.hasOwn(methods,pathname))throw httpError(404,'Not found.');
         if(!methods[pathname].includes(req.method)){res.setHeader('Allow',methods[pathname].join(', '));throw httpError(405,'Method not allowed.');}
         if(req.method!=='GET'){
@@ -48,7 +49,9 @@ async function createGameServer(options={}){
         if(pathname==='/api/health')return send(res,200,{ok:true,version});
         if(!leaderboard)throw httpError(503,'Leaderboard unavailable in this portable copy.');
         if(pathname==='/api/leaderboard')return send(res,200,{entries:leaderboard.list()});
-        const body=await readBody(req),authorization=req.headers.authorization||'',token=authorization.startsWith('Bearer ')?authorization.slice(7):'';
+        const authorization=req.headers.authorization||'',token=authorization.startsWith('Bearer ')?authorization.slice(7):'';
+        if(pathname==='/api/profile'&&req.method==='GET')return send(res,200,leaderboard.profile(token));
+        const body=await readBody(req);
         if(pathname==='/api/profile')return req.method==='POST'?send(res,201,await leaderboard.create(body)):send(res,200,await leaderboard.update(token,body));
         return send(res,200,await leaderboard.submit(token,body));
       }

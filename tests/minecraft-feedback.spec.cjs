@@ -1,4 +1,4 @@
-const {test,expect}=require('@playwright/test');const {ready,shot,chooseLevel}=require('./browser-helpers.cjs');
+const {test,expect}=require('@playwright/test');const {ready,shot,shotPlan,chooseLevel}=require('./browser-helpers.cjs');
 
 test('原版灰色按钮和泥土选关背景加载，四种弹药在弹弓上尺寸一致',async({page})=>{
  await ready(page,{level:3});
@@ -15,19 +15,28 @@ test('原版灰色按钮和泥土选关背景加载，四种弹药在弹弓上�
 });
 
 test('十关真实鼠标发射在限定库存内通关，包括新增地窖中的怪物',async({page})=>{
- test.setTimeout(180000);await page.clock.install({time:new Date('2026-10-17T12:00:00Z')});await ready(page);
+ test.setTimeout(180000);const submitted=[];page.on('request',r=>{if(r.method()==='POST'&&r.url().endsWith('/api/results'))submitted.push(r.postDataJSON());});await page.clock.install({time:new Date('2026-10-17T12:00:00Z')});await ready(page);
  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
  const plans=require('../evidence/playability-search.json'),reports=[];
  for(const plan of plans.filter(p=>!process.env.MC_REPLAY_LEVEL||p.level===Number(process.env.MC_REPLAY_LEVEL))){
   if(plan.level>1)await chooseLevel(page,plan.level-1);
   const timeline=[];for(const move of plan.history){
    if((await page.evaluate(()=>MCBlockLaunch.getStatus())).ended)break;
-   await shot(page,{cobble:1,tnt:2,ender:3,fire:4}[move.kind],135*move.pull*Math.cos(move.angle),135*move.pull*Math.sin(move.angle));
-   await page.clock.runFor((move.wait??6)*1000);timeline.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));
+   const launch=await shotPlan(page,move);
+   await page.clock.runFor((move.wait??6)*1000);
+   // The first RAF initializes its timestamp without stepping Matter. Wait for
+   // simulation time, rather than shortening the first shot by one display frame.
+   while(await page.evaluate(t=>!MCBlockLaunch.getStatus().ended&&MCBlockLaunch.getStatus().time<t-1e-6,launch.time+(move.wait??6)))await page.clock.runFor(9);
+   timeline.push({...await page.evaluate(()=>MCBlockLaunch.getDiagnostics()),launch});
   }
   await page.clock.runFor(1400);const d=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());
   require('node:fs').writeFileSync(`evidence/replay-${plan.level}.json`,JSON.stringify({timeline,final:d},null,2));expect(d.enemiesAlive,`level ${plan.level}`).toBe(0);expect(d.screen).toBe('result');expect(d.inventory.every(n=>n>=0)).toBe(true);
   await expect(page.locator('#resultFlag')).toHaveText('挑战成功');await page.screenshot({path:`evidence/campaign-clear-${plan.level}.png`});reports.push(d);
+  if(plan.level<10)expect(submitted).toEqual([]);
+ }
+ if(!process.env.MC_REPLAY_LEVEL){
+  await expect.poll(()=>submitted.length).toBeGreaterThan(0);expect(submitted.every(s=>s.stages.length===10&&s.stages.every(t=>Object.keys(t).sort().join(',')==='stage,timeMs'))).toBe(true);
+  const profile=await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.profile.v1'))),response=await page.request.get('/api/profile',{headers:{Authorization:`Bearer ${profile.token}`}});expect((await response.json()).stages.length).toBe(10);
  }
  require('node:fs').writeFileSync('evidence/ten-browser-victories.json',JSON.stringify(reports,null,2));
 });

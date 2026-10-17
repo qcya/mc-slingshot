@@ -67,11 +67,11 @@ test('静态与旋转残骸的孔洞同时更新真实碰撞形状', () => {
 });
 
 test('完整物理引擎中珍珠穿薄墙，厚墙阻挡', () => {
-  for(const [width,expected] of [[16,1],[48,0]]){
+  for(const [width,expected] of [[16,1],[48,1],[72,0]]){
     const w=fixture();w.grid.fill(140,60,width,68,5);w.synchronize();
     const p=w.spawnProjectile('ender',220,190,600,0);step(w,.32);
     assert.equal(w.stats.portals,expected,`wall cells=${width}`);
-    if(expected)assert.ok(p.body.position.x>312);else assert.ok(p.body.position.x<280);
+    if(expected)assert.ok(p.body.position.x>(140+width)*2+14);else assert.ok(p.body.position.x<280);
   }
 });
 

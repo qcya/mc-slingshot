@@ -13,10 +13,17 @@ test('original five-clear save migrates to stage six; invalid entries are filter
  assert.deepEqual(readProgress(JSON.stringify({unlocked:99,completed:[9,2,0,2,10,-1,3.5]})),{unlocked:10,completed:[0,2,9]});
 });
 test('four finite ammo slots unlock TNT, pearl and fire after stages one, two and three',()=>{
- assert.equal(LOADOUTS.length,10);assert.deepEqual(inventoryFor(0),[4,0,0,0]);assert.deepEqual(inventoryFor(1),[3,1,0,0]);
+ assert.equal(LOADOUTS.length,10);assert.deepEqual(inventoryFor(0),[3,0,0,0]);assert.deepEqual(inventoryFor(1),[3,1,0,0]);
  assert.equal(inventoryFor(2)[3],0);assert.ok(inventoryFor(3)[3]>0);
  assert.deepEqual([0,1,2,3].map(rewardFor),['TNT','末影珍珠','烈焰弹',null]);
  const ammo=inventoryFor(1);assert.equal(spendAmmo(ammo,1),true);assert.equal(spendAmmo(ammo,1),false);
  assert.equal(totalAmmo(ammo),3);assert.deepEqual(inventoryFor(1),[3,1,0,0]);
  for(const loadout of LOADOUTS){assert.equal(loadout.length,4);assert.ok(loadout.every(n=>Number.isInteger(n)&&n>=0));}
+});
+
+
+test('early and middle stages keep a measured finite retry allowance',()=>{
+ assert.equal(totalAmmo(inventoryFor(0)),3,'tutorial retains two corrections after a good opening shot');
+ assert.deepEqual([2,3,4,5,6,7,8].map(i=>totalAmmo(inventoryFor(i))),[5,6,8,6,7,8,9]);
+ assert.deepEqual(inventoryFor(9),[4,6,2,1],'accepted final-stage budget stays intact');
 });

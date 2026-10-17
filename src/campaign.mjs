@@ -2,8 +2,8 @@
 export const CAMPAIGN_LENGTH=10;
 // Slots: cobblestone, TNT, ender pearl, fire charge. Clear stages 1–3 to unlock each.
 export const LOADOUTS=[
- [4,0,0,0], [3,1,0,0], [3,2,1,0], [3,2,2,1], [4,3,2,1],
- [3,2,1,1], [3,3,2,1], [3,3,2,1], [4,3,2,1], [4,6,2,1]
+ [3,0,0,0], [3,1,0,0], [2,2,1,0], [2,2,1,1], [3,3,1,1],
+ [2,2,1,1], [2,3,1,1], [2,4,1,1], [3,3,2,1], [4,6,2,1]
 ];
 export function readProgress(raw){
  try{

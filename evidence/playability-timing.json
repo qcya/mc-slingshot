@@ -1,0 +1,405 @@
+[
+  {
+    "level": 1,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 2,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 3,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 4,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 5,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 6,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 7,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 8,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 9,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 3,
+        "delay": 0.15,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  },
+  {
+    "level": 10,
+    "won": true,
+    "checks": [
+      {
+        "initial": 0,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.1,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.1,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.25,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.5,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.5,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 0.5,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.05,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      },
+      {
+        "initial": 1,
+        "delay": 0.1,
+        "outcome": true,
+        "alive": 0,
+        "hp": 0
+      }
+    ]
+  }
+]

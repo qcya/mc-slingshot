@@ -19,6 +19,7 @@ export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeou
   return {
     createProfile:nickname=>request('profile',{method:'POST',body:{nickname}}),
     updateProfile:(token,nickname)=>request('profile',{method:'PATCH',token,body:{nickname}}),
+    profile:token=>request('profile',{token}),
     leaderboard:()=>request('leaderboard'),
     submitResult:(token,result)=>request('results',{method:'POST',token,body:result}),
   };

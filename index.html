@@ -5,7 +5,7 @@
  <canvas id="stage" width="1536" height="864" aria-label="像素攻城二维物理游戏"></canvas>
  <div id="loadState" role="status">正在加载原版纹理与物理引擎…</div>
  <div class="gamehint faded" id="gamehint"></div>
- <nav class="touch-controls" aria-label="触屏操作"><button id="touchPause" aria-label="暂停">Ⅱ</button><button id="touchInventory">物品</button><button id="touchCancel" class="hidden">取消</button></nav>
+ <nav class="touch-controls" aria-label="触屏操作"><button id="touchPause">暂停菜单</button></nav>
  <div class="inventory" id="inventory"><div id="ballbar" class="ballbar" aria-label="物品栏"></div></div>
  <section id="levelMenu" class="menu-screen hidden" aria-label="选关">
   <div class="campaign-panel"><h1>MC方块弹射</h1><p class="menu-subtitle">主世界 · 选择关卡</p><div id="levelCards" class="level-grid"></div><div class="menu-actions"><button id="profileBtn">设置昵称</button><button id="leaderboardBtn">排行榜</button><button id="fullscreenBtn">全屏</button></div><p class="menu-help" id="menuHelp">拖动发射 · 右键取消 · 滚轮换物品 · ESC 菜单</p></div>
@@ -13,8 +13,8 @@
  <section id="pauseMenu" class="menu-screen hidden" aria-label="暂停菜单"><div class="pause-panel"><h2>游戏暂停</h2>
   <button id="resume">继续游戏</button><button id="restart" aria-label="↻ 重开">重新挑战</button><button id="levelMenuBtn">选择关卡</button><button id="soundToggle">音效：开</button>
  </div></section>
- <section id="profileMenu" class="menu-screen hidden" aria-label="玩家昵称"><form class="dialog-panel" id="profileForm"><h2>你叫什么名字？</h2><p>设置昵称后开始挑战，通关成绩会出现在排行榜。</p><label for="nickname">玩家昵称</label><input id="nickname" name="nickname" maxlength="16" minlength="1" autocomplete="nickname" required><p id="profileStatus" class="online-status" role="status"></p><button id="saveProfile" type="submit">开始冒险</button><button id="profileBack" type="button">返回</button></form></section>
- <section id="leaderboardMenu" class="menu-screen hidden" aria-label="排行榜"><div class="dialog-panel leaderboard-panel"><h2>主世界排行榜</h2><p>通关更多优先 · 同关数比较耗弹，再比较用时</p><p id="leaderboardStatus" class="online-status" role="status"></p><div class="ranking-scroll"><table><thead><tr><th>名次</th><th>玩家</th><th>通关</th><th>耗弹</th><th>用时</th></tr></thead><tbody id="rankingRows"></tbody></table></div><button id="leaderboardRefresh">刷新</button><button id="leaderboardBack">返回选关</button></div></section>
+ <section id="profileMenu" class="menu-screen hidden" aria-label="玩家昵称"><form class="dialog-panel" id="profileForm"><h2>你叫什么名字？</h2><p>设置昵称后开始挑战，十关全通后记录排行榜成绩。</p><label for="nickname">玩家昵称</label><input id="nickname" name="nickname" maxlength="16" minlength="1" autocomplete="nickname" required><p id="profileStatus" class="online-status" role="status"></p><button id="saveProfile" type="submit">开始冒险</button><button id="profileBack" type="button">返回</button></form></section>
+ <section id="leaderboardMenu" class="menu-screen hidden" aria-label="排行榜"><div class="dialog-panel leaderboard-panel"><h2>主世界排行榜</h2><p>全通后记录成绩 · 十关个人最快时间相加</p><p id="leaderboardStatus" class="online-status" role="status"></p><div class="ranking-scroll" id="rankingTable"><table><thead><tr><th>名次</th><th>玩家</th><th>总用时</th></tr></thead><tbody id="rankingRows"></tbody></table></div><button id="leaderboardRefresh">刷新</button><button id="leaderboardBack">返回选关</button></div></section>
  <section class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">挑战成功</span><h2 id="resultTitle"></h2><img id="rewardIcon" class="reward-icon hidden" alt=""><p id="resultMsg"></p>
  <div class="result-buttons"><button id="retryBtn">重新挑战</button><button id="nextBtn">下一关</button><button id="resultLevels">选关</button></div></div></section>
 </main><script src="vendor/matter.min.js"></script>

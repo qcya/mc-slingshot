@@ -2,7 +2,7 @@ import { MATERIALS, AMMO } from './config.mjs';
 import {blockIcon} from './item-icons.mjs';
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(Boolean),'ladder','tnt_top',
   'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom','zombie','pillager','warden','fire_0','crossbow_standby'])];
-const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_ignite','fire_burn','warden_hurt','warden_idle'];
+const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle'];
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');

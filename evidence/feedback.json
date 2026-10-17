@@ -1,21 +1,9 @@
 {
   "assets": [
     "grass_block_side",
-    "dirt",
-    "stone",
-    "oak_log",
-    "stone_bricks",
-    "cherry_leaves",
-    "glass",
-    "bedrock",
-    "oak_leaves",
-    "iron_ore",
-    "oak_planks",
-    "grass_block_side_overlay",
     "deepslate",
-    "dark_oak_log",
-    "zombie",
     "dark_oak_planks",
+    "dark_oak_log",
     "spruce_log",
     "spruce_planks",
     "cobblestone",
@@ -23,22 +11,34 @@
     "oak_door_bottom",
     "crafting_table_front",
     "furnace_front",
-    "pillager",
+    "dirt",
+    "stone",
+    "oak_log",
+    "stone_bricks",
+    "glass",
+    "bedrock",
     "bookshelf",
+    "oak_leaves",
+    "iron_ore",
+    "oak_planks",
     "tnt_side",
     "ender_pearl",
-    "warden",
     "fire_charge",
     "ladder",
     "tnt_top",
     "spruce_leaves",
     "cherry_log",
+    "cherry_leaves",
+    "grass_block_side_overlay",
+    "zombie",
+    "pillager",
     "fire_0",
     "crossbow_standby",
+    "warden",
     "slingshot_frame",
     "ladder_wall"
   ],
-  "time": 2.999999999999992,
+  "time": 2.808333333333326,
   "removed": 0,
   "backgroundRemoved": 0,
   "explosions": 0,
@@ -51,15 +51,15 @@
   "particlesPending": 0,
   "ready": true,
   "level": 3,
-  "shots": 6,
+  "shots": 5,
   "inventory": [
-    3,
+    2,
     2,
     1,
     0
   ],
   "ammoCounts": {
-    "cobble": 3,
+    "cobble": 2,
     "tnt": 2,
     "ender": 1,
     "fire": 0
@@ -76,7 +76,7 @@
   "ammoBodies": [],
   "restingBlocks": 0,
   "fps": 75,
-  "stepMs": 0.12,
+  "stepMs": 0.1,
   "maxStepMs": 2.8,
   "launcher": {
     "x": 285,
@@ -93,6 +93,8 @@
       "hp": 100,
       "alive": true,
       "dead": false,
+      "stationary": false,
+      "burningUntil": 0,
       "appearance": {
         "hurt": false,
         "angle": 0,
@@ -105,9 +107,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.011751106603872305,
-        "headYaw": 0.05616177354741746,
-        "headPitch": 0.19153428952081886,
+        "walkBlend": 0.07060231038840226,
+        "headYaw": 0.18874695021570426,
+        "headPitch": 0.10388074358641847,
         "gesture": 0
       }
     },
@@ -116,6 +118,8 @@
       "hp": 100,
       "alive": true,
       "dead": false,
+      "stationary": false,
+      "burningUntil": 0,
       "appearance": {
         "hurt": false,
         "angle": 0,
@@ -128,9 +132,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.040908263275743,
-        "headYaw": -0.058974997817178305,
-        "headPitch": 0.12137418672245237,
+        "walkBlend": 0.24578263125387176,
+        "headYaw": 0.05583752772838001,
+        "headPitch": 0.027683589328787235,
         "gesture": 0
       }
     },
@@ -139,6 +143,8 @@
       "hp": 100,
       "alive": true,
       "dead": false,
+      "stationary": false,
+      "burningUntil": 0,
       "appearance": {
         "hurt": false,
         "angle": 0,
@@ -151,9 +157,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.1317301090102945,
-        "headYaw": -0.14240561948955535,
-        "headPitch": 0.07779404960656133,
+        "walkBlend": 0.7914531250000001,
+        "headYaw": 0.0013309399926374843,
+        "headPitch": 0.0005812060492662565,
         "gesture": 0
       }
     },
@@ -162,21 +168,23 @@
       "hp": 100,
       "alive": true,
       "dead": false,
+      "stationary": false,
+      "burningUntil": 0,
       "appearance": {
         "hurt": false,
         "angle": 0,
         "visible": true
       },
-      "x": 1233.1822444122859,
+      "x": 1235.510544412287,
       "y": 578.0125000006944,
       "facing": -1,
-      "walkDistance": 62.638655587713856,
+      "walkDistance": 60.31035558771305,
       "turns": 0,
-      "behavior": "idle",
+      "behavior": "walk",
       "pose": {
-        "walkBlend": 0.458582341424737,
-        "headYaw": -0.06272033957505793,
-        "headPitch": 0.009484933693529082,
+        "walkBlend": 1,
+        "headYaw": 0,
+        "headPitch": 0,
         "gesture": 0
       }
     }
@@ -199,7 +207,7 @@
   "sound": {
     "played": {
       "pillager_idle": 2,
-      "zombie_idle": 2
+      "zombie_idle": 1
     },
     "failed": 0,
     "lastError": null
