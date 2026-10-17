@@ -5,11 +5,12 @@ import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,totalAmmo,spendA
 import {mobAppearance} from './animation.mjs';
 import {updateOutcome} from './outcome.mjs';
 import {createOnlineClient} from './online.mjs';
+import {BackgroundMusic} from './music.mjs';
 import {TIME_SAVE_KEY,TIME_QUEUE_KEY,normalizeTimes,recordBestTime,timeBundle,parseTimeBundle,formatTime} from './timing.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const coarsePointer=matchMedia('(pointer:coarse)'),cancelledTouchClicks=new Set();
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
-let world,renderer,assets,scene,drawAudio,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
+let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
 const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=createOnlineClient();let profileReturn='levels',syncing=false,profileRevision=0,bestTimes;
 function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
 function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
@@ -130,6 +131,7 @@ function status(){
 async function start(){
  if(!window.Matter?.Engine)throw new Error('Matter.js 未加载。请通过启动脚本运行。');
  assets=await new Assets().load();renderer=new Renderer(canvas,assets);drawAudio=await new DrawAudio().load(assets.sounds.crossbow_pull.src);
+ music=new BackgroundMusic();$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';
  try{progress=readProgress(localStorage.getItem(SAVE_KEY));}catch{progress=readProgress(null);}
  for(let i=0;i<9;i++){
   const b=document.createElement('button');b.className='ball';b.setAttribute('aria-label',i<AMMO.length?AMMO[i].label:`${i+1}. 空物品格`);
@@ -144,6 +146,7 @@ async function start(){
  $('#resume').addEventListener('click',pause);for(const id of ['restart','retryBtn'])$('#'+id).addEventListener('click',()=>loadLevel(state.level));
  for(const id of ['levelMenuBtn','resultLevels'])$('#'+id).addEventListener('click',showLevels);$('#nextBtn').addEventListener('click',()=>loadLevel(state.level+1));
  $('#soundToggle').addEventListener('click',()=>{assets.soundOn=!assets.soundOn;drawAudio.setMuted(!assets.soundOn);$('#soundToggle').textContent=assets.soundOn?'音效：开':'音效：关';});
+ $('#musicToggle').addEventListener('click',()=>{music.setEnabled(!music.enabled);$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';});
  $('#profileForm').addEventListener('submit',saveProfile);$('#profileBtn').addEventListener('click',showProfile);$('#profileBack').addEventListener('click',()=>{menus(profileReturn);void syncResults();});
  $('#leaderboardBtn').addEventListener('click',showLeaderboard);$('#leaderboardRefresh').addEventListener('click',showLeaderboard);$('#leaderboardBack').addEventListener('click',showLevels);
  for(const id of ['fullscreenBtn','rotateFullscreen'])$('#'+id).addEventListener('click',fullscreen);
@@ -167,7 +170,7 @@ async function start(){
  window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:loadLevel,select,
  getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),
- sound:{...assets.audioStats,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
+ music:music.diagnostics(),sound:{...assets.audioStats,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
  requestAnimationFrame(frame);
 }
 start().catch(error=>{loadState.hidden=false;loadState.classList.add('error');loadState.textContent=`游戏未能启动：${error.message}`;console.error(error);});

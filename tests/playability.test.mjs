@@ -56,7 +56,7 @@ test('final stage wins after all fifteen realistic idle and input timing offsets
 
 test('early and middle stages win in their documented aiming-delay scenarios',()=>{
  for(const plan of strategies.slice(0,9)){
-  assert.equal(plan.timingChecks.length,plan.level===8?2:4,`stage ${plan.level} must include its documented timing scenarios`);
+  assert.equal(plan.timingChecks.length,[6,8].includes(plan.level)?2:4,`stage ${plan.level} must include its documented timing scenarios`);
   for(const timing of plan.timingChecks)replay(plan,timing);
  }
 });

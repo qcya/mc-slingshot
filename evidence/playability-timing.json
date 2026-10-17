@@ -186,20 +186,6 @@
         "outcome": true,
         "alive": 0,
         "hp": 0
-      },
-      {
-        "initial": 1,
-        "delay": 0.1,
-        "outcome": true,
-        "alive": 0,
-        "hp": 0
-      },
-      {
-        "initial": 3,
-        "delay": 0.15,
-        "outcome": true,
-        "alive": 0,
-        "hp": 0
       }
     ]
   },

@@ -135,9 +135,11 @@ export class Renderer {
     const angle=state.drag||state.launch?pouchRotation(state.vx,state.vy):.15;
     const a={x:p.x-Math.cos(angle)*15,y:p.y-Math.sin(angle)*15},b={x:p.x+Math.cos(angle)*15,y:p.y+Math.sin(angle)*15};
     const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
-    band(left,a,8,'#34251c');band(left,a,4,'#98765b');
     c.save();c.beginPath();c.rect(0,0,WIDTH,SLING_FRAME.ground);c.clip();
     c.drawImage(this.assets.images.slingshot_frame,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
+    // The left strap attaches to the inner face; drawing it behind the fork
+    // hides that attachment and makes the visible band emerge from the outside.
+    band(left,a,8,'#34251c');band(left,a,4,'#98765b');
     c.save();c.translate(p.x,p.y);c.rotate(angle);c.fillStyle='#563824';c.beginPath();c.roundRect(-18,-9,36,18,5);c.fill();c.strokeStyle='#b68b5d';c.lineWidth=2;c.stroke();c.restore();
     if(state.loaded)this.ball(p.x,p.y,state.ammo);
     band(right,b,9,'#39271c');band(right,b,4,'#b48c63');

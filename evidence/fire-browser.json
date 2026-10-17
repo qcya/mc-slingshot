@@ -1,27 +1,15 @@
 {
   "assets": [
     "grass_block_side",
-    "furnace_front",
-    "bookshelf",
-    "tnt_side",
-    "ender_pearl",
-    "fire_charge",
-    "ladder",
-    "tnt_top",
-    "dirt",
-    "oak_log",
-    "spruce_leaves",
     "stone",
-    "stone_bricks",
-    "cherry_log",
-    "cherry_leaves",
-    "grass_block_side_overlay",
-    "zombie",
-    "pillager",
+    "dirt",
     "glass",
+    "stone_bricks",
+    "oak_log",
     "bedrock",
-    "oak_leaves",
     "iron_ore",
+    "ender_pearl",
+    "oak_leaves",
     "oak_planks",
     "deepslate",
     "dark_oak_log",
@@ -32,15 +20,27 @@
     "oak_door_top",
     "oak_door_bottom",
     "crafting_table_front",
-    "fire_0",
+    "furnace_front",
+    "bookshelf",
+    "tnt_side",
+    "fire_charge",
+    "ladder",
+    "tnt_top",
+    "spruce_leaves",
+    "cherry_log",
+    "cherry_leaves",
+    "zombie",
+    "grass_block_side_overlay",
+    "pillager",
     "warden",
+    "fire_0",
     "crossbow_standby",
     "slingshot_frame",
     "ladder_wall"
   ],
-  "time": 1.274999999999998,
-  "removed": 96,
-  "backgroundRemoved": 59,
+  "time": 1.2999999999999978,
+  "removed": 91,
+  "backgroundRemoved": 56,
   "explosions": 0,
   "portals": 0,
   "physics": "Matter.js",
@@ -76,8 +76,8 @@
   "ammoBodies": [],
   "restingBlocks": 0,
   "fps": 75,
-  "stepMs": 0.51,
-  "maxStepMs": 2.7,
+  "stepMs": 0.47,
+  "maxStepMs": 2.6,
   "launcher": {
     "x": 285,
     "y": 545,
@@ -94,16 +94,16 @@
       "alive": true,
       "dead": false,
       "stationary": false,
-      "burningUntil": 2.991666666666665,
+      "burningUntil": 3.024999999999998,
       "appearance": {
         "hurt": false,
         "angle": 0,
         "visible": true
       },
-      "x": 1165.0023000000094,
+      "x": 1165.5396000000096,
       "y": 434.01250000069444,
       "facing": 1,
-      "walkDistance": 27.223200000009456,
+      "walkDistance": 27.760500000009642,
       "turns": 0,
       "behavior": "walk",
       "pose": {
@@ -125,10 +125,10 @@
         "angle": 0,
         "visible": true
       },
-      "x": 1230.1976999999904,
+      "x": 1229.6603999999902,
       "y": 434.01250000069444,
       "facing": -1,
-      "walkDistance": 27.223200000009456,
+      "walkDistance": 27.760500000009642,
       "turns": 0,
       "behavior": "walk",
       "pose": {
@@ -158,8 +158,8 @@
       "behavior": "idle",
       "pose": {
         "walkBlend": 0,
-        "headYaw": -0.0955612533127725,
-        "headPitch": -0.05388061985348163,
+        "headYaw": -0.09764956059930181,
+        "headPitch": -0.05476351350586563,
         "gesture": 0
       }
     },
@@ -175,10 +175,10 @@
         "angle": 0,
         "visible": true
       },
-      "x": 1148.6443064504851,
+      "x": 1148.107006450485,
       "y": 626.0125000006944,
       "facing": -1,
-      "walkDistance": 27.17659354951479,
+      "walkDistance": 27.713893549514978,
       "turns": 0,
       "behavior": "walk",
       "pose": {
@@ -200,10 +200,20 @@
     "failed": false
   },
   "preview": [],
-  "backgroundPixels": 39365,
+  "backgroundPixels": 39368,
   "movingBackgroundPixels": 0,
-  "terrainPixels": 41888,
+  "terrainPixels": 41893,
   "debrisPixels": 0,
+  "music": {
+    "track": "C418 — Sweden",
+    "enabled": true,
+    "playing": true,
+    "loop": true,
+    "volume": 0.18,
+    "time": 0.917133,
+    "duration": 185.72576,
+    "lastError": ""
+  },
   "sound": {
     "played": {
       "fire_launch": 1,
@@ -212,5 +222,5 @@
     "failed": 0,
     "lastError": null
   },
-  "physicsParts": 318
+  "physicsParts": 313
 }

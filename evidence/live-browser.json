@@ -6,6 +6,16 @@
     "screen": "play",
     "previewPoints": 5,
     "cancelledWithoutFiring": true,
+    "music": {
+      "track": "C418 — Sweden",
+      "enabled": true,
+      "playing": true,
+      "loop": true,
+      "volume": 0.18,
+      "time": 0.209565,
+      "duration": 185.72576,
+      "lastError": ""
+    },
     "errors": [],
     "failed": []
   },
@@ -16,6 +26,16 @@
     "screen": "play",
     "previewPoints": 5,
     "cancelledWithoutFiring": true,
+    "music": {
+      "track": "C418 — Sweden",
+      "enabled": true,
+      "playing": true,
+      "loop": true,
+      "volume": 0.18,
+      "time": 0.206461,
+      "duration": 185.72576,
+      "lastError": ""
+    },
     "errors": [],
     "failed": []
   }

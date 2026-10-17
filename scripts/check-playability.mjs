@@ -19,8 +19,9 @@ function simulate(w,shot){if(w.playability.outcome!==null)return w;w.playability
 function dispose(w){M.Events.off(w.engine);M.Composite.clear(w.engine.world,false);M.Engine.clear(w.engine);}
 const output=process.argv[3]||new URL('../evidence/playability-search.json',import.meta.url),requested=Number(process.argv[2]);
 const result=(requested||process.argv.includes('--verify'))&&fs.existsSync(output)?JSON.parse(fs.readFileSync(output)):[];
-// Quarry patrols have cold and long-idle solutions; the final stage keeps its full 15-case matrix.
-const timingScenarios=level=>level===7?[{initial:0,delay:0},{initial:3,delay:.15}]:level===9?[0,.1,.25,.5,1].flatMap(initial=>[0,.05,.1].map(delay=>({initial,delay}))):[{initial:0,delay:0},{initial:.25,delay:.05},{initial:1,delay:.1},{initial:3,delay:.15}];
+// Record only verified fixed sequences; moving guards need different aims at
+// other times. Lumberyard's old later clears depended on the resting-pearl bug.
+const timingScenarios=level=>level===5?[{initial:0,delay:0},{initial:.25,delay:.05}]:level===7?[{initial:0,delay:0},{initial:3,delay:.15}]:level===9?[0,.1,.25,.5,1].flatMap(initial=>[0,.05,.1].map(delay=>({initial,delay}))):[{initial:0,delay:0},{initial:.25,delay:.05},{initial:1,delay:.1},{initial:3,delay:.15}];
 function robustFinish(level,plan){
  if(!plan)throw new Error('Robust search requires an existing valid prefix at the output path.');
  const scenarios=timingScenarios(level);

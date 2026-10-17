@@ -1,5 +1,10 @@
 # Third-party assets
 
+## Alpha 0.11.2 背景音乐
+
+- `assets/music/sweden.ogg`：C418《Sweden》，[作者曲目页](https://c418.bandcamp.com/track/sweden)。从 Mojang 官方 1.20.4 [asset index 12](https://piston-meta.mojang.com/v1/packages/129fc8163fdedb50c886731a839751c22aa0dbc6/12.json) 的 `minecraft/sounds/music/game/sweden.ogg` 获取原版游戏 OGG，未从第三方录音提取。
+- [原始资源](https://resources.download.minecraft.net/14/14ae57a6bce3d4254daa8be2b098c2d99743cc3f)，2,232,651 字节，SHA-1 `14ae57a6bce3d4254daa8be2b098c2d99743cc3f`；不是本项目创作或 MIT 授权的游戏代码。
+
 - Physics: Matter.js 0.20.0, MIT License. See `vendor/matter.min.js` and https://github.com/liabru/matter-js.
 - MC-style reference textures: Faithful-Pack/Default-Java repository used as source of Minecraft-default-style 16x16 assets for the prototype. Their terms are separate from this game's source code. No ownership claim is made over upstream textures.
 - Audio: `dirt.ogg`, `grass.ogg`, `stone.ogg`, `deepslate.ogg`, `glass.ogg` are selected Minecraft block sounds from the user-supplied testing pack. These are distinct from the MIT-licensed game code.

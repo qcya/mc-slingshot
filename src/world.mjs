@@ -200,6 +200,12 @@ export class SiegeWorld {
       // blast knockback must not turn one TNT explosion into two damage sources.
       if(entity?.type!=='ammo')return target.skin==='warden'?0:impactDamage(speed,mass,targetMass);
       if(['tnt','fire'].includes(entity.ammo.id))return 0;
+      if(entity.ammo.id==='ender'){
+        // Use the pearl's velocity BEFORE collision resolution, not relative
+        // speed: a walking mob must not turn a resting pearl into a trap.
+        const velocity=this.before.get(entity.body.id)||entity.body.velocity;
+        if(Math.hypot(velocity.x,velocity.y)*60<30)return 0;
+      }
       if(target.skin==='warden'){
         if(target.projectileHits.has(entity.id))return 0;target.projectileHits.add(entity.id);
         return entity.ammo.id==='cobble'?100:75;
@@ -268,7 +274,13 @@ export class SiegeWorld {
     }
     for(const e of this.allMoving()){
       const {x,y}=e.body.position;
-      if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,e.hp+1);this.remove(e);}
+      if(e.type==='enemy'){
+        const bounds=e.body.bounds;
+        if(bounds.max.x<0||bounds.min.x>this.width||bounds.max.y<0||bounds.min.y>this.height){
+          if(e.alive)this.hurt(e,Math.max(3,e.hp+1));this.remove(e);continue;
+        }
+      }
+      if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,Math.max(3,e.hp+1));this.remove(e);}
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
