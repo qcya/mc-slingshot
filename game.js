@@ -25,10 +25,9 @@ const BALLS=[
 {id:'ender',label:'末影珍珠',short:'末',color:'#33ae9e',mass:1.1,r:13,detail:'可穿透不超过 16 格像素的墙',sprite:'ender_pearl'},
 {id:'blackhole',label:'黑洞',short:'●',color:'#6540aa',mass:1.5,r:16,detail:'附着表面 · 持续吸入周围的方块',sprite:null}
 ];
-const SPRITE_NAMES=['cobblestone','tnt_side','ender_pearl','oak_log','oak_planks','stone_bricks','stone','dirt','grass_block_side','grass_block_top','obsidian','glass','bedrock','oak_leaves','iron_ore','deepslate','pillager'];
-const EMBEDDED_TILES={"oak_leaves":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEUAAAC5vLmYmZh3dXdoZGjJX6haAAAAAXRSTlMAQObYZgAAAGlJREFUeNoFgAERwyAMAD8pAtJ0AgIYaAEBbI1/TTtSNOaPiyCHDqkwtVvIia7tHzB6p1IatFtW8gazuB93e1j7tBwy8PJtR4+OkW+0cDR2exThSqQeASMalo9QZe2iV8XcmbgRp5W8Rf/WMg1MmmHulQAAAABJRU5ErkJggg==","iron_ore":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAG1BMVEXiwKrYr5OvjnePj49/f3+IdFV0dHR3Z09oaGgI1kKFAAAAfklEQVR42gVAwQ2CQBAcO0Cp4AIa3+5q/O+w8D4TKMDzcm8TrAAIZRsoPZWcBSyL6Tw5PI5D7lqiC1r25BlvKWs87wnGeDy0nwbJJNRuijxsomUhZL1uffw57BtqC6JYpHom8QxSjP3L4Ft8zOE04n4xv1WNwqZEEyUozBTnH6b0JCp9JVwWAAAAAElFTkSuQmCC","deepslate":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAD1BMVEV5eXlkZGRRUVE9PUMvLzfdbkGmAAAAZUlEQVR42hXJQRHEMAwDQIVBLAS1FQA3VhA04Y/ppvtdjCoHVdC1syzE4LpnG005EcQpd8wQkPVGVmJwuXwbtGfoFCQ/pBu+ldX7gGztU0BoQuoB+gm6A95v6Fx/t3/MCZDriYo/+sYRXDxJGR4AAAAASUVORK5CYII="};
+const SPRITE_NAMES=['cobblestone','tnt_side','ender_pearl','oak_log','oak_planks','stone_bricks','stone','dirt','grass_block_side','grass_block_top','obsidian','glass','bedrock','oak_leaves','iron_ore','deepslate','pillager','zombie'];
 const sprites={};const sampledColors={};
-function loadSprites(){return Promise.all(SPRITE_NAMES.map(n=>new Promise(resolve=>{const im=new Image();im.onload=()=>{sprites[n]=im;if(im.width===16&&im.height===16){try{const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);sampledColors[n]=x.getImageData(0,0,16,16).data;}catch(e){}}resolve();};im.onerror=resolve;im.src=EMBEDDED_TILES[n]||'assets/textures/'+n+'.png';}))).then(()=>{state.dirty=true;drawGridImage();});}
+function loadSprites(){return Promise.all(SPRITE_NAMES.map(n=>new Promise(resolve=>{const im=new Image();im.onload=()=>{sprites[n]=im;if(im.width===16&&im.height===16){try{const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);sampledColors[n]=x.getImageData(0,0,16,16).data;}catch(e){}}resolve();};im.onerror=resolve;im.src='assets/textures/'+n+'.png';}))).then(()=>{state.dirty=true;drawGridImage();});}
 const materialSprites={1:'grass_block_side',2:'dirt',3:'stone',4:'oak_log',5:'stone_bricks',6:'glass',7:'bedrock',8:'oak_leaves',9:'iron_ore',10:'oak_planks',11:'deepslate'};
 const LEVELS=[
 {title:'01 / 草地小屋',desc:'拆掉两名守卫藏身的木屋',kind:'hut',shots:7,mobs:2,seed:104},
@@ -67,48 +66,60 @@ function addGround(seed){
    tile(x,GROUND+BLOCK,2);
  }
 }
-function addTree(x,top=64){
- x=Math.floor(x/BLOCK)*BLOCK;top=Math.floor(top/BLOCK)*BLOCK;
- tileColumn(x,top+BLOCK,GROUND-BLOCK,4);
- for(let y=top;y<=top+BLOCK;y+=BLOCK)
-  for(let xx=x-BLOCK;xx<=x+BLOCK;xx+=BLOCK)if(xx>=0&&xx<GW)tile(xx,y,8);
- // Leave the log visible below the canopy.
+function addTree(x,top=48){
+ // Vanilla oak silhouette: single upright trunk with blocky, staggered leaf canopy.
+ x=Math.floor(x/BLOCK)*BLOCK; top=Math.floor(top/BLOCK)*BLOCK;
+ tileColumn(x,top+16,GROUND-16,4);
+ const canopy=[[-2,1],[-1,0],[0,0],[1,0],[2,1]];
+ for(let dy=0;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+   if((dy===0&&Math.abs(dx)===2)||(dy===2&&Math.abs(dx)===2))continue;
+   let tx=x+dx*16,ty=top+dy*16;
+   if(tx>=0&&tx<GW&&!(dx===0&&dy===2))tile(tx,ty,8);
+ }
 }
 function addEnemy(x,y,kind='pillager'){state.enemies.push({x:x*S,y:y*S-33,vx:0,vy:0,r:14,alive:true,dying:false,life:100,type:kind,rotation:0,hits:0});}
+// Minecraft villages are built from complete 16x16 block units, including roofs.
+// Empty interior spaces are intentional: separate columns and floors can break and fall.
+function addRoof(x,y,width,m=10){
+ tileRow(x,x+width-16,y+16,m);
+ tileRow(x+16,x+width-32,y,m);
+}
 function stageHut(){
- const x=144;tileRow(x,x+64,64,10); // five intact plank blocks form a flat roof
- for(const a of [x,x+64]){tile(a,80,4);tile(a,96,4);}
- tile(x,96,6);tile(x+64,96,6); // Minecraft glass windows, full tiles
- addEnemy(x+32,GROUND);addEnemy(x+48,GROUND);
+ const x=144;addRoof(x,48,96,10);
+ for(const a of [x+16,x+64])tileColumn(a,80,96,4);
+ tile(x+16,80,6);tile(x+64,80,6);
+ tileRow(x+16,x+64,96,10);
+ addEnemy(x+48,GROUND,'zombie');addEnemy(x+80,GROUND,'pillager');
 }
 function stageTower(){
- const x=176;tileRow(x,x+64,32,5);
- for(const a of [x,x+64])tileColumn(a,48,96,5);
- tileRow(x+16,x+48,80,10); // inner suspended floor
- addEnemy(x+32,32);addEnemy(x+48,80);addEnemy(x+32,GROUND);
+ const x=160;tileRow(x,x+96,16,5);tileRow(x+16,x+80,32,10);
+ tileColumn(x+16,48,96,5);tileColumn(x+80,48,96,5);
+ tileRow(x+32,x+64,80,10);tile(x+16,64,6);
+ addEnemy(x+48,32,'pillager');addEnemy(x+64,80,'zombie');addEnemy(x+48,GROUND,'pillager');
 }
 function stageDouble(){
- tileRow(112,160,64,10);tileColumn(112,80,96,4);tileColumn(160,80,96,4);
- tileRow(192,240,48,5);tileColumn(192,64,96,5);tileColumn(240,64,96,5);
- tile(176,80,10); // single block bridge
- tile(112,96,6);tile(240,80,6);
- addEnemy(144,GROUND);addEnemy(224,GROUND);addEnemy(208,48);
+ addRoof(96,64,80,10);tileColumn(112,96,96,4);tileColumn(160,96,96,4);
+ addRoof(192,32,64,5);tileColumn(208,64,96,5);tileColumn(240,64,96,5);
+ tileRow(176,192,80,10);tile(112,96,6);tile(240,80,6);
+ addEnemy(144,GROUND,'zombie');addEnemy(224,GROUND,'pillager');addEnemy(224,48,'pillager');
 }
 function stageOutpost(){
- tileRow(160,240,32,10);
- tileColumn(160,48,96,4);tileColumn(240,48,96,4);
- tileRow(176,224,64,10);tileRow(176,224,96,10);
- tile(160,64,4);tile(240,64,4);
- addEnemy(192,32);addEnemy(224,32);addEnemy(192,64);addEnemy(224,96);
+ // Inspired by the recognizable silhouette of a vanilla pillager outpost.
+ tileRow(144,240,16,10);tileRow(160,224,32,10);
+ tileColumn(160,48,96,4);tileColumn(224,48,96,4);
+ tileRow(176,208,64,10);tileRow(176,208,96,10);
+ tile(160,64,4);tile(224,64,4);
+ addEnemy(192,32,'pillager');addEnemy(208,32,'pillager');addEnemy(192,80,'pillager');addEnemy(208,GROUND,'pillager');
 }
 function stageCastle(){
  tileColumn(128,48,96,5);tileColumn(240,48,96,5);
  tileRow(144,224,48,5);tileRow(144,224,96,5);
- tile(160,80,5);tile(208,80,5);tile(192,80,6);
+ tile(160,80,6);tile(208,80,6);
  tileRow(128,160,32,5);tileRow(208,240,32,5);
- addEnemy(144,32);addEnemy(224,32);addEnemy(176,48);addEnemy(208,48);addEnemy(176,96);
+ for(const x of [128,160,208,240])tile(x,16,5);
+ addEnemy(144,32,'pillager');addEnemy(224,32,'pillager');addEnemy(176,48,'zombie');addEnemy(208,48,'pillager');addEnemy(176,96,'zombie');
 }
-function initLevel(n){state.seed=LEVELS[n].seed;state.grid.fill(0);state.hp.fill(0);state.dynamic=[];state.particles=[];state.projectiles=[];state.vortices=[];state.enemies=[];resetPhysics();state.effects=[];state.t=0;state.shake=0;state.removed=0;state.shots=LEVELS[n].shots;state.level=n;state.ended=false;state.drag=false;state.lastShot=-100;state.armKick=0;state.paused=false;state.dirty=true;state.needRebuild=false;state.lastRebuild=0;noTargetsAt=0;const l=LEVELS[n];addGround(state.seed);if(l.kind==='hut')stageHut();if(l.kind==='tower')stageTower();if(l.kind==='double')stageDouble();if(l.kind==='outpost')stageOutpost();if(l.kind==='castle')stageCastle();if(n===0)addTree(0,64);if(n===1)addTree(112,64);if(n===2)addTree(0,64);if(n===3)addTree(0,64);if(n===4)addTree(0,64);UI.result.classList.add('hidden');UI.hint.textContent='拖动投石车上方的弹药向左拉，松手发射';updateHUD();drawGridImage();}
+function initLevel(n){state.seed=LEVELS[n].seed;state.grid.fill(0);state.hp.fill(0);state.dynamic=[];state.particles=[];state.projectiles=[];state.vortices=[];state.enemies=[];resetPhysics();state.effects=[];state.t=0;state.shake=0;state.removed=0;state.shots=LEVELS[n].shots;state.level=n;state.ended=false;state.drag=false;state.lastShot=-100;state.armKick=0;state.paused=false;state.dirty=true;state.needRebuild=false;state.lastRebuild=0;noTargetsAt=0;const l=LEVELS[n];addGround(state.seed);if(l.kind==='hut')stageHut();if(l.kind==='tower')stageTower();if(l.kind==='double')stageDouble();if(l.kind==='outpost')stageOutpost();if(l.kind==='castle')stageCastle();if(n===0)addTree(240,64);if(n===1)addTree(112,64);if(n===2)addTree(240,64);if(n===3)addTree(240,64);if(n===4)addTree(0,64);UI.result.classList.add('hidden');UI.hint.textContent='拖动投石车上方的弹药向左拉，松手发射';updateHUD();drawGridImage();}
 function updateHUD(){const l=LEVELS[state.level];UI.level.textContent=l.title;UI.desc.textContent=l.desc;UI.ammo.textContent=state.shots;UI.targets.textContent=state.enemies.filter(e=>e.alive).length;UI.destroyed.textContent=state.removed.toLocaleString();Array.from(UI.bar.children).forEach((b,i)=>b.classList.toggle('selected',i===state.selected));UI.pause.textContent=state.paused?'▶ 继续':'Ⅱ 暂停';}
 function spawnFragments(x,y,m,count=1,force=1){if(state.particles.length>900)return;let c=textureColor(m,Math.floor(x/S),Math.floor(y/S));for(let i=0;i<count;i++){let a=Math.random()*Math.PI*2,s=(45+Math.random()*100)*force;state.particles.push({x:x+Math.random()*S,y:y+Math.random()*S,vx:Math.cos(a)*s,vy:Math.sin(a)*s-45,color:c,size:2+Math.random()*3,life:1.1+Math.random()*1.1,total:2.2});}}
 function deletePixel(x,y,impulse=1){if(!inside(x,y))return;let k=idx(x,y),m=state.grid[k];if(!m||m===7)return;state.grid[k]=0;state.hp[k]=0;state.dirty=true;state.removed++;if(Math.random()<.22)spawnFragments((x+.3)*S,(y+.3)*S,m,1,impulse);}
@@ -287,13 +298,14 @@ if(!state.ended){if(state.enemies.every(e=>!e.alive)){noTargetsAt+=dt;if(noTarge
 if(state.shots===0&&state.projectiles.length===0&&state.t-state.lastShot>4&&!state.ended)finishWin(false);
 if(state.dirty&&Math.floor(state.t*30)%2===0)drawGridImage();if(Math.floor(state.t*10)%5===0)updateHUD();}
 function drawBackdrop(){
- ctx.fillStyle='#8fc5ef';ctx.fillRect(0,0,CW,CH);
- // Rectangular Minecraft clouds. No smooth mountain slopes or curves.
- ctx.fillStyle='#edf7ff';
- for(const [x,y] of [[165,105],[495,75],[810,146],[1070,90]]){
-  ctx.fillRect(x,y,154,25);ctx.fillRect(x+31,y-20,83,20);
+ ctx.fillStyle='#83b9ed';ctx.fillRect(0,0,CW,CH);
+ // Old-style Minecraft cloud slabs: broad horizontal 16-pixel aligned sections.
+ ctx.fillStyle='#ffffff';
+ for(const [x,y] of [[96,96],[464,64],[800,112],[1088,80]]){
+   ctx.fillRect(x,y,192,16);
+   ctx.fillRect(x+32,y-16,128,16);
+   ctx.fillRect(x+64,y+16,64,16);
  }
- // The world background is deliberately empty; playable structures use tile sprites.
 }
 function drawObjects(){// Draw separated rigid pieces with nearest-neighbor pixel rendering and true rotations.
 for(const b of state.dynamic){if(!b.count)continue;ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.rot);ctx.imageSmoothingEnabled=false;ctx.drawImage(b.pic,-b.w*S/2,-b.h*S/2,b.w*S,b.h*S);ctx.restore();}
@@ -302,11 +314,25 @@ for(const p of state.projectiles){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p
 for(const p of state.particles){ctx.globalAlpha=Math.min(1,p.life/.7);ctx.fillStyle=p.color;ctx.fillRect(Math.floor(p.x),Math.floor(p.y),p.size,p.size);}ctx.globalAlpha=1;
 for(const v of state.vortices){ctx.save();let a=Math.min(1,v.life/.45);ctx.globalAlpha=a*.65;ctx.strokeStyle='#5f31c4';ctx.lineWidth=8;ctx.beginPath();ctx.arc(v.x,v.y,Math.min(v.r,15+v.age*37),state.t*1.2,state.t*1.2+Math.PI*1.65);ctx.stroke();ctx.globalAlpha=a;ctx.fillStyle='#090710';ctx.beginPath();ctx.arc(v.x,v.y,12+Math.sin(state.t*8)*3,0,Math.PI*2);ctx.fill();ctx.restore();}
 for(const e of state.effects){ctx.save();ctx.globalAlpha=Math.min(.8,e.life*2);ctx.strokeStyle=e.portal?'#70f6f3':e.flash?'#fff1c0':'#ffb76a';ctx.lineWidth=e.portal?4:3;let t=1-e.life/(e.portal?.3:e.flash?.2:.35);ctx.beginPath();ctx.arc(e.x,e.y,Math.max(1,e.r*t),0,Math.PI*2);ctx.stroke();ctx.restore();}}
-function drawEnemy(e){const pix=4;const rect=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x*pix,y*pix,w*pix,h*pix);};ctx.globalAlpha=e.alive?1:.45;
-// Side-view pillager built from the Minecraft-style illager gray skin and brown tunic.
-rect(-3,-8,6,6,'#a4a6a6');rect(-3,-5,6,2,'#9da3a2');rect(-2,-5,1,1,'#346954');rect(1,-5,1,1,'#346954');rect(-1,-3,2,2,'#6f7475');rect(-4,-2,8,7,'#62442e');rect(-2,-1,4,5,'#764e37');rect(-5,-1,1,5,'#909596');rect(4,-1,1,5,'#909596');rect(-3,5,2,3,'#424046');rect(1,5,2,3,'#424046');
-// crossbow
-rect(2,0,6,1,'#402d23');rect(5,-2,1,5,'#8c6a45');rect(5,2,3,1,'#b6b6b2');ctx.globalAlpha=1;}
+function drawEnemy(e){
+ ctx.globalAlpha=e.alive?1:.45;
+ const sheet=sprites[e.type==='zombie'?'zombie':'pillager'];
+ if(sheet && sheet.width>=64){
+   // Sample the real Minecraft entity skin atlas, not hand-drawn guards.
+   // Head front (8,8,8,8), torso front (20,20,8,12), limbs front.
+   ctx.imageSmoothingEnabled=false;
+   ctx.drawImage(sheet,8,8,8,8,-16,-34,32,32);
+   ctx.drawImage(sheet,20,20,8,12,-16,-2,32,24);
+   ctx.drawImage(sheet,4,20,4,12,-13,22,12,14);
+   ctx.drawImage(sheet,4,20,4,12,1,22,12,14);
+   ctx.drawImage(sheet,44,20,4,12,-23,0,8,24);
+   ctx.drawImage(sheet,44,20,4,12,15,0,8,24);
+ }else{
+   ctx.fillStyle=e.type==='zombie'?'#4b8f52':'#909e9b';ctx.fillRect(-16,-34,32,34);
+   ctx.fillStyle=e.type==='zombie'?'#427bba':'#72503e';ctx.fillRect(-16,0,32,30);
+ }
+ ctx.globalAlpha=1;
+}
 function drawBall(x,y,ball,r=14){if(ball.id==='blackhole'){ctx.fillStyle='#1c1729';ctx.beginPath();ctx.arc(x,y,r+5+Math.sin(state.t*8)*2,0,6.283);ctx.fill();ctx.strokeStyle='#9465dc';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r+2,0,6.283);ctx.stroke();ctx.fillStyle='#07080b';ctx.beginPath();ctx.arc(x,y,r-3,0,6.283);ctx.fill();return;}
 const im=sprites[ball.sprite];const d=ball.id==='ender'?r*2:r*2;
 if(im){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x-d/2,y-d/2,d,d);}
@@ -364,7 +390,7 @@ if(Math.hypot(x-CANNON_X,y-(CANNON_Y-13))>100)return;state.drag=true;state.dragX
 function moveDrag(ev){if(!state.drag)return;let rect=canvas.getBoundingClientRect(),x=(ev.clientX-rect.left)*CW/rect.width,y=(ev.clientY-rect.top)*CH/rect.height;let dx=x-state.dragStartX,dy=y-state.dragStartY;let mag=Math.hypot(dx,dy),cap=Math.min(110,mag);if(mag>1){state.dragX=CANNON_X+dx/mag*cap;state.dragY=CANNON_Y-13+dy/mag*cap;}else{state.dragX=CANNON_X;state.dragY=CANNON_Y-13;}}
 function endDrag(){if(!state.drag)return;state.drag=false;let dx=CANNON_X-state.dragX,dy=CANNON_Y-13-state.dragY;if(Math.hypot(dx,dy)<10)return;let vx=dx*6.9,vy=dy*6.9;if(vx<70){UI.hint.textContent='把方块向左后方拉，再松手，才能向右发射';return;}const ball=BALLS[state.selected];state.projectiles.push({x:CANNON_X,y:CANNON_Y-13,vx,vy,kind:ball,r:ball.r,rot:0,spin:vx/460,age:0,dead:false,resting:false,lastImpact:-100,uses:0,drillEnergy:360});state.armKick=.38;state.shots--;state.lastShot=state.t;UI.hint.textContent=`已发射 ${ball.label} · 尝试切换不同弹药`;audio('wood_like',.35);updateHUD();}
 canvas.addEventListener('pointerdown',startDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',()=>state.drag=false);canvas.addEventListener('contextmenu',ev=>ev.preventDefault());
-BALLS.forEach((ball,i)=>{let b=document.createElement('button');b.className='ball';b.innerHTML=`<span class="ball-icon" style="background:${ball.color}">${ball.short}</span><span><b>${i+1}. ${ball.label}</b><small>${ball.detail}</small></span>`;b.title=ball.detail;b.addEventListener('click',()=>{state.selected=i;updateHUD();});UI.bar.appendChild(b);});
+BALLS.forEach((ball,i)=>{let b=document.createElement('button');b.className='ball';b.innerHTML=`<span class="ball-icon sprite-icon ${ball.id==='blackhole'?'blackhole-icon':''}" style="${ball.sprite?`background-image:url(assets/textures/${ball.sprite}.png)`:''}">${ball.sprite?'':ball.short}</span><span><b>${i+1}. ${ball.label}</b><small>${ball.detail}</small></span>`;b.title=ball.detail;b.addEventListener('click',()=>{state.selected=i;updateHUD();});UI.bar.appendChild(b);});
 function next(){initLevel((state.level+1)%LEVELS.length);}function restart(){initLevel(state.level);}
 $('#restart').addEventListener('click',restart);$('#retryBtn').addEventListener('click',restart);$('#skip').addEventListener('click',next);$('#nextBtn').addEventListener('click',next);$('#pause').addEventListener('click',()=>{state.paused=!state.paused;updateHUD();});$('#soundToggle').addEventListener('click',()=>{soundOn=!soundOn;UI.sound.textContent=soundOn?'♫ 音效开':'♪ 音效关';});
 window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;if(e.key>='1'&&e.key<='4'){state.selected=Number(e.key)-1;updateHUD();}if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='n')next();if(e.code==='Space'){e.preventDefault();state.paused=!state.paused;updateHUD();}});
