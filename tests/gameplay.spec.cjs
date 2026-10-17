@@ -33,7 +33,8 @@ test('四种弹药通过真实拖拽产生撞击、延迟爆炸、穿墙和引�
     await page.getByRole('button',{name:'↻ 重开',exact:true}).click();
     await dragShot(page,kind);
     await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(1);
-    if(id==='ender')await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().portals),{timeout:6000}).toBeGreaterThan(0);
+    if(id==='tnt')await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().explosions),{timeout:7000}).toBe(1);
+    else if(id==='ender')await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().portals),{timeout:6000}).toBeGreaterThan(0);
     else await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().removed),{timeout:7000}).toBeGreaterThan(0);
     if(id==='tnt')expect(await page.evaluate(()=>MCBlockLaunch.getStatus().explosions)).toBe(1);
     if(id==='blackhole'){
@@ -43,6 +44,11 @@ test('四种弹药通过真实拖拽产生撞击、延迟爆炸、穿墙和引�
       expect(await page.evaluate(()=>MCBlockLaunch.getStatus().particles)).toBeLessThanOrEqual(850);
     }
     await page.locator('#stage').screenshot({path:`evidence/ammo-${id}.png`});
+    if(id!=='blackhole'){
+      const sound={cobble:'stone',tnt:'explode',ender:'portal'}[id];
+      await expect.poll(()=>page.evaluate(name=>MCBlockLaunch.getDiagnostics().sound?.played?.[name]||0,sound)).toBeGreaterThan(0);
+      expect(await page.evaluate(()=>MCBlockLaunch.getDiagnostics().sound.failed)).toBe(0);
+    }
     if(id==='cobble'){
       await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().restingBlocks),{timeout:14000}).toBeGreaterThan(0);
     }
@@ -52,6 +58,7 @@ test('四种弹药通过真实拖拽产生撞击、延迟爆炸、穿墙和引�
 });
 
 test('五关初始与 TNT 后画面、重开及暂停均可核验',async({page})=>{
+  test.setTimeout(90000);
   await ready(page);const errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});
   const reports=[];

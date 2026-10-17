@@ -1,7 +1,7 @@
 import { MATERIALS, AMMO } from './config.mjs';
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite),...AMMO.map(a=>a.sprite).filter(Boolean),
   'oak_leaves','spruce_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom','zombie','pillager','crossbow_standby'])];
-const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','fuse'];
+const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse'];
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
@@ -9,7 +9,7 @@ function tint(im,color){
   x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);return c;
 }
 export class Assets {
-  constructor(){this.images={};this.colors={};this.sounds={};this.soundOn=true;this.playing=0;}
+  constructor(){this.images={};this.colors={};this.sounds={};this.soundOn=true;this.playing=0;this.audioStats={played:{},failed:0,lastError:null};}
   async load(){
     await Promise.all(NAMES.map(async name=>{
       const im=await image(`assets/textures/${name}.png`);
@@ -35,7 +35,8 @@ export class Assets {
     if(!this.soundOn||this.playing>=8||!this.sounds[name])return;
     const a=this.sounds[name].cloneNode();a.volume=Math.min(.8,volume);this.playing++;
     let done=false;const finish=()=>{if(!done){done=true;this.playing--;}};
-    a.addEventListener('ended',finish,{once:true});a.addEventListener('error',finish,{once:true});a.play().catch(finish);
+    a.addEventListener('ended',finish,{once:true});a.addEventListener('error',finish,{once:true});
+    a.play().then(()=>{this.audioStats.played[name]=(this.audioStats.played[name]||0)+1;}).catch(error=>{this.audioStats.failed++;this.audioStats.lastError=error.message;finish();});
   }
   pixel(m,x,y){const data=this.colors[MATERIALS[m].sprite],k=((y&15)*16+(x&15))*4;return [data[k],data[k+1],data[k+2],m===6?Math.max(28,data[k+3]):data[k+3]];}
 }

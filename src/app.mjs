@@ -3,27 +3,26 @@ import { Assets } from './assets.mjs';
 import { buildLevel, LEVELS } from './levels.mjs';
 import { SiegeWorld } from './world.mjs';
 import { Renderer, armTip, PIVOT, REST, RELEASE } from './renderer.mjs';
+import {aimAngle} from './aim.mjs';
 
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const state={level:0,shots:0,selected:0,paused:false,ended:false,drag:false,angle:REST,power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
 let world,renderer,assets,scene,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0;
 
 function hud(){
-  $('#levelTitle').textContent=scene.title;$('#levelDesc').textContent=scene.desc;
-  $('#ammo').textContent=state.shots;$('#targets').textContent=world.enemies.filter(e=>e.alive).length;
-  $('#destroyed').textContent=world.stats.removed.toLocaleString();
-  $('#pause').textContent=state.paused?'▶ 继续':'Ⅱ 暂停';
+  $('#ammo').textContent=`${AMMO[state.selected].label} · 剩余 ${state.shots} 发`;
+  $('#pause').textContent=state.paused?'▶':'Ⅱ';$('#pause').setAttribute('aria-label',state.paused?'▶ 继续':'Ⅱ 暂停');
   for(const [i,b] of [...$('#ballbar').children].entries()){
     b.classList.toggle('selected',i===state.selected);b.setAttribute('aria-pressed',String(i===state.selected));
   }
 }
 function loadLevel(n){
   if(world){window.Matter.Events.off(world.engine);window.Matter.Composite.clear(world.engine.world,false);window.Matter.Engine.clear(world.engine);}
-  scene=buildLevel(n);world=new SiegeWorld(window.Matter,{grid:scene.grid});
+  scene=buildLevel(n);world=new SiegeWorld(window.Matter,{grid:scene.grid,rear:scene.rear});
   for(const e of scene.enemies)world.addEnemy(e.x,e.feet,e.skin);
   Object.assign(state,{level:n,shots:scene.shots,ended:false,paused:false,drag:false,angle:REST,launch:null,quiet:0,winWait:0,power:0,launched:0});
   renderer.reset(scene);acc=0;maxStepMs=0;$('#levelSelect').value=String(n);
-  $('#result').classList.add('hidden');$('#gamehint').textContent='拖住投石臂上的弹药，向左下蓄力，松手抛射';hud();
+  $('#result').classList.add('hidden');$('#gamehint').classList.remove('faded');$('#gamehint').textContent='拖住投石臂上的弹药，向左下蓄力，松手抛射';hud();
 }
 function launcher(){return {...state,ammo:AMMO[state.launch?.kind??state.selected],loaded:!state.ended&&state.shots>0&&(!state.launch||!state.launch.released)};}
 function result(win){
@@ -69,13 +68,13 @@ function moveDrag(e){
   if(!state.drag||e.pointerId!==state.pointerId)return;
   const p=point(e),dx=state.start.x-p.x,dy=state.start.y-p.y,length=Math.hypot(dx,dy),scale=length>135?135/length:1;
   state.vx=clamp(dx*scale*8.4,0,1110);state.vy=clamp(dy*scale*8.4,-920,100);state.power=Math.min(1,length/135);
-  state.angle=clamp(Math.atan2(p.y-PIVOT.y,p.x-PIVOT.x),-2.9,-.35);
+  state.angle=aimAngle(p,PIVOT);
 }
 function endDrag(e){
   if(!state.drag||e.pointerId!==state.pointerId)return;
   state.drag=false;if(state.power<.12||state.vx<120){cancelDrag();return;}
   state.launch={age:0,from:state.angle,kind:state.selected,vx:state.vx,vy:state.vy,released:false};
-  $('#gamehint').textContent=`${AMMO[state.selected].label} 正在发射 · 击中建筑支撑会引发坍塌`;
+  $('#gamehint').classList.add('faded');
 }
 function select(i){if(state.launch||state.drag)return;state.selected=clamp(i,0,3);hud();}
 function pause(){cancelDrag();state.paused=!state.paused;hud();}
@@ -91,12 +90,12 @@ async function start(){
   if(!window.Matter?.Engine)throw new Error('Matter.js 未加载。请检查 vendor/matter.min.js 并通过启动脚本运行。');
   assets=await new Assets().load();renderer=new Renderer(canvas,assets);
   AMMO.forEach((a,i)=>{
-    const b=document.createElement('button');b.className='ball';b.title=a.detail;
-    const icon=document.createElement('span');icon.className=`ball-icon ${a.sprite?'sprite-icon':'blackhole-icon'}`;
-    if(a.sprite){const img=document.createElement('img');img.src=`assets/textures/${a.sprite}.png`;img.alt=a.label;icon.append(img);}
-    const text=document.createElement('span'),label=document.createElement('b'),detail=document.createElement('small');
-    label.textContent=`${i+1}. ${a.label}`;detail.textContent=a.detail;text.append(label,detail);b.append(icon,text);b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
+    const b=document.createElement('button');b.className='ball';b.title=`${i+1} · ${a.label} · ${a.detail}`;b.setAttribute('aria-label',`${i+1}. ${a.label}`);
+    if(a.sprite){const img=document.createElement('img');img.src=`assets/textures/${a.sprite}.png`;img.alt='';b.append(img);}
+    else{const icon=document.createElement('span');icon.className='blackhole-icon';b.append(icon);}
+    b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
   });
+  for(let i=4;i<9;i++){const empty=document.createElement('button');empty.className='ball';empty.disabled=true;empty.setAttribute('aria-label','空物品格');$('#ballbar').append(empty);}
   LEVELS.forEach((l,i)=>{const o=document.createElement('option');o.value=i;o.textContent=l.title;$('#levelSelect').append(o);});
   loadLevel(0);loadState.hidden=true;
   canvas.addEventListener('pointerdown',beginDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);
@@ -105,7 +104,7 @@ async function start(){
   for(const id of ['restart','retryBtn'])$(`#${id}`).addEventListener('click',()=>loadLevel(state.level));
   for(const id of ['skip','nextBtn'])$(`#${id}`).addEventListener('click',()=>loadLevel((state.level+1)%5));
   $('#levelSelect').addEventListener('change',e=>{loadLevel(Number(e.target.value));e.target.blur();});
-  $('#pause').addEventListener('click',pause);$('#soundToggle').addEventListener('click',()=>{assets.soundOn=!assets.soundOn;$('#soundToggle').textContent=assets.soundOn?'♫ 音效开':'♪ 音效关';});
+  $('#pause').addEventListener('click',pause);$('#soundToggle').addEventListener('click',()=>{assets.soundOn=!assets.soundOn;$('#soundToggle').textContent=assets.soundOn?'♫':'♪';$('#soundToggle').setAttribute('aria-label',assets.soundOn?'音效开':'音效关');});
   window.addEventListener('keydown',e=>{
     if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
     if(e.key>='1'&&e.key<='4')select(Number(e.key)-1);
@@ -114,8 +113,9 @@ async function start(){
   });
   window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});
   window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel((state.level+1)%5),select,
-    getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({hp:e.hp,alive:e.alive,x:e.body.position.x,y:e.body.position.y})),
-      terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
+    getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns})),
+      backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.backPixels.length),0),
+      terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),sound:{...assets.audioStats,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
   requestAnimationFrame(frame);
 }
 start().catch(error=>{loadState.hidden=false;loadState.classList.add('error');loadState.textContent=`游戏未能启动：${error.message}`;console.error(error);});

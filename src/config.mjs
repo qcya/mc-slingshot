@@ -22,7 +22,7 @@ export const MATERIALS={
 };
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:32,mass:4,detail:'实心方块 · 冲量撞击'},
-  {id:'tnt',label:'TNT',sprite:'tnt_side',size:32,mass:2.4,detail:'碰撞引信 · 像素爆破'},
+  {id:'tnt',label:'TNT',sprite:'tnt_side',size:32,mass:2.4,detail:'四秒引信 · 碰撞仅碎玻璃'},
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:24,mass:1.1,detail:'测量墙厚 · 寻找安全出口'},
   {id:'blackhole',label:'黑洞',sprite:null,size:24,mass:1.8,detail:'黏附表面 · 引力与吞噬'}
 ];

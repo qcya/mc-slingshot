@@ -31,12 +31,28 @@ test('承重只剩一侧且重心越界时，屋顶自然翻倒', () => {
   assert.equal(grid.get(110,70),0);
 });
 
-test('TNT 碰撞后有短引信再爆炸，只删除爆炸内具体像素', () => {
+test('TNT 固定四秒引信，撞击木材不挖洞，爆炸才破坏具体像素', () => {
   const w=fixture();w.grid.fill(140,40,16,88,4);w.synchronize();
   const p=w.spawnProjectile('tnt',230,210,330,0);
-  step(w,.15);assert.ok(w.projectiles.includes(p));assert.equal(w.stats.explosions,0);
-  step(w,1);assert.equal(w.stats.explosions,1);assert.ok(w.stats.removed>0);
+  step(w,1);assert.ok(w.projectiles.includes(p));assert.equal(w.stats.explosions,0);assert.equal(w.stats.removed,0);
+  step(w,3.3);assert.equal(w.stats.explosions,1);assert.ok(w.stats.removed>0);
   assert.ok(w.stats.removed<16*88); // 远离爆心的部分可成为残骸，但不能整柱消失。
+});
+
+test('弹药直接碰怪即击杀，慢速 TNT 也不例外', () => {
+  for(const kind of ['cobble','tnt','ender']){
+    const w=fixture(),e=w.addEnemy(160,256);w.spawnProjectile(kind,125,210,80,0);step(w,.35);
+    assert.equal(e.alive,false,kind);
+  }
+});
+
+test('TNT 接触可碎玻璃，不能接触打碎木材或石头', () => {
+  for(const material of [4,5,6]){
+    const w=fixture();w.grid.fill(140,80,16,48,material);w.synchronize();
+    w.spawnProjectile('tnt',250,205,300,0);step(w,.3);
+    if(material===6)assert.ok(w.stats.removed>0);else assert.equal(w.stats.removed,0);
+    assert.equal(w.stats.explosions,0);
+  }
 });
 
 test('黑洞逐步吞噬并吸引真实刚体，结束后不遗留活动黑洞', () => {
