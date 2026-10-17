@@ -18,10 +18,15 @@ test('人物在实际楼板上巡逻并转向，边缘前停步而非悬空走�
  grid.fill(60,112,80,16,0);w.synchronize();for(let i=0;i<36;i++)w.step(1/120);
  assert.ok(e.body.bounds.max.y>230);
 });
-test('两个人物迎面相遇会转身，不永久互相堵住',()=>{
+test('两个人物迎面可以交错走过，不相撞弹开',()=>{
  const grid=new PixelGrid(240,160);grid.fill(0,128,240,32,7);const w=new SiegeWorld(M,{grid,pixelSize:2}),a=w.addEnemy(180,256),b=w.addEnemy(265,256,'pillager');
  for(let i=0;i<480;i++)w.step(1/120);
- assert.ok(a.turns>0&&b.turns>0);assert.ok(Math.abs(a.body.position.x-b.body.position.x)>45);
+ assert.equal(a.turns,0);assert.equal(b.turns,0);assert.ok(a.body.position.x>b.body.position.x);
+});
+test('人物会暂停观望与抬手，动作连续而非一直机械行走',()=>{
+ const grid=new PixelGrid(500,160);grid.fill(0,128,500,32,7);const w=new SiegeWorld(M,{grid,pixelSize:2}),e=w.addEnemy(400,256);
+ const seen=new Set();let look=false,wave=false;for(let i=0;i<14*120;i++){w.step(1/120);seen.add(e.behavior);look||=Math.abs(e.pose?.headYaw||0)>.08;wave||=(e.pose?.gesture||0)>.3;}
+ assert.ok(seen.has('walk')&&seen.has('idle'));assert.ok(look);assert.ok(wave);
 });
 test('人物相邻显示帧连续插值，不量化成每周期24张图片',async()=>{
  const {MobSprites}=await import('../src/mobs.mjs'),calls=[];

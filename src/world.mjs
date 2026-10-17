@@ -1,6 +1,7 @@
 import { AMMO, MATERIALS, clamp } from './config.mjs';
 import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDamage } from './pixels.mjs';
 import {RearLayer} from './rear.mjs';
+import {actorState,animateActor} from './behavior.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -9,13 +10,17 @@ export class SiegeWorld {
     if(!Matter?.Engine)throw new Error('Matter.js 物理引擎未加载，请重新启动游戏。');
     this.M=Matter;this.grid=grid;this.s=pixelSize;this.rear=rear;
     this.width=grid.width*pixelSize;this.height=grid.height*pixelSize;
-    this.groundRow=grid.height;for(let y=0;y<grid.height;y++)if(grid.get(0,y)){this.groundRow=y;break;}
     this.engine=Matter.Engine.create({enableSleeping:true,positionIterations:8,velocityIterations:8,gravity:{x:0,y:1,scale:.001}});
     this.staticTiles=new Map();this.projectiles=[];this.debris=[];this.enemies=[];
     this.vortices=[];this.events=[];this.contacts=[];this.cooldowns=new Map();
     this.time=0;this.serial=0;this.stats={removed:0,backgroundRemoved:0,explosions:0,portals:0,enemyDamage:0};
-    Matter.Events.on(this.engine,'collisionStart',event=>this.contacts.push(...event.pairs));
-    this.synchronize(false);
+    Matter.Events.on(this.engine,'collisionStart',event=>{
+      for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
+        const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null,wall=ammo===ea?b:a;
+        if(ammo&&['cobble','tnt'].includes(ammo.ammo.id)&&wall.plugin.glass)pair.isSensor=true;
+      }this.contacts.push(...event.pairs);
+    });
+    this.synchronize();
   }
   allMoving(){return [...this.projectiles,...this.debris,...this.enemies].filter(e=>!e.dead);}
   register(entity,body){
@@ -38,35 +43,33 @@ export class SiegeWorld {
     this.projectiles.push(p);return p;
   }
   addEnemy(x,feetY,skin='zombie'){
-    const body=this.M.Bodies.rectangle(x,feetY-46,32,92,{friction:.85,frictionStatic:1,restitution:0,frictionAir:.01,slop:.025,inertia:Infinity});
+    const body=this.M.Bodies.rectangle(x,feetY-46,32,92,{friction:.85,frictionStatic:1,restitution:0,frictionAir:.01,slop:.025,inertia:Infinity,collisionFilter:{category:2,mask:0xfffffffd}});
     this.M.Body.setMass(body,1.2);
-    const e=this.register({type:'enemy',skin,hp:100,alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);this.enemies.push(e);return e;
+    const e=this.register({type:'enemy',skin,hp:100,alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);
+    Object.assign(e,actorState(e.id,this.time));this.enemies.push(e);return e;
   }
   patrol(dt){
     for(const e of this.enemies){
       if(e.dead||!e.alive)continue;const b=e.body,x=b.position.x,feet=b.bounds.max.y;
-      e.walkDistance+=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
-      if(this.vortices.some(v=>Math.hypot(v.x-x,v.y-b.position.y)<v.radius*1.7))continue;
+      const distance=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
+      const influenced=this.time<e.externalUntil||this.vortices.some(v=>Math.hypot(v.x-x,v.y-b.position.y)<v.radius*1.7);
       const ground=this.sample(x-10,feet+3)||this.sample(x+10,feet+3);
-      if(!ground||Math.abs(b.velocity.y)>.65||Math.abs(b.velocity.x)>2.2)continue;
-      const occupied=this.enemies.some(other=>other!==e&&other.alive&&!other.dead&&Math.abs(other.body.position.y-b.position.y)<40&&(other.body.position.x-x)*e.facing>0&&(other.body.position.x-x)*e.facing<45);
-      const ahead=x+e.facing*23,wall=occupied||this.sample(ahead,feet-24)||this.sample(ahead,feet-65),edge=!this.sample(ahead,feet+5);
+      const grounded=!!ground&&Math.abs(b.velocity.y)<.65&&Math.abs(b.velocity.x)<2.2&&!influenced;
+      const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded);
+      if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:e.skin==='pillager'?'pillager_idle':'zombie_idle'});
+      if(!grounded)continue;
+      if(!walking){this.M.Body.setVelocity(b,{x:b.velocity.x*.7,y:b.velocity.y});continue;}e.walkDistance+=distance;
+      const ahead=x+e.facing*23,wall=this.sample(ahead,feet-24)||this.sample(ahead,feet-65),edge=!this.sample(ahead,feet+5);
       if((wall||edge)&&this.time>e.turnAt){e.facing*=-1;e.turnAt=this.time+.4;e.turns++;}
       if(wall||edge){this.M.Body.setVelocity(b,{x:0,y:b.velocity.y});continue;}
       this.M.Sleeping.set(b,false);this.M.Body.setVelocity(b,{x:e.facing*.36,y:b.velocity.y});
     }
   }
-  synchronize(detach=true){
+  synchronize(){
     if(!this.grid.dirty.size)return;
     const cols=Math.ceil(this.grid.width/16);
-    if(detach){
-      this.rear.rebindMissing(this.grid);
-      const cuts=new Set();for(const id of this.grid.dirty){const y=Math.floor(id/cols)*16;if(y>0&&y<=this.groundRow)cuts.add(y);if(y+16<=this.groundRow)cuts.add(y+16);}
-      // A broken ridge redistributes load down to supports outside the blast.
-      // Inspect those unchanged sections too, not only the damaged tile rows.
-      for(let y=16;y<=this.groundRow;y+=16)cuts.add(y);
-      this.detachUnsupported();this.releaseUnbalanced([...cuts].sort((a,b)=>b-a));
-    }
+    // Minecraft-like terrain stays fixed, even when completely unsupported.
+    // Only the pixels explicitly removed by a weapon are changed.
     for(const id of this.grid.dirty){
       const old=this.staticTiles.get(id);if(old)this.M.Composite.remove(this.engine.world,old);
       this.staticTiles.delete(id);
@@ -77,52 +80,10 @@ export class SiegeWorld {
       const rects=meshPixels(mask,w,h);if(!rects.length)continue;
       const parts=rects.map(r=>this.M.Bodies.rectangle((tx+r.x+r.w/2)*this.s,(ty+r.y+r.h/2)*this.s,r.w*this.s,r.h*this.s,{isStatic:true,friction:.8,frictionStatic:1.2,restitution:0,slop:.025}));
       const body=parts.length===1?parts[0]:this.M.Body.create({parts,isStatic:true,friction:.8,frictionStatic:1.2,slop:.025});
-      body.plugin.terrain=true;this.staticTiles.set(id,body);this.M.Composite.add(this.engine.world,body);
+      body.plugin.terrain=true;body.plugin.tileId=id;body.plugin.glass=mask.every(m=>!m||m===6);
+      this.staticTiles.set(id,body);this.M.Composite.add(this.engine.world,body);
     }
     this.grid.dirty.clear();
-  }
-  releaseUnbalanced(cuts){
-    const {width:w,cells}=this.grid;
-    for(const cut of cuts){
-      for(const indices of components(cells.subarray(0,w*cut),w,cut)){
-        let min=Infinity,max=-Infinity,weighted=0,total=0;
-        for(const k of indices){
-          const x=k%w,y=Math.floor(k/w),weight=MATERIALS[cells[k]].density;
-          weighted+=(x+.5)*weight;total+=weight;
-          if(y===cut-1&&this.grid.get(x,cut)){min=Math.min(min,x);max=Math.max(max,x+1);}
-        }
-        if(min===Infinity||indices.length<64)continue;
-        const center=weighted/total;
-        if(center>=min-2&&center<=max+2)continue;
-        const piece=cropPixels(cells,w,indices);
-        for(const k of indices)this.grid.set(k%w,Math.floor(k/w),0);
-        // No scripted spin: the surviving contact applies the torque in Matter.
-        const e=this.addDebris(piece.mask,piece.w,piece.h,{x:piece.x*this.s,y:piece.y*this.s},{x:piece.x,y:piece.y});
-        e.backPixels=this.rear.take(indices,piece.x,piece.y);
-      }
-    }
-  }
-  detachUnsupported(){
-    const {width:w,height:h,cells}=this.grid,seen=new Uint8Array(cells.length),queue=[];
-    // The indestructible bottom row is the anchor. Four-neighbour connectivity
-    // permits severed terrain as well as buildings to become physical islands.
-    for(let x=0;x<w;x++){const k=(h-1)*w+x;if(cells[k]){seen[k]=1;queue.push(k);}}
-    for(let q=0;q<queue.length;q++){
-      const k=queue[q],x=k%w,y=Math.floor(k/w);
-      const visit=n=>{if(cells[n]&&!seen[n]){seen[n]=1;queue.push(n);}};
-      if(x>0)visit(k-1);if(x+1<w)visit(k+1);if(y>0)visit(k-w);if(y+1<h)visit(k+w);
-    }
-    const islands=components(cells,w,h,seen);
-    for(const indices of islands){
-      const piece=cropPixels(cells,w,indices);
-      for(const k of indices)this.grid.set(k%w,Math.floor(k/w),0);
-      if(indices.length<6){
-        for(const k of indices)this.emitPixel(k%w*this.s,Math.floor(k/w)*this.s,piece.mask.find(m=>m));
-        const back=this.rear.take(indices,0,0);for(let i=0;i<back.length;i+=5){const p=back[i];this.emitPixel(p.x*this.s,p.y*this.s,p.m);}continue;
-      }
-      const e=this.addDebris(piece.mask,piece.w,piece.h,{x:piece.x*this.s,y:piece.y*this.s},{x:piece.x,y:piece.y});
-      e.backPixels=this.rear.take(indices,piece.x,piece.y);
-    }
   }
   addDebris(mask,w,h,origin,texture={x:0,y:0},angle=0,velocity={x:0,y:0},omega=0){
     const rects=meshPixels(mask,w,h);if(!rects.length)return null;
@@ -210,8 +171,10 @@ export class SiegeWorld {
     this.damageDisk(x,y,radius,power,{jagged:true,seed:this.stats.explosions,background:true});this.synchronize();
     for(const e of this.allMoving()){
       const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy),reach=radius+50;if(d>reach)continue;
-      const force=(1-d/reach)*.005*e.body.mass;
-      this.M.Sleeping.set(e.body,false);this.M.Body.applyForce(e.body,e.body.position,{x:dx/(d||1)*force,y:(dy/(d||1)-.3)*force});
+      const speed=clamp(1600*(1-d/reach)/e.body.mass,0,650),ux=d>1?dx/d:(e.id%2?1:-1),uy=d>1?dy/d:0;
+      this.M.Sleeping.set(e.body,false);
+      this.M.Body.setVelocity(e.body,{x:e.body.velocity.x+ux*speed/60,y:e.body.velocity.y+(uy-.5)*speed/60});
+      e.externalUntil=this.time+.8;
       if(e.type==='enemy')this.hurt(e,Math.max(0,180*(1-d/reach)));
     }
   }
@@ -238,10 +201,8 @@ export class SiegeWorld {
     const other=ammo===ea?eb:ea,otherBody=ammo===ea?b:a;
     if(ammo){
       const kind=ammo.ammo.id;
-      if(kind==='tnt'){
-        const removed=this.damageDisk(point.x,point.y,22,100,{onlyMaterial:6});
-        if(removed)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed});return;
-      }
+      if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
+      if(kind==='tnt')return;
       if(kind==='blackhole'){if(otherBody.plugin.terrain||other?.type==='debris')this.attachHole(ammo,other,point);return;}
       if(kind==='ender'&&ammo.uses===0&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
@@ -259,6 +220,11 @@ export class SiegeWorld {
       this.damageDisk(point.x,point.y,radius,power);
       this.events.push({type:'impact',x:point.x,y:point.y,m:material,speed,sound:striker.type==='ammo'&&striker.ammo.id==='cobble'?'stone':MATERIALS[material]?.sound});
     }
+  }
+  shatterGlass(body,point,speed){
+    const id=body.plugin.tileId,cols=Math.ceil(this.grid.width/16),tx=id%cols*16,ty=Math.floor(id/cols)*16;let count=0;
+    for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.grid.set(x,y,0);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
+    this.stats.removed+=count;if(count)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});
   }
   updateHoles(dt){
     for(const v of this.vortices){

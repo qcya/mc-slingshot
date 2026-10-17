@@ -2,30 +2,33 @@
   "initial": {
     "assets": [
       "grass_block_side",
-      "oak_leaves",
-      "iron_ore",
-      "oak_planks",
-      "deepslate",
       "dark_oak_log",
       "dark_oak_planks",
       "spruce_log",
       "spruce_planks",
       "cobblestone",
-      "stone",
       "dirt",
-      "oak_log",
-      "stone_bricks",
       "oak_door_top",
+      "stone",
+      "oak_log",
       "oak_door_bottom",
+      "stone_bricks",
       "glass",
-      "bedrock",
       "tnt_side",
+      "bedrock",
+      "oak_leaves",
+      "iron_ore",
+      "oak_planks",
+      "deepslate",
       "ender_pearl",
       "spruce_leaves",
+      "cherry_log",
+      "cherry_leaves",
       "grass_block_side_overlay",
       "zombie",
       "pillager",
-      "crossbow_standby"
+      "crossbow_standby",
+      "slingshot_frame"
     ],
     "time": 0.025,
     "removed": 0,
@@ -51,11 +54,13 @@
     "ammoBodies": [],
     "restingBlocks": 0,
     "fps": 59,
-    "stepMs": 0.11,
-    "maxStepMs": 3.1,
+    "stepMs": 0.07,
+    "maxStepMs": 2.1,
     "launcher": {
       "x": 205,
       "y": 545,
+      "vx": 0,
+      "vy": 0,
       "angle": 0,
       "phase": "ready",
       "type": "slingshot"
@@ -69,7 +74,14 @@
         "y": 578.0125000006944,
         "facing": 1,
         "walkDistance": 0.3582000000001244,
-        "turns": 0
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
       },
       {
         "skin": "pillager",
@@ -79,9 +91,24 @@
         "y": 578.0125000006944,
         "facing": -1,
         "walkDistance": 0.3582000000001244,
-        "turns": 0
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
       }
     ],
+    "drawSound": {
+      "active": false,
+      "starts": 0,
+      "stops": 0,
+      "state": "unused",
+      "signalRms": 0
+    },
+    "preview": [],
     "backgroundPixels": 42240,
     "movingBackgroundPixels": 0,
     "terrainPixels": 41472,
@@ -96,32 +123,35 @@
   "moved": {
     "assets": [
       "grass_block_side",
-      "oak_leaves",
-      "iron_ore",
-      "oak_planks",
-      "deepslate",
       "dark_oak_log",
       "dark_oak_planks",
       "spruce_log",
       "spruce_planks",
       "cobblestone",
-      "stone",
       "dirt",
-      "oak_log",
-      "stone_bricks",
       "oak_door_top",
+      "stone",
+      "oak_log",
       "oak_door_bottom",
+      "stone_bricks",
       "glass",
-      "bedrock",
       "tnt_side",
+      "bedrock",
+      "oak_leaves",
+      "iron_ore",
+      "oak_planks",
+      "deepslate",
       "ender_pearl",
       "spruce_leaves",
+      "cherry_log",
+      "cherry_leaves",
       "grass_block_side_overlay",
       "zombie",
       "pillager",
-      "crossbow_standby"
+      "crossbow_standby",
+      "slingshot_frame"
     ],
-    "time": 2.66666666666666,
+    "time": 2.449999999999994,
     "removed": 0,
     "backgroundRemoved": 0,
     "explosions": 0,
@@ -145,11 +175,13 @@
     "ammoBodies": [],
     "restingBlocks": 0,
     "fps": 75,
-    "stepMs": 0.1,
-    "maxStepMs": 0.3,
+    "stepMs": 0.08,
+    "maxStepMs": 0.5,
     "launcher": {
       "x": 205,
       "y": 545,
+      "vx": 928.5731497205929,
+      "vy": -1112.4,
       "angle": 0,
       "phase": "ready",
       "type": "slingshot"
@@ -159,30 +191,52 @@
         "skin": "zombie",
         "hp": 100,
         "alive": true,
-        "x": 1161.444755587712,
+        "x": 1156.7881555877104,
         "y": 578.0125000006944,
         "facing": 1,
-        "walkDistance": 57.26565558771199,
-        "turns": 0
+        "walkDistance": 52.60905558771037,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
       },
       {
         "skin": "pillager",
         "hp": 100,
         "alive": true,
-        "x": 1214.7338067527269,
+        "x": 1219.3912064504764,
         "y": 578.0125000006944,
         "facing": -1,
-        "walkDistance": 57.08709324727306,
-        "turns": 0
+        "walkDistance": 52.42969354952356,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
       }
     ],
+    "drawSound": {
+      "active": false,
+      "starts": 1,
+      "stops": 1,
+      "state": "running",
+      "signalRms": 0
+    },
+    "preview": [],
     "backgroundPixels": 42240,
     "movingBackgroundPixels": 0,
     "terrainPixels": 41472,
     "debrisPixels": 0,
     "sound": {
       "played": {
-        "wood": 1
+        "bow": 1
       },
       "failed": 0,
       "lastError": null
@@ -192,7 +246,9 @@
   "aimed": {
     "x": 119.02100465550066,
     "y": 648,
-    "angle": -3.65,
+    "vx": 928.5731497205929,
+    "vy": -1112.4,
+    "angle": 2.2663686291905654,
     "phase": "aim",
     "type": "slingshot"
   }

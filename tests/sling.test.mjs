@@ -8,3 +8,8 @@ test('弹弓未拉开时力度为零，最大拉伸长度有上限',()=>{
  assert.equal(pullSling(SLING_HOME).power,0);const p=pullSling({x:-2000,y:100});
  assert.ok(Math.hypot(p.origin.x-SLING_HOME.x,p.origin.y-SLING_HOME.y)<=135.001);
 });
+test('弹弓可向后和任意小力度发射，不强制向右',()=>{
+ const backward=pullSling({x:SLING_HOME.x+90,y:SLING_HOME.y+10});assert.ok(backward.vx<0);
+ const tiny=pullSling({x:SLING_HOME.x-.2,y:SLING_HOME.y});assert.ok(tiny.vx>0&&tiny.power<.01);
+ const down=pullSling({x:SLING_HOME.x,y:SLING_HOME.y-100});assert.ok(down.vy>1000);
+});

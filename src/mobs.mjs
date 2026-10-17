@@ -1,12 +1,16 @@
 // Orthographic cuboids with the original Java skin box UV layout. Physics stays 2D.
 // Every face is a different region of the skin, never a flat skin atlas billboard.
-export function mobGeometry(skin,phase,direction){
+export function mobGeometry(skin,phase,direction,pose={}){
  const ill=skin==='pillager',headH=ill?10:8,faces=[],yaw=-direction*1.08,cy=Math.cos(yaw),sy=Math.sin(yaw);
- const swing=Math.sin(phase)*.64;
+ const swing=Math.sin(phase)*.64*(pose.walkBlend??1);
  function box(part,x,y,z,w,h,d,u,v,rotation=0,pivotY=y){
   const transform=([px,py,pz])=>{
    const dy=py-pivotY,zz=pz,cr=Math.cos(rotation),sr=Math.sin(rotation);
    py=pivotY+dy*cr-zz*sr;pz=dy*sr+zz*cr;
+   if(part==='head'||part==='nose'){
+    const yaw=pose.headYaw||0,pitch=pose.headPitch||0,c=Math.cos(yaw),s=Math.sin(yaw),xx=px*c+pz*s,zz=-px*s+pz*c,yy=py+24;
+    px=xx;py=-24+yy*Math.cos(pitch)-zz*Math.sin(pitch);pz=yy*Math.sin(pitch)+zz*Math.cos(pitch);
+   }
    const xx=px*cy+pz*sy,depth=-px*sy+pz*cy;
    return {x:xx,y:py-depth*.16,depth};
   };
@@ -26,15 +30,15 @@ export function mobGeometry(skin,phase,direction){
  box('body',-4,-24,-3,8,12,6,16,ill?20:16);
  // Pillager independent-arm UV is at (40,46), not the crossed-arm texture.
  box('leftArm',4,-24,-2,4,12,4,40,ill?46:16,swing*.75,-24);
- box('rightArm',-8,-24,-2,4,12,4,40,ill?46:16,-swing*.75,-24);
+ box('rightArm',-8,-24,-2,4,12,4,40,ill?46:16,-swing*.75-(pose.gesture||0)*1.5,-24);
  box('head',-4,-24-headH,-4,8,headH,8,0,0);
  if(ill)box('nose',-1,-29,-6,2,4,2,24,0);
  return faces.sort((a,b)=>b.depth-a.depth);
 }
 export class MobSprites{
  constructor(assets){this.assets=assets;this.cache=new Map();this.scratch=new WeakMap();}
- paint(c,skin,phase,direction){
-  for(const f of mobGeometry(skin,phase,direction)){
+ paint(c,skin,phase,direction,pose={}){
+  for(const f of mobGeometry(skin,phase,direction,pose)){
    const [u,v,w,h]=f.uv,[a,b,,d]=f.vertices;c.save();
    c.transform((b.x-a.x)/w,(b.y-a.y)/w,(d.x-a.x)/h,(d.y-a.y)/h,a.x,a.y);
    c.drawImage(this.assets.images[skin],u,v,w,h,0,0,w,h);
@@ -55,7 +59,7 @@ export class MobSprites{
   let frame=this.scratch.get(e);
   if(!frame){frame=document.createElement('canvas');frame.width=108;frame.height=120;this.scratch.set(e,frame);}
   const paint=frame.getContext('2d');paint.setTransform(1,0,0,1,0,0);paint.clearRect(0,0,108,120);paint.imageSmoothingEnabled=false;
-  paint.translate(54,110);paint.scale(2.7,2.7);this.paint(paint,e.skin,phase,e.facing||1);
+  paint.translate(54,110);paint.scale(2.7,2.7);this.paint(paint,e.skin,phase,e.facing||1,e.pose);
   c.save();c.translate(b.position.x,b.position.y);c.rotate(b.angle);
   if(!e.alive)c.globalAlpha=Math.max(0,1-(world.time-e.deathAt)/3);
   c.drawImage(frame,-54,46-110);c.restore();

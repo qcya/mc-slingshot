@@ -2,16 +2,16 @@ import { PixelGrid } from './pixels.mjs';
 import { TILE } from './config.mjs';
 import {RearLayer} from './rear.mjs';
 export const LEVELS=[
-  {title:'01 / 村庄小木屋',desc:'击碎窗户，或拆掉屋角让屋顶落下',shots:8},
-  {title:'02 / 石质哨塔',desc:'不同高度的守卫，承重柱和石质塔楼',shots:8},
-  {title:'03 / 双层村庄建筑',desc:'打穿楼板，让上层残骸击中下层',shots:9},
-  {title:'04 / 掠夺者前哨站',desc:'高架木楼与外挑平台，试试破坏支柱',shots:9},
-  {title:'05 / 小型堡垒',desc:'双塔、门楼和厚墙，合理切换四种弹药',shots:10}
+  {title:'01 / 村庄小木屋',desc:'击碎窗户，让弹药进入房间',shots:8},
+  {title:'02 / 石质哨塔',desc:'穿过薄墙，瞄准不同高度的守卫',shots:8},
+  {title:'03 / 双层村庄建筑',desc:'楼板可破坏，剩余房屋保持固定',shots:9},
+  {title:'04 / 掠夺者前哨站',desc:'穿过木墙，攻击高架平台上的守卫',shots:9},
+  {title:'05 / 小型堡垒',desc:'爆破打开射界，利用爆炸推动其他弹药',shots:10}
 ];
 
 export function buildLevel(number){
   const level=Math.max(0,Math.min(4,number)),grid=new PixelGrid(512,288),rear=new RearLayer(512,288),enemies=[];
-  const room=(x,y,w,h,m,floor,b)=>rear.room(x,y,w,h,m,floor*16,{x0:b[0]*16,y0:b[1]*16,x1:b[2]*16,y1:b[3]*16});
+  const room=(x,y,w,h,m)=>rear.room(x,y,w,h,m);
   const row=(x0,x1,y,m)=>{for(let x=x0;x<=x1;x++)grid.tile(x,y,m);};
   const column=(x,y0,y1,m)=>{for(let y=y0;y<=y1;y++)grid.tile(x,y,m);};
   const tile=(x,y,m)=>grid.tile(x,y,m);
@@ -24,10 +24,8 @@ export function buildLevel(number){
       row(left,left+1,y-step,m);row(right-1,right,y-step,m);
       sections.push({x:left+2,y:y-step,w:right-left-3});
     }
-    // The gable is a non-colliding rear wall, carried by its own roof beams.
-    for(const part of sections)if(part.w>0)rear.room(part.x,part.y,part.w,1,m,x=>{
-      let yy=part.y*16-1;while(yy>0&&!grid.get(x,yy))yy--;return yy;
-    },{x0:x0*16,y0:Math.max(0,y-Math.ceil((x1-x0)/2))*16,x1:(x1+1)*16,y1:(y+1)*16});
+    // The gable rear wall stays fixed just like the remaining foreground.
+    for(const part of sections)if(part.w>0)rear.room(part.x,part.y,part.w,1,m);
   };
   for(let x=0;x<32;x++){tile(x,14,1);tile(x,15,2);tile(x,16,3);tile(x,17,7);rear.grid.tile(x,14,2);rear.grid.tile(x,15,2);rear.grid.tile(x,16,3);rear.grid.tile(x,17,7);}
   if(level===0){
@@ -63,7 +61,6 @@ export function buildLevel(number){
     room(20,7,1,6,5,13,[19,6,22,14]);room(29,7,1,6,5,13,[28,6,31,14]);room(23,11,4,2,5,13,[22,10,28,14]);
   }
   // Background objects never enter the destructible/support grid.
-  const trees=[{x:11,base:14,height:5,kind:level===1?'spruce':'oak'},
-    {x:1,base:14,height:6,kind:'spruce'},{x:31,base:14,height:4,kind:'oak'}];
+  const trees=[{x:1,base:14,height:4,kind:'cherry'},{x:31,base:14,height:5,kind:'cherry'}];
   return {...LEVELS[level],number:level,grid,rear,enemies,trees};
 }

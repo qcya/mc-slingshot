@@ -1,7 +1,7 @@
 import { MATERIALS, AMMO } from './config.mjs';
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite),...AMMO.map(a=>a.sprite).filter(Boolean),
-  'oak_leaves','spruce_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom','zombie','pillager','crossbow_standby'])];
-const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse'];
+  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom','zombie','pillager','crossbow_standby'])];
+const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','zombie_idle','pillager_idle'];
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
@@ -16,6 +16,7 @@ export class Assets {
       if(!['zombie','pillager'].includes(name)&&(im.width!==16||im.height!==16))throw new Error(`纹理尺寸错误：${name}`);
       this.images[name]=im;
     }));
+    this.images.slingshot_frame=await image('assets/sprites/slingshot-frame.png');
     this.images.oak_leaves=tint(this.images.oak_leaves,'#76a745');
     this.images.spruce_leaves=tint(this.images.spruce_leaves,'#649877');
     const grass=document.createElement('canvas');grass.width=grass.height=16;

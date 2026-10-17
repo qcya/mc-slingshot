@@ -19,18 +19,6 @@ test('旋转的方块弹药落在真实 Matter 地面后停稳，不下沉', () 
   assert.equal(p.body.isSleeping,true);
 });
 
-test('承重只剩一侧且重心越界时，屋顶自然翻倒', () => {
-  const grid=new PixelGrid(240,160);grid.fill(0,128,240,32,7);
-  grid.fill(96,80,16,48,4);grid.fill(144,80,16,48,4);grid.fill(96,64,64,16,10);
-  const w=new SiegeWorld(Matter,{grid,pixelSize:2});
-  grid.fill(96,112,16,16,0);w.synchronize();
-  assert.equal(w.debris.length,1);
-  const piece=w.debris[0],before=piece.body.position.y;step(w,.25);
-  assert.ok(piece.body.position.y>before+2);
-  assert.ok(Math.abs(piece.body.angle)>.01);
-  assert.equal(grid.get(110,70),0);
-});
-
 test('TNT 固定四秒引信，撞击木材不挖洞，爆炸才破坏具体像素', () => {
   const w=fixture();w.grid.fill(140,40,16,88,4);w.synchronize();
   const p=w.spawnProjectile('tnt',230,210,330,0);
@@ -118,12 +106,4 @@ test('翻倒长梁的旋转端点可造成伤害，不能只看重心速度',()=
  w.addDebris(new Uint8Array(100*8).fill(3),100,8,{x:292,y:140},{x:0,y:0},0,{x:0,y:0},-.15);
  for(let i=0;i<20;i++)w.step(1/120);
  assert.ok(e.hp<100,`hp=${e.hp}`);
-});
-test('炸断屋脊后重新检查整个屋顶承重，远离爆点的悬臂也会落下',async()=>{
- const {buildLevel}=await import('../src/levels.mjs');const s=buildLevel(0),w=new SiegeWorld(Matter,{grid:s.grid,rear:s.rear});
- // Break the ridge only. The two roof halves can no longer balance each other.
- w.damageDisk(1176,264,42,500);w.synchronize();
- const leftRoof=w.debris.find(e=>e.texture.y<144&&e.texture.x<384&&e.count>1000);
- assert.ok(leftRoof,'left overhanging roof should detach even though its base is outside the blast tiles');
- const y=leftRoof.body.position.y;step(w,.45);assert.ok(leftRoof.body.position.y>y+3);
 });

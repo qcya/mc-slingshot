@@ -1,0 +1,7 @@
+# Slingshot frame PNG
+
+Generated with the built-in imagegen tool on 2026-10-17. The original generated RGBA file is copied unchanged into `slingshot-frame.png`; transparency is retained. Elastic bands and the pouch are separate animated game layers.
+
+## Prompt
+
+Use case: stylized-concept. Asset type: production browser-game sprite, transparent PNG. Generate ONE beautiful, believable wooden slingshot FRAME only, isolated with genuine transparent alpha background. Camera: three-quarter SIDE view appropriate to a 2D side-scrolling game, projectile normally fires toward screen RIGHT; a slight turn shows the depth of the two fork tips, avoid the flat symmetrical front-facing Y icon look. Upright natural forked walnut wood frame, tapered comfortable short handle, sturdy rounded branches, warm realistic wood grain, restrained polished highlights, small leather attachment wraps at the two tips. Polished stylized 3D game-asset render with readable silhouette at 140px tall, refined and natural, not a vector drawing, not cartoon black outlines, not Minecraft block texture, not a sketch. The empty fork opening and handle must be readable. NO elastic bands, NO string and NO pouch: game will draw and animate those dynamically. No projectile, no ground, no pedestal, no cast shadow outside the asset, no scenery, no text, no watermark. Entire frame fully visible with small transparent margins, centered vertically on a portrait-like composition.
