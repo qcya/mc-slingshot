@@ -73,7 +73,7 @@ if(require.main===module)(async()=>{
   const flag=process.argv.indexOf('--port'),port=Number(flag>=0?process.argv[flag+1]:process.env.PORT||8766),host=process.env.HOST||'127.0.0.1';
   if(!Number.isInteger(port)||port<0||port>65535)throw Error('Invalid port.');
   const server=await createGameServer();let retried=false;
-  server.on('error',error=>{if(error.code==='EADDRINUSE'&&!retried&&port!==0&&host==='127.0.0.1'){retried=true;console.log(`Port ${port} is busy; choosing a free local port.`);server.listen(0,host);return;}console.error(`MC Block Launch: ${error.message}`);process.exitCode=1;});
-  server.on('listening',()=>{const url=`http://${host==='0.0.0.0'?'127.0.0.1':host}:${server.address().port}`;console.log(`MC Block Launch: ${url}\nKeep this window open. Ctrl+C to stop.`);if(process.argv.includes('--open')){if(process.platform==='win32')exec(`start "" "${url}"`,{windowsHide:true});else console.log('Open the address above in your browser.');}});
+  server.on('error',error=>{if(error.code==='EADDRINUSE'&&!retried&&port!==0&&host==='127.0.0.1'){retried=true;console.log(`Port ${port} is busy; choosing a free local port.`);server.listen(0,host);return;}console.error(`MC Slingshot: ${error.message}`);process.exitCode=1;});
+  server.on('listening',()=>{const url=`http://${host==='0.0.0.0'?'127.0.0.1':host}:${server.address().port}`;console.log(`MC Slingshot: ${url}\nKeep this window open. Ctrl+C to stop.`);if(process.argv.includes('--open')){if(process.platform==='win32')exec(`start "" "${url}"`,{windowsHide:true});else console.log('Open the address above in your browser.');}});
   server.listen(port,host);
-})().catch(error=>{console.error(`MC Block Launch: ${error.message}`);process.exitCode=1;});
+})().catch(error=>{console.error(`MC Slingshot: ${error.message}`);process.exitCode=1;});

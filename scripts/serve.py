@@ -35,7 +35,7 @@ if __name__ == '__main__':
         print(f'Port {args.port} is busy; choosing a free local port.', flush=True)
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     url = f'http://127.0.0.1:{server.server_port}'
-    print(f'MC Block Launch: {url}', flush=True)
+    print(f'MC Slingshot: {url}', flush=True)
     if args.open:
         webbrowser.open(url)
     try:

@@ -12,6 +12,8 @@ function nickname(value){
   return name;
 }
 function fields(body,names){if(!body||typeof body!=='object'||Array.isArray(body)||Object.keys(body).length!==names.length||names.some(name=>!Object.hasOwn(body,name)))fail(400,'Invalid request fields.');}
+const nicknameKey=name=>name.normalize('NFKC').toLowerCase();
+function uniqueNickname(state,name,exceptId){if(state.profiles.some(p=>p.id!==exceptId&&nicknameKey(p.nickname)===nicknameKey(name)))fail(409,'用户名已占用');}
 function result(body,legacy=false){
   fields(body,legacy?['stage','shots','timeMs']:['stage','timeMs']);
   for(const [key,min,max] of [['stage',0,9],['timeMs',100,3600000],...(legacy?[['shots',1,50]]:[])])if(!Number.isSafeInteger(body[key])||body[key]<min||body[key]>max)fail(400,`Invalid ${key}.`);
@@ -26,7 +28,7 @@ function results(body){
 }
 function publicEntry(profile){
   const stages=Object.values(profile.stages).sort((a,b)=>a.stage-b.stage);
-  return {id:profile.id,nickname:profile.nickname,completed:stages.length,totalTimeMs:stages.reduce((n,s)=>n+s.timeMs,0),stages};
+  return {id:profile.id,nickname:profile.nickname,completed:stages.length,totalTimeMs:stages.reduce((n,s)=>n+s.timeMs,0),stages,...(profile.demo===true?{demo:true}:{})};
 }
 async function createLeaderboard({dataDir}){
   await fs.mkdir(dataDir,{recursive:true,mode:0o700});
@@ -74,15 +76,15 @@ async function createLeaderboard({dataDir}){
     profile(token){const id=authenticate(token),p=state.profiles.find(p=>p.id===id);return {profile:{id,nickname:p.nickname},stages:publicEntry(p).stages};},
     async create(body){
       fields(body,['nickname']);const name=nickname(body.nickname),token=crypto.randomBytes(32).toString('base64url'),id=crypto.randomBytes(16).toString('base64url');
-      return mutate(next=>{if(next.profiles.length>=10000)fail(503,'Player limit reached.');next.profiles.push({id,nickname:name,tokenHash:hash(token),stages:{}});return {profile:{id,nickname:name},token};});
+      return mutate(next=>{if(next.profiles.length>=10000)fail(503,'Player limit reached.');uniqueNickname(next,name);next.profiles.push({id,nickname:name,tokenHash:hash(token),stages:{}});return {profile:{id,nickname:name},token};});
     },
     async update(token,body){
       const id=authenticate(token);fields(body,['nickname']);const name=nickname(body.nickname);
-      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);p.nickname=name;return {profile:{id,nickname:name}};});
+      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);if(p.demo===true)fail(403,'Test entry is read-only.');if(nicknameKey(p.nickname)!==nicknameKey(name))uniqueNickname(next,name,id);p.nickname=name;return {profile:{id,nickname:name}};});
     },
     async submit(token,body){
       const id=authenticate(token),scores=results(body);
-      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);for(const score of scores){const old=p.stages[score.stage];if(!old||score.timeMs<old.timeMs)p.stages[score.stage]=score;}return {entry:publicEntry(p)};});
+      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);if(p.demo===true)return {entry:publicEntry(p)};for(const score of scores){const old=p.stages[score.stage];if(!old||score.timeMs<old.timeMs)p.stages[score.stage]=score;}return {entry:publicEntry(p)};});
     },
   };
 }

@@ -18,7 +18,7 @@ function pendingResults(){const raw=readLocal(PENDING_KEY,[]);return Array.isArr
 function queueBestTimes(){const bundle=timeBundle(bestTimes);if(bundle)saveLocal(PENDING_KEY,[bundle]);}
 async function restoreTimes(){
  if(!profile?.token)return;const revision=profileRevision;
- try{const reply=await online.profile(profile.token);if(revision!==profileRevision)return;const bundle=parseTimeBundle(reply);if(!bundle)return;for(const s of bundle.stages)bestTimes=recordBestTime(bestTimes,s.stage,s.timeMs);saveLocal(TIME_SAVE_KEY,bestTimes);queueBestTimes();}catch{/* Offline play keeps local records. */}
+ try{const reply=await online.profile(profile.token);if(revision!==profileRevision)return;if(!profile.dirty&&reply.profile?.id===profile.id&&typeof reply.profile.nickname==='string'){profile={...profile,nickname:reply.profile.nickname};saveLocal(PROFILE_KEY,profile);profileLabel();}const bundle=parseTimeBundle(reply);if(!bundle)return;for(const s of bundle.stages)bestTimes=recordBestTime(bestTimes,s.stage,s.timeMs);saveLocal(TIME_SAVE_KEY,bestTimes);queueBestTimes();}catch{/* Offline play keeps local records. */}
 }
 function profileLabel(){$('#profileBtn').textContent=profile?.nickname?`玩家：${profile.nickname}`:'设置昵称';}
 async function syncResults(){
@@ -27,21 +27,21 @@ async function syncResults(){
   if(profile.token&&profile.dirty){try{const reply=await online.updateProfile(profile.token,profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:profile.token};}catch(error){if(revision!==profileRevision)return;if(error.status!==401)throw error;profile.token=null;}}
   if(!profile.token){const reply=await online.createProfile(profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:reply.token};}saveLocal(PROFILE_KEY,profile);profileLabel();await restoreTimes();if(revision!==profileRevision)return;
   while(pendingResults().length){const score=pendingResults()[0];if(revision!==profileRevision)return;try{await online.submitResult(profile.token,score);}catch(error){if(revision!==profileRevision)return;if(error.status===401){profile.token=null;saveLocal(PROFILE_KEY,profile);}throw error;}if(revision!==profileRevision)return;const rest=pendingResults().filter(s=>JSON.stringify(s)!==JSON.stringify(score));saveLocal(PENDING_KEY,rest);}
- }catch(error){console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
+ }catch(error){if(error.status===409&&revision===profileRevision){showProfile();$('#profileStatus').textContent='用户名已占用';}else console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
 }
 function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?'levels':state.screen;cancelDrag();$('#saveProfile').disabled=false;$('#nickname').value=profile?.nickname||'';$('#profileStatus').textContent='昵称 1—16 个字符；不需要密码。';$('#profileBack').classList.toggle('hidden',!profile);menus('profile');}
 async function saveProfile(event){
  event.preventDefault();if($('#saveProfile').disabled)return;const nickname=$('#nickname').value.normalize('NFKC').trim().replace(/ +/g,' ');if(!nickname||[...nickname].length>16||! /^[\p{L}\p{N}\p{M}_ -]+$/u.test(nickname)||!/[\p{L}\p{N}]/u.test(nickname)){$('#profileStatus').textContent='请输入 1—16 个字母、汉字或数字，可含空格、下划线和短横线。';return;}
  const revision=++profileRevision,returnTo=profileReturn;$('#saveProfile').disabled=true;let nextProfile;
  try{const reply=profile?.token?await online.updateProfile(profile.token,nickname):await online.createProfile(nickname);nextProfile={...reply.profile,token:reply.token||profile?.token};}
- catch(error){if(revision!==profileRevision)return;if(error.status===400){$('#profileStatus').textContent='这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
+ catch(error){if(revision!==profileRevision)return;if([400,403,409].includes(error.status)){$('#profileStatus').textContent=error.status===409?'用户名已占用':error.status===403?'这是测试记录，不能修改昵称':'这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
  if(revision!==profileRevision)return;profile=nextProfile;$('#saveProfile').disabled=false;saveLocal(PROFILE_KEY,profile);profileLabel();if(state.screen==='profile')menus(returnTo);void syncResults();
 }
 async function showLeaderboard(){
  cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision;
  $('#leaderboardStatus').textContent='正在读取排行榜…';
  try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?'十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。':'还没有全通成绩，来成为第一位挑战者。';
-  for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
+  for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const [i,value] of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)].entries()){const cell=document.createElement('td');cell.textContent=value;if(i===1&&entry.demo){const badge=document.createElement('small');badge.className='demo-badge';badge.textContent='测试';cell.append(' ',badge);}row.append(cell);}$('#rankingRows').append(row);}
  }catch{if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
 async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock('landscape');}catch{/* A browser may require rotation by hand. */}}

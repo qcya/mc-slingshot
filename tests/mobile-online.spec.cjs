@@ -52,6 +52,23 @@ test('overlapping board refreshes cannot append duplicate rows or replace newer 
  await expect(page.locator('#rankingRows tr')).toHaveCount(100);await expect(page.locator('#rankingRows tr').first()).toContainText('Latest0');
 });
 
+test('an occupied nickname stays in the form with a clear message',async({page})=>{
+ const occupied=`Taken${Date.now().toString(36)}`;expect((await page.request.post('/api/profile',{data:{nickname:occupied}})).ok()).toBe(true);
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await expect(page).toHaveTitle('MC打弹弓 · MC Slingshot');await expect(page.locator('#levelMenu h1')).toHaveText('MC打弹弓');await page.locator('#nickname').fill(occupied);await page.locator('#saveProfile').click();
+ await expect(page.locator('#profileMenu')).toBeVisible();await expect(page.locator('#profileStatus')).toHaveText('用户名已占用');await expect(page.locator('#saveProfile')).toBeEnabled();
+ expect(await page.evaluate(()=>localStorage.getItem('mc-block-launch.profile.v1'))).toBeNull();
+ await page.locator('#nickname').fill(`${occupied}a`);await page.locator('#saveProfile').click();await expect(page.locator('#levelMenu')).toBeVisible();
+ await page.locator('#leaderboardBtn').click();
+ expect(await page.locator('#leaderboardMenu').evaluate(e=>getComputedStyle(e).backgroundImage)).toBe(await page.locator('#levelMenu').evaluate(e=>getComputedStyle(e).backgroundImage));
+ await page.screenshot({path:'evidence/leaderboard-menu-background.png'});
+});
+
+test('the sample score is visibly labelled as a test record',async({page})=>{
+ await page.route('**/api/leaderboard',r=>r.fulfill({json:{entries:[{id:'sample',rank:1,nickname:'星海',completed:10,totalTimeMs:397000,demo:true}]}}));
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('SampleViewer');await page.locator('#saveProfile').click();await page.locator('#leaderboardBtn').click();
+ await expect(page.locator('#rankingRows tr')).toContainText('星海');await expect(page.locator('.demo-badge')).toHaveText('测试');await expect(page.locator('#rankingRows tr')).toContainText('06:37.000');await page.screenshot({path:'evidence/demo-leaderboard-preview.png'});
+});
+
 test.describe('Android 触屏布局与实际输入',()=>{
  test.use({viewport:{width:844,height:390},isMobile:true,hasTouch:true});
  test('one pause control, five-point aim, anywhere second-finger cancel and direct hotbar access',async({page,context})=>{

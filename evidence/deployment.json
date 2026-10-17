@@ -1,17 +1,19 @@
 {
-  "version": "0.11.3",
+  "version": "0.11.4",
+  "name": "MC\u6253\u5f39\u5f13 / MC Slingshot",
+  "repository": "https://github.com/qcya/mc-slingshot",
   "url": "https://qcya.fun:8443/mc-block-launch/",
   "lanUrl": "http://192.168.1.4:8770/",
-  "release": "/srv/mc-block-launch/releases/0.11.3-20261017222455",
-  "previousRelease": "/srv/mc-block-launch/releases/0.11.3-20261017222252",
+  "release": "/srv/mc-block-launch/releases/0.11.4-20261017225252",
+  "previousRelease": "/srv/mc-block-launch/releases/0.11.3-20261017222455",
   "service": "mc-block-launch.service",
   "files": 111,
   "publicFilesHashedOverTLS": 108,
   "manifest": {
-    "index.html": "d0a596cc4ee2b9e35f682c23c28650c59177f1f038b53b89699b5083414794f4",
+    "index.html": "74ee7d21a17d50918c0a2e24f421087b0ea14c50c891dad801ffef2996cfcdd1",
     "game.js": "ad9c185c2409eaa64cff087b38ea37ea4424c1cfb8f5361a5d54021043cd0854",
-    "style.css": "543ae887fa9238bc66a276c03046e50c2fabfe9bc3d9d8cfc9c3d165aa5406e4",
-    "package.json": "abf60455d8103e9a0edc8e771061e5fa7e492e95662704270e598ca4ea4e17fa",
+    "style.css": "d685d2a4ab160880fd054337dfa4ff16501a00a770bf0b6b2ebced8f8c58fd07",
+    "package.json": "37f9f8842914ee9e7592444cbfa26208f9b550448034db717f897d9b030a4be7",
     "assets/effects/explosion_0.png": "3e2ca80f6accdcf50f580df2e8777ada3279ea9b6c74c28028e1bb2d2edb9140",
     "assets/effects/explosion_1.png": "06b235749d132ff1ff4e946341c4eb56deb09feaa5f49cbb430383b0bbe4f292",
     "assets/effects/explosion_10.png": "e166b8ab4d3821dae540daaa8cfb073b44966a87383e26c64a8ca9750301468d",
@@ -95,7 +97,7 @@
     "assets/textures/zombie.png": "1c879744424077ab6f7d8b13b015dfc9d5e0efee6c70696de5c2ee588f4f563a",
     "src/aim.mjs": "e74864c2baf2d8d449d492ad8f5281be050727348768087699157985f7ac3648",
     "src/animation.mjs": "d1d592d1cd911b25279a28e9226f4fc616d652202156700369e7738338f3822f",
-    "src/app.mjs": "8362a659483cf1086d1f23fa5fc250c37ae17a2775b2d89e6721ddcaf2f932c6",
+    "src/app.mjs": "dfa88abbfc8bd1f24081f620610a5b3bd19d3368a4ca4eb66e968e34cdc32071",
     "src/assets.mjs": "a280a6a7e6cae1703997d26e6bc7bc4817d0fd3c99a8a05cccb475596449d38a",
     "src/behavior.mjs": "deffd12683878a367cb26cac2cee952dd9e77b6f57dbb25a727369190b008c27",
     "src/campaign.mjs": "b4777d0738fa52f8c80440de7f09a7720e79200b77c6781d16a01d7e45aaf3cb",
@@ -117,8 +119,8 @@
     "src/world.mjs": "4cd83949fc61dbf2d367bad94cb4540bf5da4c7ba2e03b664fe1ad259c20cdcf",
     "vendor/matter.min.js": "40120ab0e4f6c956b6ee691ba38ade20d38c8fac9b74079b75071276baa8fa93",
     "vendor/node-runtime-LICENSE.txt": "4573185d56580da2b890ba34a85a409257640f1c5632eade4300137266194d18",
-    "scripts/serve.cjs": "9737475511519590ab72c0473cbabd7e6f4c04fcd648404cbdbbd3dbc0e99b93",
-    "scripts/leaderboard.cjs": "76600da82971f9ec5d8f50c61a832b5a257638e4f70a82bd5c73529da4098cc1"
+    "scripts/serve.cjs": "c90249103a8998b330a1269b110b96dee6928b8b6e23893d15707a4e79a8a98c",
+    "scripts/leaderboard.cjs": "aef3709959f683a12f538704524437429acf0dd44304dcd2c3da674920b4abc9"
   },
   "verified": [
     "LAN-health-and-key-file-hashes",
@@ -128,9 +130,11 @@
     "partial-score-rejected",
     "identity-persists-after-service-restart",
     "full-time-only-leaderboard",
-    "private-paths-404"
+    "private-paths-404",
+    "explicit-demo-edit-only-other-profiles-preserved",
+    "demo-nickname-reserved"
   ],
   "externalNetwork": "User will verify outside LAN; household connection has no NAT loopback.",
-  "leaderboard": "Existing data backed up and retained, no fabricated leaderboard scores.",
+  "leaderboard": "Backed up all data; user-requested existing test record renamed to \u661f\u6d77, 397000ms, labelled demo. All other existing profiles unchanged.",
   "firewall": "8770 restricted to LAN subnet on enp3s0 and existing Caddy bridge rule; forwarded headers trusted only from configured Caddy peer."
 }

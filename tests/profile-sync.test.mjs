@@ -33,3 +33,15 @@ test('reconnecting restores full server times after an offline startup',async()=
  const {context:c,storage}=fixture();c.online.profile=async()=>{throw Error('offline');};await c.syncResults();assert.equal(storage.has('times'),false);
  c.online.profile=async()=>bundle(2500);let submitted;c.online.submitResult=async(token,s)=>submitted=s;await c.syncResults();assert.equal(JSON.parse(storage.get('times')).length,10);assert.equal(submitted.stages[9].timeMs,2500);
 });
+
+test('an offline nickname conflict on reconnect asks for another name without losing the local profile',async()=>{
+ const {context:c,node}=fixture();c.profile={nickname:'Taken',dirty:true};c.online.createProfile=async()=>{throw Object.assign(Error('taken'),{status:409});};await c.syncResults();assert.equal(c.state.screen,'profile');assert.equal(node('#profileStatus').textContent,'用户名已占用');assert.equal(c.profile.nickname,'Taken');assert.equal(c.syncing,false);
+});
+
+test('a read-only sample rename cannot be saved as a dirty offline change',async()=>{
+ const {context:c,node,storage}=fixture();c.state.screen='profile';const before={...c.profile};c.online.updateProfile=async()=>{throw Object.assign(Error('read only'),{status:403});};await c.saveProfile({preventDefault(){}});assert.equal(c.state.screen,'profile');assert.deepEqual({...c.profile},before);assert.equal(storage.has('profile'),false);assert.equal(node('#profileStatus').textContent,'这是测试记录，不能修改昵称');assert.equal(node('#saveProfile').disabled,false);
+});
+
+test('restoring the same identity refreshes a server-renamed nickname',async()=>{
+ const {context:c,node}=fixture();c.profile.nickname='1';c.online.profile=async()=>({profile:{id:'id',nickname:'星海'},...bundle(39700)});c.online.submitResult=async()=>{};await c.syncResults();assert.equal(c.profile.nickname,'星海');assert.equal(node('#profileBtn').textContent,'玩家：星海');
+});

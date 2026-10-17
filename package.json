@@ -1,6 +1,6 @@
 {
-  "name": "mc-block-launch",
-  "version": "0.11.3",
+  "name": "mc-slingshot",
+  "version": "0.11.4",
   "private": true,
   "description": "Minecraft 风格的二维逐像素物理攻城游戏",
   "scripts": {

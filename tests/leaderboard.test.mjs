@@ -90,6 +90,21 @@ test('the public board contains only the fastest 100 full clears',async t=>{
  assert.equal(response.status,200);assert.equal(entries.length,100);assert.equal(entries[0].nickname,'Rank0');assert.equal(entries[99].nickname,'Rank99');assert.equal(entries[99].rank,100);assert.ok(entries.every(e=>e.completed===10));
 });
 
+test('nicknames are unique after normalization, including concurrent creation and rename',async t=>{
+ const f=await fixture(t),first=(await create(f,'  Star  Sea  ')).data,other=(await create(f,'Other')).data;
+ assert.equal((await create(f,'star sea')).status,409);assert.equal((await create(f,'ＳＴＡＲ ＳＥＡ')).status,409);
+ assert.equal((await f.request('/api/profile',{method:'PATCH',token:other.token,body:{nickname:'STAR SEA'}})).status,409);
+ assert.equal((await f.request('/api/profile',{method:'PATCH',token:first.token,body:{nickname:'Star Sea'}})).status,200);
+ const race=await Promise.all([create(f,'Racer'),create(f,'racer')]);assert.deepEqual(race.map(r=>r.status).sort(),[201,409]);
+ await f.restart();assert.equal((await create(f,'STAR SEA')).status,409);
+});
+
+test('the explicitly marked sample entry keeps its displayed time and reserved name',async t=>{
+ const token=crypto.randomBytes(32).toString('base64url'),p={id:crypto.randomBytes(16).toString('base64url'),nickname:'星海',tokenHash:crypto.createHash('sha256').update(token).digest('hex'),demo:true,stages:Object.fromEntries(stages(39700).map(s=>[s.stage,s]))};
+ const f=await fixture(t,{}, {version:2,profiles:[p]});let entry=(await f.request('/api/leaderboard')).data.entries[0];assert.equal(entry.demo,true);assert.equal(entry.totalTimeMs,397000);
+ assert.equal((await submit(f,token,stages(1000))).data.entry.totalTimeMs,397000);assert.equal((await create(f,'星海')).status,409);assert.equal((await f.request('/api/profile',{method:'PATCH',token,body:{nickname:'Changed'}})).status,403);
+});
+
 test('concurrent complete bundles atomically preserve independent stage bests and profiles',async t=>{
   const f=await fixture(t),players=await Promise.all(Array.from({length:12},(_,i)=>create(f,`Player${i}`)));
   const responses=await Promise.all(players.flatMap(p=>Array.from({length:10},(_,index)=>submit(f,p.data.token,stages(stage=>index===stage?100+stage:1000)))));

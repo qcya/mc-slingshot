@@ -1,7 +1,8 @@
 ﻿const {expect}=require('@playwright/test');
+let profileSequence=0;
 async function ready(page,{level=0,unlocked=10}={}){
  if(unlocked>1)await page.addInitScript(n=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:n,completed:[]})),unlocked);
- await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill('测试玩家');await page.locator('#saveProfile').click();}await page.locator('#level-'+level).click();
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill(`Test${process.pid.toString(36)}_${++profileSequence}`);await page.locator('#saveProfile').click();}await page.locator('#level-'+level).click();
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().screen)).toBe('play');
 }
 async function chooseLevel(page,level){
