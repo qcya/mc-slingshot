@@ -1,0 +1,16 @@
+{
+  "title": "MC打弹弓",
+  "version": "0.12.0",
+  "slug": "mc-slingshot",
+  "category": "GAME",
+  "visibility": "public",
+  "previewUrl": "https://www.bilibili.com/toy/preview/preview_fEKohVnX/index.html",
+  "supersededPreviewUrl": "https://www.bilibili.com/toy/preview/preview_r6nIm0dH/index.html",
+  "reviewSubmitted": false,
+  "platformBrowserVerified": false,
+  "userFeedback": "User confirmed ordinary-script preview plays, but home API board failed. Final native SDK board preview awaits user verification.",
+  "buildDirectory": "dist/toy-CL3lM2",
+  "cloudSdk": "Official bundled Toy SDK; account-scoped getUserProfile/getCloudStorage/setCloudStorage",
+  "ranking": "Native Toy SDK board 1; Bilibili account identity, full-clear fastest stage totals encoded to centiseconds, top 100; no home API",
+  "cloudKey": "mcslingshot_save_v1"
+}

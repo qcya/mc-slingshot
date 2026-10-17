@@ -6,7 +6,7 @@ const functions=source.slice(source.indexOf('function readLocal('),source.indexO
 function fixture(){
  const storage=new Map(),nodes=new Map();const node=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',value:'新昵称',disabled:false,classList:{toggle(){}}});return nodes.get(id);};
  const context=vm.createContext({console,queueMicrotask,parseTimeBundle,normalizeTimes,recordBestTime,timeBundle,TIME_SAVE_KEY:'times',bestTimes:[],PROFILE_KEY:'profile',PENDING_KEY:'pending',profile:{id:'id',token:'token',nickname:'旧昵称'},profileRevision:0,profileReturn:'levels',syncing:false,state:{screen:'levels'},online:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:node,cancelDrag(){},menus(screen){context.state.screen=screen;}});
- vm.runInContext(functions,context);return {context,storage,node};
+ vm.runInContext('const appStorage=localStorage;const nativeOnline=false;',context);vm.runInContext(functions,context);return {context,storage,node};
 }
 const bundle=t=>({stages:Array.from({length:10},(_,stage)=>({stage,timeMs:t}))});
 test('a faster full run queued during upload is drained without another win or reload',async()=>{

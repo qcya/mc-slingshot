@@ -1,0 +1,16 @@
+// Static Toy build. Never includes Node server code, player data or credentials.
+const fs=require('node:fs'),path=require('node:path'),esbuild=require('esbuild');
+const root=path.resolve(__dirname,'..');
+function buildToy({output}={}){
+ if(!output){const dist=path.join(root,'dist');fs.mkdirSync(dist,{recursive:true});output=fs.mkdtempSync(path.join(dist,'toy-'));}
+ else{output=path.resolve(output);if(fs.existsSync(output))throw Error('Build output already exists.');fs.mkdirSync(output,{recursive:true});}
+ for(const file of ['index.html','style.css','assets','vendor'])fs.cpSync(path.join(root,file),path.join(output,file),{recursive:true,filter:source=>fs.statSync(source).isDirectory()||/\.(html|js|css|png|ogg)$/.test(source)});
+ // Toy/CDN static hosts need not advertise .mjs with a module MIME type.
+ // Emit one ordinary script so neither ESM MIME nor source imports can block boot.
+ esbuild.buildSync({entryPoints:[path.join(root,'game.js')],bundle:true,format:'iife',platform:'browser',target:'es2020',minify:true,outfile:path.join(output,'game.js')});
+ fs.writeFileSync(path.join(output,'toy-config.js'),`globalThis.MC_PLATFORM=${JSON.stringify({toy:true,ranking:'toy'})};\n`);
+ const entry=path.join(output,'index.html');fs.writeFileSync(entry,fs.readFileSync(entry,'utf8').replace('<script type="module" src="game.js">','<script src="toy-config.js"></script><script src="vendor/toy-sdk.min.js"></script><script defer src="game.js">'));
+ return {output,ranking:'Toy SDK'};
+}
+module.exports={buildToy};
+if(require.main===module)console.log(JSON.stringify(buildToy()));

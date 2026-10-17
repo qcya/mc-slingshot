@@ -6,3 +6,4 @@ playwright-report/
 __pycache__/
 runtime/
 releases/
+dist/

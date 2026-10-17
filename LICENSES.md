@@ -48,3 +48,7 @@
 ## Alpha 0.11 战斗素材
 
 - 烈焰弹、火焰动画图集、监守者皮肤及四种配套 OGG 均为 Minecraft 原版资源。逐项来源、版本、音效 SHA-1 和模型 UV 参考见 [docs/combat-assets.md](docs/combat-assets.md)。
+
+## Toy SDK
+
+- `vendor/toy-sdk.min.js`：Bilibili 官方分发原文件，仅 Toy 构建加载。来源 `https://s1.hdslb.com/bfs/seed/toy/app/sdk/toy-sdk.js`，2026-10-17 获取，SHA-256 `b025be2dc7e526aa074b329d65c122f2dfbdc851203195dc3e53800aaae32de4`。适配使用实文件公开接口 `getUserProfile()`、`getCloudStorage(keys)`、`setCloudStorage(values)`、`getRankList`、`getMyRank` 和 `submitScore`；没有在包里嵌入发布会话或玩家令牌。

@@ -5,15 +5,19 @@ import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,totalAmmo,spendA
 import {mobAppearance} from './animation.mjs';
 import {updateOutcome} from './outcome.mjs';
 import {createOnlineClient} from './online.mjs';
+import {createToyOnlineClient} from './toy-online.mjs';
+import {createToyStorage} from './toy-storage.mjs';
 import {BackgroundMusic} from './music.mjs';
 import {TIME_SAVE_KEY,TIME_QUEUE_KEY,normalizeTimes,recordBestTime,timeBundle,parseTimeBundle,formatTime} from './timing.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const coarsePointer=matchMedia('(pointer:coarse)'),cancelledTouchClicks=new Set();
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
 let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
-const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=createOnlineClient();let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
-function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
-function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
+const nativeOnline=globalThis.MC_PLATFORM?.ranking==='toy';
+const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=nativeOnline?createToyOnlineClient({getUser:()=>appStorage.user(),getTimes:()=>readLocal(TIME_SAVE_KEY,[])}):createOnlineClient({baseUrl:globalThis.MC_PLATFORM?.apiBaseUrl||''});let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
+const appStorage=createToyStorage({enabled:globalThis.MC_PLATFORM?.toy===true,storage:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)},onStatus:s=>{const node=$('#cloudState');if(node){node.hidden=!s.enabled;node.textContent=s.lastError?'云存档暂未同步，进度已暂存本机':s.dirty?'云存档正在同步…':'Toy 云存档已连接';}}});
+function readLocal(key,fallback){try{return JSON.parse(appStorage.getItem(key))||fallback;}catch{return fallback;}}
+function saveLocal(key,value){try{appStorage.setItem(key,JSON.stringify(value));}catch{}}
 function pendingResults(){const raw=readLocal(PENDING_KEY,[]);return Array.isArray(raw)?raw.map(parseTimeBundle).filter(Boolean):[];}
 function queueBestTimes(){const bundle=timeBundle(bestTimes);if(bundle)saveLocal(PENDING_KEY,[bundle]);}
 async function restoreTimes(){
@@ -29,9 +33,9 @@ async function syncResults(){
   while(pendingResults().length){const score=pendingResults()[0];if(revision!==profileRevision)return;try{await online.submitResult(profile.token,score);}catch(error){if(revision!==profileRevision)return;if(error.status===401){profile.token=null;saveLocal(PROFILE_KEY,profile);}throw error;}if(revision!==profileRevision)return;const rest=pendingResults().filter(s=>JSON.stringify(s)!==JSON.stringify(score));saveLocal(PENDING_KEY,rest);}
  }catch(error){if(error.status===409&&revision===profileRevision){showProfile();$('#profileStatus').textContent='用户名已占用';}else console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
 }
-function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?'levels':state.screen;cancelDrag();$('#saveProfile').disabled=false;$('#nickname').value=profile?.nickname||'';$('#profileStatus').textContent='昵称 1—16 个字符；不需要密码。';$('#profileBack').classList.toggle('hidden',!profile);menus('profile');}
+function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?'levels':state.screen;cancelDrag();$('#saveProfile').disabled=false;$('#nickname').value=profile?.nickname||'';$('#nickname').readOnly=!!(nativeOnline&&appStorage.user()?.nickname);$('#profileStatus').textContent=$('#nickname').readOnly?'使用当前 B 站账号昵称，改名后刷新游戏同步。':'昵称 1—16 个字符；不需要密码。';$('#profileBack').classList.toggle('hidden',!profile);menus('profile');}
 async function saveProfile(event){
- event.preventDefault();if($('#saveProfile').disabled)return;const nickname=$('#nickname').value.normalize('NFKC').trim().replace(/ +/g,' ');if(!nickname||[...nickname].length>16||! /^[\p{L}\p{N}\p{M}_ -]+$/u.test(nickname)||!/[\p{L}\p{N}]/u.test(nickname)){$('#profileStatus').textContent='请输入 1—16 个字母、汉字或数字，可含空格、下划线和短横线。';return;}
+ event.preventDefault();if($('#saveProfile').disabled)return;const platformName=nativeOnline&&appStorage.user()?.nickname,nickname=platformName||$('#nickname').value.normalize('NFKC').trim().replace(/ +/g,' ');if(!platformName&&(!nickname||[...nickname].length>16||! /^[\p{L}\p{N}\p{M}_ -]+$/u.test(nickname)||!/[\p{L}\p{N}]/u.test(nickname))){$('#profileStatus').textContent='请输入 1—16 个字母、汉字或数字，可含空格、下划线和短横线。';return;}
  const revision=++profileRevision,returnTo=profileReturn;$('#saveProfile').disabled=true;let nextProfile;
  try{const reply=profile?.token?await online.updateProfile(profile.token,nickname):await online.createProfile(nickname);nextProfile={...reply.profile,token:reply.token||profile?.token};}
  catch(error){if(revision!==profileRevision)return;if([400,403,409].includes(error.status)){$('#profileStatus').textContent=error.status===409?'用户名已占用':error.status===403?'这是测试记录，不能修改昵称':'这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
@@ -40,9 +44,9 @@ async function saveProfile(event){
 async function showLeaderboard(){
  cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision;
  $('#leaderboardStatus').textContent='正在读取排行榜…';
- try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?'十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。':'还没有全通成绩，来成为第一位挑战者。';
+ try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?(nativeOnline?'十关个人最快时间之和，用时越短排名越高，精度 0.01 秒，仅显示前 100 名。':'十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。'):'还没有全通成绩，来成为第一位挑战者。';
   for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
- }catch{if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
+ }catch(error){if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent=nativeOnline?`Toy 排行榜暂不可用：${error.message||error.code||'连接失败'}。通关成绩已保存在本机。`:'暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
 async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock('landscape');}catch{/* A browser may require rotation by hand. */}}
 function iconUrl(i){const icon=assets.icons[AMMO[i].id];return icon instanceof HTMLCanvasElement?icon.toDataURL():icon.src;}
@@ -128,15 +132,16 @@ function status(){
 }
 async function start(){
  if(!window.Matter?.Engine)throw new Error('Matter.js 未加载。请通过启动脚本运行。');
+ loadState.textContent='正在加载方块纹理与音效…';
  assets=await new Assets().load();renderer=new Renderer(canvas,assets);drawAudio=await new DrawAudio().load(assets.sounds.crossbow_pull.src);
  music=new BackgroundMusic();$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';
- try{progress=readProgress(localStorage.getItem(SAVE_KEY));}catch{progress=readProgress(null);}
+ if(globalThis.MC_PLATFORM?.toy)loadState.textContent='正在连接 Toy 云存档…';await appStorage.initialize();try{progress=readProgress(appStorage.getItem(SAVE_KEY));}catch{progress=readProgress(null);}
  for(let i=0;i<9;i++){
   const b=document.createElement('button');b.className='ball';b.setAttribute('aria-label',i<AMMO.length?AMMO[i].label:`${i+1}. 空物品格`);
   if(i<AMMO.length){const img=document.createElement('img');img.src=iconUrl(i);img.alt='';const count=document.createElement('span');count.className='stack-count';b.append(img,count);}
   b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
  }
- profile=readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;profileLabel();
+ profile=readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;if(nativeOnline&&appStorage.user()?.nickname){const linked=await online.createProfile();profile={...linked.profile,token:linked.token};saveLocal(PROFILE_KEY,profile);}profileLabel();
  bestTimes=normalizeTimes(readLocal(TIME_SAVE_KEY,[]));queueBestTimes();loadLevel(progress.unlocked-1);showLevels();if(!profile)showProfile();else void syncResults();loadState.hidden=true;
  canvas.addEventListener('pointerdown',beginDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);
  canvas.addEventListener('pointercancel',cancelDrag);canvas.addEventListener('lostpointercapture',()=>{if(state.drag)cancelDrag();});
@@ -164,7 +169,7 @@ async function start(){
   if(e.target instanceof HTMLInputElement)return;if(e.key==='Escape'){e.preventDefault();if(['profile','leaderboard'].includes(state.screen)){if(profile){showLevels();void syncResults();}}else pause();return;}if(state.screen!=='play')return;
   if(e.key>='1'&&e.key<='9')select(Number(e.key)-1);if(e.key.toLowerCase()==='r')loadLevel(state.level);if(e.code==='Space'){e.preventDefault();pause();}
  });
- window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.screen==='play')pause();});window.addEventListener('online',()=>void syncResults());
+ window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.screen==='play')pause();void appStorage.flush();}});window.addEventListener('online',()=>{void syncResults();void appStorage.flush();});
  window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:loadLevel,select,
  getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),

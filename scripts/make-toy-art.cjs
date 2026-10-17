@@ -1,0 +1,9 @@
+// Cover and icon are composed from the actual game screenshot and bundled art.
+const {chromium}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'docs/publishing');
+const data=file=>'data:image/png;base64,'+fs.readFileSync(path.join(root,file)).toString('base64');
+async function main(){fs.mkdirSync(out,{recursive:true});const browser=await chromium.launch({channel:'msedge'});try{const page=await browser.newPage({viewport:{width:1200,height:900},deviceScaleFactor:1});
+ await page.setContent(`<style>*{box-sizing:border-box}body{margin:0;background:#35251c url('${data('assets/textures/dirt.png')}');background-size:96px;image-rendering:pixelated}h1{margin:0;height:158px;display:flex;align-items:center;justify-content:center;color:#fff;font:900 98px 'Microsoft YaHei',sans-serif;text-shadow:5px 6px #222;letter-spacing:5px;background:#0006;border-bottom:8px solid #29231b}.game{width:1200px;height:675px;background:url('${data('evidence/level-6-initial.png')}') center/cover;image-rendering:pixelated}.foot{height:67px;background:#0006;border-top:8px solid #29231b}</style><h1>MC打弹弓</h1><div class="game"></div><div class="foot"></div>`);await page.screenshot({path:path.join(out,'toy-cover.png')});
+ await page.setViewportSize({width:512,height:512});await page.setContent(`<style>body{margin:0;display:flex;align-items:flex-end;justify-content:center;background:#8db9de;width:512px;height:512px;border:14px solid #362b21;box-sizing:border-box}img{height:470px;image-rendering:pixelated;filter:drop-shadow(8px 5px 0 #0005)}</style><img src="${data('assets/sprites/slingshot-frame.png')}">`);await page.screenshot({path:path.join(out,'toy-icon.png')});
+ }finally{await browser.close();}}
+main().catch(e=>{console.error(e);process.exitCode=1;});

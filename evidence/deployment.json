@@ -1,19 +1,19 @@
 {
-  "version": "0.11.5",
+  "version": "0.12.0",
   "name": "MC\u6253\u5f39\u5f13 / MC Slingshot",
   "repository": "https://github.com/qcya/mc-slingshot",
   "url": "https://qcya.fun:8443/mc-block-launch/",
   "lanUrl": "http://192.168.1.4:8770/",
-  "release": "/srv/mc-block-launch/releases/0.11.5-20261017225900",
-  "previousRelease": "/srv/mc-block-launch/releases/0.11.4-20261017225252",
+  "release": "/srv/mc-block-launch/releases/0.12.0-20261017235432",
+  "previousRelease": "/srv/mc-block-launch/releases/0.12.0-20261017233410",
   "service": "mc-block-launch.service",
-  "files": 111,
-  "publicFilesHashedOverTLS": 108,
+  "files": 114,
+  "publicFilesHashedOverTLS": 111,
   "manifest": {
-    "index.html": "74ee7d21a17d50918c0a2e24f421087b0ea14c50c891dad801ffef2996cfcdd1",
+    "index.html": "d30cb0a6f47ec6ae429bfd0d06a1d43c24ec4078cdc0202c498b84370610caa5",
     "game.js": "ad9c185c2409eaa64cff087b38ea37ea4424c1cfb8f5361a5d54021043cd0854",
     "style.css": "942ea10593e8a6ad5097d7ad54c0910a18f5ded5959f1d0831c686f8ecdaa508",
-    "package.json": "c757e4c86cc4615719a59dcbaac0c3834badfd89288f8b360c301c395cf445eb",
+    "package.json": "cdc8b4b582d8482aea00bef0d672ee81112cc94d6b8f2489fdabbfb3e67a7da9",
     "assets/effects/explosion_0.png": "3e2ca80f6accdcf50f580df2e8777ada3279ea9b6c74c28028e1bb2d2edb9140",
     "assets/effects/explosion_1.png": "06b235749d132ff1ff4e946341c4eb56deb09feaa5f49cbb430383b0bbe4f292",
     "assets/effects/explosion_10.png": "e166b8ab4d3821dae540daaa8cfb073b44966a87383e26c64a8ca9750301468d",
@@ -97,7 +97,7 @@
     "assets/textures/zombie.png": "1c879744424077ab6f7d8b13b015dfc9d5e0efee6c70696de5c2ee588f4f563a",
     "src/aim.mjs": "e74864c2baf2d8d449d492ad8f5281be050727348768087699157985f7ac3648",
     "src/animation.mjs": "d1d592d1cd911b25279a28e9226f4fc616d652202156700369e7738338f3822f",
-    "src/app.mjs": "efc97b706d0ba289be4a3d9e215302bb808b86a1db7d9542ab7d47c099cb3111",
+    "src/app.mjs": "b71584ea588167c1a6274376285de609c72769bada8d223efcfc4314e2802aee",
     "src/assets.mjs": "a280a6a7e6cae1703997d26e6bc7bc4817d0fd3c99a8a05cccb475596449d38a",
     "src/behavior.mjs": "deffd12683878a367cb26cac2cee952dd9e77b6f57dbb25a727369190b008c27",
     "src/campaign.mjs": "b4777d0738fa52f8c80440de7f09a7720e79200b77c6781d16a01d7e45aaf3cb",
@@ -108,7 +108,7 @@
     "src/levels.mjs": "8a3aae0acf871f7abfb8cd39bd174f7efd45ac8684aaf0d57c0ead1e1281be25",
     "src/mobs.mjs": "dbfbb5cd077762a0f71ec198d66553020591159432f408637e0dd250f955f2fa",
     "src/music.mjs": "dc0ee50ca1f472e5e5d6e7f0535514aca3b88ef0ad2ca2ded7c2f630e0c8ead8",
-    "src/online.mjs": "3f0b75dc3267e99ffca9a6038470f24b1ce59655b592f8795c725a1450e1bb83",
+    "src/online.mjs": "b84f57eb3de6ebe09bd7fbb7681202d4bdc93a5a2918d615d0239a4979393938",
     "src/outcome.mjs": "f743ef60f04bfa10a37f8c0a122447dfc188d5a4ef92c97a523e52852f00f9ca",
     "src/pixels.mjs": "6a025aa5955030103907d997e38a8b505663d12b655b7edf504421f633066339",
     "src/rear.mjs": "28d161cea0de6b2b79f2679d06c4471fb42bddf96070af0535d59b55d7b25c53",
@@ -116,10 +116,13 @@
     "src/scenery.mjs": "afedd84bf00560148c4bcfd5013d8cd48f45f83e2e56c7ec1cc64bb8918450a4",
     "src/sling.mjs": "4f4c3f6102516e7e9643ad92e98da413fc55e30c23fb2b95937e97d456f4c2f0",
     "src/timing.mjs": "b5a108b7c9237c52f1183e3c8f582fcdea0d2a624c6ab6ea49f6c294099d8548",
+    "src/toy-online.mjs": "3d9d1b6dd8fce16d3216a12167fc5c6946eabf8ea9ad3ce60511b0204e9221b7",
+    "src/toy-storage.mjs": "91321de588fea4c56c530486e90495435e4b4be4c1d54f849f942a3c9a922ecb",
     "src/world.mjs": "4cd83949fc61dbf2d367bad94cb4540bf5da4c7ba2e03b664fe1ad259c20cdcf",
     "vendor/matter.min.js": "40120ab0e4f6c956b6ee691ba38ade20d38c8fac9b74079b75071276baa8fa93",
     "vendor/node-runtime-LICENSE.txt": "4573185d56580da2b890ba34a85a409257640f1c5632eade4300137266194d18",
-    "scripts/serve.cjs": "c90249103a8998b330a1269b110b96dee6928b8b6e23893d15707a4e79a8a98c",
+    "vendor/toy-sdk.min.js": "b025be2dc7e526aa074b329d65c122f2dfbdc851203195dc3e53800aaae32de4",
+    "scripts/serve.cjs": "9bd0edfafdaaaa676338871550431d17a662b10ad129725a71794a81d5e82d87",
     "scripts/leaderboard.cjs": "aef3709959f683a12f538704524437429acf0dd44304dcd2c3da674920b4abc9"
   },
   "verified": [
@@ -131,10 +134,16 @@
     "identity-persists-after-service-restart",
     "full-time-only-leaderboard",
     "private-paths-404",
-    "explicit-demo-edit-only-other-profiles-preserved",
-    "demo-nickname-reserved"
+    "demo-nickname-reserved",
+    "all-existing-profiles-preserved",
+    "Toy-CORS-preflight-over-trusted-TLS",
+    "Toy-CORS-profile-create",
+    "unexpected-origin-denied"
   ],
   "externalNetwork": "User will verify outside LAN; household connection has no NAT loopback.",
-  "leaderboard": "Backed up all data; user-requested existing test record renamed to \u661f\u6d77, 397000ms, labelled demo. All other existing profiles unchanged.",
-  "firewall": "8770 restricted to LAN subnet on enp3s0 and existing Caddy bridge rule; forwarded headers trusted only from configured Caddy peer."
+  "leaderboard": "All existing profiles and results retained unchanged; no test leaderboard scores submitted.",
+  "firewall": "8770 restricted to LAN subnet on enp3s0 and existing Caddy bridge rule; forwarded headers trusted only from configured Caddy peer.",
+  "toyCorsOrigins": [
+    "https://www.bilibili.com"
+  ]
 }

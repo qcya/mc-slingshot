@@ -6,7 +6,7 @@ export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeou
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
     try {
       const response=await fetchImpl(`${prefix}api/${route}`,{
-        method,signal:controller.signal,cache:'no-store',credentials:'same-origin',
+        method,signal:controller.signal,cache:'no-store',credentials:baseUrl?'omit':'same-origin',
         headers:{...(body!==undefined?{'Content-Type':'application/json'}:{}),...(token?{Authorization:`Bearer ${token}`}:{})},
         ...(body===undefined?{}:{body:JSON.stringify(body)}),
       });

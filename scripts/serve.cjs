@@ -23,6 +23,8 @@ async function createGameServer(options={}){
     leaderboard=await require('./leaderboard.cjs').createLeaderboard({dataDir});
   }
   const rates=new Map();
+  const corsOrigins=new Set(options.corsOrigins??(process.env.MC_CORS_ORIGINS||'').split(',').filter(Boolean));
+  for(const origin of corsOrigins){const url=new URL(origin);if(url.origin!==origin||!['https:','http:'].includes(url.protocol))throw Error('Invalid MC_CORS_ORIGINS origin.');}
   function rate(req){
     const proxyAddress=options.trustedProxyAddress||process.env.MC_PROXY_ADDRESS,peer=(req.socket.remoteAddress||'').replace(/^::ffff:/,'');
     const trusted=(options.trustProxy??process.env.MC_TRUST_PROXY==='1')&&(!proxyAddress||peer===proxyAddress);
@@ -37,14 +39,23 @@ async function createGameServer(options={}){
       let pathname;try{pathname=decodeURIComponent((req.url||'').split('?')[0]);}catch{throw httpError(400,'Bad URL.');}
       if(!pathname.startsWith('/')||pathname.includes('\\')||pathname.includes('\0'))throw httpError(400,'Bad URL.');
       if(pathname==='/api'||pathname.startsWith('/api/')){
-        rate(req);
         const methods={'/api/health':['GET'],'/api/profile':['GET','POST','PATCH'],'/api/leaderboard':['GET'],'/api/results':['POST']};
         if(!Object.hasOwn(methods,pathname))throw httpError(404,'Not found.');
+        const origin=req.headers.origin,corsAllowed=!!origin&&corsOrigins.has(origin);
+        if(corsAllowed){res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');}
+        if(req.method==='OPTIONS'){
+          if(!corsAllowed)throw httpError(403,'Origin not allowed.');
+          if(!methods[pathname].includes(req.headers['access-control-request-method']))throw httpError(405,'Method not allowed.');
+          const requested=String(req.headers['access-control-request-headers']||'').toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
+          if(requested.some(header=>!['content-type','authorization'].includes(header)))throw httpError(403,'Request headers not allowed.');
+          res.writeHead(204,{'Access-Control-Allow-Methods':methods[pathname].join(', '),'Access-Control-Allow-Headers':'Content-Type, Authorization','Access-Control-Max-Age':'600'});return res.end();
+        }
+        rate(req);
         if(!methods[pathname].includes(req.method)){res.setHeader('Allow',methods[pathname].join(', '));throw httpError(405,'Method not allowed.');}
         if(req.method!=='GET'){
-          const origin=req.headers.origin,allowedOrigin=options.publicOrigin||process.env.MC_PUBLIC_ORIGIN;
-          if(origin){let valid=false;try{valid=origin===allowedOrigin||new URL(origin).host===req.headers.host;}catch{}if(!valid)throw httpError(403,'Origin not allowed.');}
-          if(req.headers['sec-fetch-site']==='cross-site')throw httpError(403,'Origin not allowed.');
+          const allowedOrigin=options.publicOrigin||process.env.MC_PUBLIC_ORIGIN;
+          if(origin){let valid=corsAllowed;try{valid||=origin===allowedOrigin||new URL(origin).host===req.headers.host;}catch{}if(!valid)throw httpError(403,'Origin not allowed.');}
+          if(req.headers['sec-fetch-site']==='cross-site'&&!corsAllowed)throw httpError(403,'Origin not allowed.');
         }
         if(pathname==='/api/health')return send(res,200,{ok:true,version});
         if(!leaderboard)throw httpError(503,'Leaderboard unavailable in this portable copy.');

@@ -8,6 +8,7 @@
 | PORT | 默认 8766 |
 | MC_DATA_DIR | 游戏目录之外的持久数据目录 |
 | MC_PUBLIC_ORIGIN | 代理对外的协议、域名、端口，不带路径 |
+| MC_CORS_ORIGINS | Toy 跨站 API 允许的确切 Origin，逗号分隔，无尾斜线；默认关闭，不使用通配符 |
 | MC_TRUST_PROXY=1 | 仅在可信代理前置、监听地址受限时启用，使用代理提供的客户端 IP 限流 |
 | MC_PROXY_ADDRESS | 只信任这个直接连接的代理地址提供的转发 IP；同时提供局域网直连时必须配置 |
 

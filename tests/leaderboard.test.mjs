@@ -9,6 +9,24 @@ import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
 const {createGameServer}=require('../scripts/serve.cjs');
 
+test('Toy CORS preflight and authenticated calls allow only configured exact origins',async t=>{
+ const origin='https://www.bilibili.com',f=await fixture(t,{corsOrigins:[origin]});
+ const headers={Origin:origin,'Sec-Fetch-Site':'cross-site'};
+ const preflight=await f.request('/api/profile',{method:'OPTIONS',headers:{...headers,'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'content-type, authorization'}});
+ assert.equal(preflight.status,204);assert.equal(preflight.headers.get('access-control-allow-origin'),origin);assert.equal(preflight.headers.get('access-control-allow-credentials'),null);
+ const created=await f.request('/api/profile',{method:'POST',body:{nickname:'ToyPlayer'},headers});assert.equal(created.status,201);assert.equal(created.headers.get('access-control-allow-origin'),origin);
+ assert.equal((await f.request('/api/profile',{token:created.data.token,headers})).status,200);
+ const duplicate=await f.request('/api/profile',{method:'POST',body:{nickname:'ToyPlayer'},headers});assert.equal(duplicate.status,409);assert.equal(duplicate.headers.get('access-control-allow-origin'),origin);
+ for(const bad of ['https://www.bilibili.com.evil.example','null','http://www.bilibili.com']){
+  const response=await f.request('/api/profile',{method:'OPTIONS',headers:{Origin:bad,'Access-Control-Request-Method':'POST'}});assert.equal(response.status,403);assert.equal(response.headers.get('access-control-allow-origin'),null);
+ }
+ assert.equal((await f.request('/api/profile',{method:'OPTIONS',headers:{Origin:origin,'Access-Control-Request-Method':'DELETE'}})).status,405);
+ assert.equal((await f.request('/api/profile',{method:'OPTIONS',headers:{Origin:origin,'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'x-arbitrary'}})).status,403);
+ assert.equal((await f.request('/api/profile',{method:'POST',body:{nickname:'Untrusted'},headers:{Origin:'https://evil.example','Sec-Fetch-Site':'cross-site'}})).status,403);
+ assert.equal((await f.request('/api/leaderboard',{headers})).status,200);
+ assert.equal((await f.request('/style.css',{headers})).headers.get('access-control-allow-origin'),null);
+});
+
 async function fixture(t,options={},initialState) {
   const directory=await fs.mkdtemp(path.join(os.tmpdir(),'mc-ranking-'));
   const dataDir=path.join(directory,'private');
