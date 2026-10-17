@@ -9,7 +9,9 @@ function packageWindows(output,node=process.execPath){
  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mc-player-build-')),stage=path.join(temp,'MC_Block_Launch');fs.mkdirSync(stage);
  try{
   for(const name of ['index.html','game.js','style.css','START_GAME.bat','LICENSES.md','assets','src','vendor'])fs.cpSync(path.join(root,name),path.join(stage,name),{recursive:true});
-  fs.mkdirSync(path.join(stage,'scripts'));for(const name of ['serve.cjs','serve.py','launcher-help.txt'])fs.copyFileSync(path.join(root,'scripts',name),path.join(stage,'scripts',name));
+  fs.mkdirSync(path.join(stage,'scripts'));for(const name of ['serve.cjs','leaderboard.cjs','serve.py','launcher-help.txt'])fs.copyFileSync(path.join(root,'scripts',name),path.join(stage,'scripts',name));
+  fs.copyFileSync(path.join(root,'package.json'),path.join(stage,'package.json'));
+  fs.mkdirSync(path.join(stage,'docs'));fs.copyFileSync(path.join(root,'docs/combat-assets.md'),path.join(stage,'docs/combat-assets.md'));
   // Always emit a CMD-compatible launcher, including when building from a Git ZIP.
   const bat=path.join(stage,'START_GAME.bat');fs.writeFileSync(bat,fs.readFileSync(bat,'utf8').replace(/\r?\n/g,'\r\n'),'ascii');
   fs.mkdirSync(path.join(stage,'runtime'));fs.copyFileSync(node,path.join(stage,'runtime/node.exe'));

@@ -1,14 +1,14 @@
 {
   "assets": [
     "grass_block_side",
-    "furnace_front",
-    "bookshelf",
     "dirt",
     "stone",
     "oak_log",
     "stone_bricks",
     "glass",
-    "tnt_side",
+    "ender_pearl",
+    "fire_charge",
+    "ladder",
     "bedrock",
     "oak_leaves",
     "iron_ore",
@@ -17,25 +17,28 @@
     "dark_oak_log",
     "dark_oak_planks",
     "spruce_log",
+    "tnt_top",
     "spruce_planks",
     "cobblestone",
-    "ender_pearl",
     "oak_door_top",
     "oak_door_bottom",
     "crafting_table_front",
-    "ladder",
-    "tnt_top",
+    "furnace_front",
+    "tnt_side",
+    "bookshelf",
     "spruce_leaves",
     "cherry_log",
     "cherry_leaves",
     "grass_block_side_overlay",
     "zombie",
     "pillager",
+    "warden",
+    "fire_0",
     "crossbow_standby",
     "slingshot_frame",
     "ladder_wall"
   ],
-  "time": 2.366666666666661,
+  "time": 2.341666666666661,
   "removed": 337,
   "backgroundRemoved": 0,
   "explosions": 0,
@@ -48,16 +51,18 @@
   "particlesPending": 0,
   "ready": true,
   "level": 1,
-  "shots": 4,
+  "shots": 3,
   "inventory": [
-    4,
+    3,
+    0,
     0,
     0
   ],
   "ammoCounts": {
-    "cobble": 4,
+    "cobble": 3,
     "tnt": 0,
-    "ender": 0
+    "ender": 0,
+    "fire": 0
   },
   "screen": "result",
   "unlocked": 2,
@@ -66,14 +71,15 @@
   "selectedSlot": 0,
   "paused": true,
   "ended": true,
-  "particles": 67,
+  "particles": 65,
+  "burning": 0,
   "ammoBodies": [
     {
       "id": "cobble",
-      "x": 1121.1487556745358,
-      "y": 609.9940491642842,
-      "angle": 1.5672300651214663,
-      "speed": 0.000019270549913731203,
+      "x": 1121.2711252107,
+      "y": 609.9950031518889,
+      "angle": 1.567491454056146,
+      "speed": 0.000017417907528494624,
       "sleeping": false,
       "uses": 0
     }
@@ -102,10 +108,10 @@
         "angle": 1.5707963267948966,
         "visible": false
       },
-      "x": 1154.468731569379,
+      "x": 1154.3227700347775,
       "y": 578.0125000006944,
       "facing": 1,
-      "walkDistance": 23.959638610889215,
+      "walkDistance": 23.422338610889028,
       "turns": 0,
       "behavior": "walk",
       "pose": {
@@ -134,8 +140,8 @@
   "sound": {
     "played": {
       "bow": 1,
-      "stone": 4,
       "glass": 1,
+      "stone": 4,
       "zombie_hurt": 1
     },
     "failed": 0,

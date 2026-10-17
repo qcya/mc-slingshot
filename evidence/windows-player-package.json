@@ -1,9 +1,9 @@
 {
-  "version": "0.10.1",
-  "zip": "MC_Block_Launch_0.10.1_Windows.zip",
-  "zipSha256": "a2017de595d04719b93304d314cef3e2745eba064489321adfa9c3d2fc79f25f",
+  "version": "0.11.0",
+  "zip": "MC_Block_Launch_0.11.0_Windows.zip",
+  "zipSha256": "9caf969824c864b4b8565fdab3791577c3203b8d52189203bdafb4e24108205e",
   "runtime": "v24.14.0",
-  "verifiedFiles": 102,
+  "verifiedFiles": 114,
   "isolatedPath": true,
   "unicodeAndAmpersandPath": true,
   "occupiedPortFallback": true,
@@ -11,7 +11,8 @@
     {
       "level": 1,
       "inventory": [
-        5,
+        4,
+        0,
         0,
         0
       ]
@@ -19,40 +20,89 @@
     {
       "level": 2,
       "inventory": [
-        4,
+        3,
         1,
+        0,
         0
       ]
     },
     {
       "level": 3,
       "inventory": [
-        4,
+        3,
         2,
-        1
+        1,
+        0
       ]
     },
     {
       "level": 4,
       "inventory": [
-        4,
+        3,
         2,
-        2
+        2,
+        1
       ]
     },
     {
       "level": 5,
       "inventory": [
-        5,
+        4,
         3,
-        3
+        2,
+        1
+      ]
+    },
+    {
+      "level": 6,
+      "inventory": [
+        3,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "level": 7,
+      "inventory": [
+        3,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "level": 8,
+      "inventory": [
+        3,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "level": 9,
+      "inventory": [
+        4,
+        3,
+        2,
+        1
+      ]
+    },
+    {
+      "level": 10,
+      "inventory": [
+        4,
+        6,
+        2,
+        1
       ]
     }
   ],
   "weapons": [
     {
       "id": "cobble",
-      "time": 0.783333333333333,
+      "time": 0.7583333333333331,
       "removed": 356,
       "backgroundRemoved": 0,
       "explosions": 0,
@@ -65,25 +115,28 @@
       "particlesPending": 0,
       "ready": true,
       "level": 3,
-      "shots": 6,
+      "shots": 5,
       "inventory": [
-        3,
         2,
-        1
+        2,
+        1,
+        0
       ],
       "ammoCounts": {
-        "cobble": 3,
+        "cobble": 2,
         "tnt": 2,
-        "ender": 1
+        "ender": 1,
+        "fire": 0
       },
       "screen": "play",
-      "unlocked": 5,
+      "unlocked": 10,
       "launched": 1,
       "selected": "cobble",
       "selectedSlot": 0,
       "paused": false,
       "ended": false,
       "particles": 70,
+      "burning": 0,
       "ammoBodies": [
         {
           "id": "cobble",
@@ -97,7 +150,7 @@
       ],
       "restingBlocks": 0,
       "fps": 75,
-      "stepMs": 0.19,
+      "stepMs": 0.18,
       "maxStepMs": 1.6,
       "launcher": {
         "x": 285,
@@ -111,7 +164,7 @@
     },
     {
       "id": "tnt",
-      "time": 4.174999999999997,
+      "time": 4.208333333333332,
       "removed": 1339,
       "backgroundRemoved": 2201,
       "explosions": 1,
@@ -124,30 +177,33 @@
       "particlesPending": 0,
       "ready": true,
       "level": 3,
-      "shots": 6,
+      "shots": 5,
       "inventory": [
-        4,
+        3,
         1,
-        1
+        1,
+        0
       ],
       "ammoCounts": {
-        "cobble": 4,
+        "cobble": 3,
         "tnt": 1,
-        "ender": 1
+        "ender": 1,
+        "fire": 0
       },
       "screen": "play",
-      "unlocked": 5,
+      "unlocked": 10,
       "launched": 1,
       "selected": "tnt",
       "selectedSlot": 1,
       "paused": false,
       "ended": false,
       "particles": 218,
+      "burning": 0,
       "ammoBodies": [],
       "restingBlocks": 0,
       "fps": 75,
-      "stepMs": 0.22,
-      "maxStepMs": 2.4,
+      "stepMs": 0.21,
+      "maxStepMs": 2.8,
       "launcher": {
         "x": 285,
         "y": 545,
@@ -160,7 +216,7 @@
     },
     {
       "id": "ender",
-      "time": 0.7583333333333331,
+      "time": 0.7166666666666666,
       "removed": 0,
       "backgroundRemoved": 0,
       "explosions": 0,
@@ -173,45 +229,100 @@
       "particlesPending": 0,
       "ready": true,
       "level": 3,
-      "shots": 6,
+      "shots": 5,
       "inventory": [
-        4,
+        3,
         2,
+        0,
         0
       ],
       "ammoCounts": {
-        "cobble": 4,
+        "cobble": 3,
         "tnt": 2,
-        "ender": 0
+        "ender": 0,
+        "fire": 0
       },
       "screen": "play",
-      "unlocked": 5,
+      "unlocked": 10,
       "launched": 1,
       "selected": "cobble",
       "selectedSlot": 0,
       "paused": false,
       "ended": false,
       "particles": 0,
+      "burning": 0,
       "ammoBodies": [
         {
           "id": "ender",
-          "x": 986.066576866828,
-          "y": 545.1120674066304,
-          "angle": -0.03778598302012686,
-          "speed": 1262.4996289403894,
+          "x": 975.6513090481088,
+          "y": 543.6254385935541,
+          "angle": 0,
+          "speed": 1262.2958011675014,
           "sleeping": false,
           "uses": 1
         }
       ],
       "restingBlocks": 0,
       "fps": 75,
-      "stepMs": 0.14,
-      "maxStepMs": 0.6,
+      "stepMs": 0.15,
+      "maxStepMs": 0.7,
       "launcher": {
         "x": 285,
         "y": 545,
         "vx": 1382.4,
         "vy": -367.20000000000005,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      }
+    },
+    {
+      "id": "fire",
+      "time": 0.8249999999999995,
+      "removed": 0,
+      "backgroundRemoved": 0,
+      "explosions": 0,
+      "portals": 0,
+      "physics": "Matter.js",
+      "bodies": 172,
+      "debris": 0,
+      "enemiesAlive": 4,
+      "projectiles": 0,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 4,
+      "shots": 7,
+      "inventory": [
+        3,
+        2,
+        2,
+        0
+      ],
+      "ammoCounts": {
+        "cobble": 3,
+        "tnt": 2,
+        "ender": 2,
+        "fire": 0
+      },
+      "screen": "play",
+      "unlocked": 10,
+      "launched": 1,
+      "selected": "cobble",
+      "selectedSlot": 0,
+      "paused": false,
+      "ended": false,
+      "particles": 0,
+      "burning": 1,
+      "ammoBodies": [],
+      "restingBlocks": 0,
+      "fps": 75,
+      "stepMs": 0.28,
+      "maxStepMs": 1.5,
+      "launcher": {
+        "x": 285,
+        "y": 545,
+        "vx": 1416.21079668191,
+        "vy": -346.5703094057394,
         "angle": 0,
         "phase": "ready",
         "type": "slingshot"

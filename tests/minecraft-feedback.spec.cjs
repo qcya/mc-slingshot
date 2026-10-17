@@ -1,8 +1,8 @@
 const {test,expect}=require('@playwright/test');const {ready,shot,chooseLevel}=require('./browser-helpers.cjs');
 
-test('原版灰色按钮和泥土选关背景加载，三种弹药在弹弓上尺寸一致',async({page})=>{
- await ready(page,{level:2});
- for(const [key,name] of [[1,'cobble'],[2,'tnt'],[3,'ender']]){
+test('原版灰色按钮和泥土选关背景加载，四种弹药在弹弓上尺寸一致',async({page})=>{
+ await ready(page,{level:3});
+ for(const [key,name] of [[1,'cobble'],[2,'tnt'],[3,'ender'],[4,'fire']]){
   await page.keyboard.press(String(key));
   const b=await page.locator('#stage').boundingBox();
   await page.screenshot({path:`evidence/sling-${name}.png`,clip:{x:b.x+180*b.width/1536,y:b.y+480*b.height/864,width:210*b.width/1536,height:205*b.height/864}});
@@ -14,22 +14,22 @@ test('原版灰色按钮和泥土选关背景加载，三种弹药在弹弓上�
  await page.mouse.move(10,10);await page.screenshot({path:'evidence/minecraft-menu.png'});
 });
 
-test('五关真实鼠标发射在限定库存内通关，包括新增地窖中的怪物',async({page})=>{
- test.setTimeout(90000);await page.clock.install({time:new Date('2026-10-17T12:00:00Z')});await ready(page);
+test('十关真实鼠标发射在限定库存内通关，包括新增地窖中的怪物',async({page})=>{
+ test.setTimeout(180000);await page.clock.install({time:new Date('2026-10-17T12:00:00Z')});await ready(page);
  await page.clock.pauseAt(await page.evaluate(()=>Date.now()+1000));
  const plans=require('../evidence/playability-search.json'),reports=[];
- for(const plan of plans){
+ for(const plan of plans.filter(p=>!process.env.MC_REPLAY_LEVEL||p.level===Number(process.env.MC_REPLAY_LEVEL))){
   if(plan.level>1)await chooseLevel(page,plan.level-1);
-  for(const move of plan.history){
+  const timeline=[];for(const move of plan.history){
    if((await page.evaluate(()=>MCBlockLaunch.getStatus())).ended)break;
-   await shot(page,{cobble:1,tnt:2,ender:3}[move.kind],135*move.pull*Math.cos(move.angle),135*move.pull*Math.sin(move.angle));
-   await page.clock.runFor(6000);
+   await shot(page,{cobble:1,tnt:2,ender:3,fire:4}[move.kind],135*move.pull*Math.cos(move.angle),135*move.pull*Math.sin(move.angle));
+   await page.clock.runFor((move.wait??6)*1000);timeline.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));
   }
   await page.clock.runFor(1400);const d=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());
-  expect(d.enemiesAlive,`level ${plan.level}`).toBe(0);expect(d.screen).toBe('result');expect(d.inventory.every(n=>n>=0)).toBe(true);
+  require('node:fs').writeFileSync(`evidence/replay-${plan.level}.json`,JSON.stringify({timeline,final:d},null,2));expect(d.enemiesAlive,`level ${plan.level}`).toBe(0);expect(d.screen).toBe('result');expect(d.inventory.every(n=>n>=0)).toBe(true);
   await expect(page.locator('#resultFlag')).toHaveText('挑战成功');await page.screenshot({path:`evidence/campaign-clear-${plan.level}.png`});reports.push(d);
  }
- require('node:fs').writeFileSync('evidence/five-browser-victories.json',JSON.stringify(reports,null,2));
+ require('node:fs').writeFileSync('evidence/ten-browser-victories.json',JSON.stringify(reports,null,2));
 });
 
 test('真实圆石击杀依次显示红闪、倒地和白色消散，全部结束后才显示胜利',async({page})=>{

@@ -1,0 +1,208 @@
+{
+  "assets": [
+    "grass_block_side",
+    "dirt",
+    "stone",
+    "oak_log",
+    "stone_bricks",
+    "glass",
+    "bedrock",
+    "oak_leaves",
+    "iron_ore",
+    "oak_planks",
+    "deepslate",
+    "dark_oak_log",
+    "dark_oak_planks",
+    "spruce_log",
+    "spruce_planks",
+    "cobblestone",
+    "oak_door_top",
+    "crafting_table_front",
+    "oak_door_bottom",
+    "furnace_front",
+    "bookshelf",
+    "tnt_side",
+    "ender_pearl",
+    "ladder",
+    "fire_charge",
+    "tnt_top",
+    "spruce_leaves",
+    "cherry_log",
+    "cherry_leaves",
+    "grass_block_side_overlay",
+    "zombie",
+    "pillager",
+    "warden",
+    "fire_0",
+    "crossbow_standby",
+    "slingshot_frame",
+    "ladder_wall"
+  ],
+  "time": 1.3833333333333309,
+  "removed": 192,
+  "backgroundRemoved": 8,
+  "explosions": 0,
+  "portals": 0,
+  "physics": "Matter.js",
+  "bodies": 172,
+  "debris": 0,
+  "enemiesAlive": 4,
+  "projectiles": 0,
+  "particlesPending": 0,
+  "ready": true,
+  "level": 4,
+  "shots": 7,
+  "inventory": [
+    3,
+    2,
+    2,
+    0
+  ],
+  "ammoCounts": {
+    "cobble": 3,
+    "tnt": 2,
+    "ender": 2,
+    "fire": 0
+  },
+  "screen": "play",
+  "unlocked": 10,
+  "launched": 1,
+  "selected": "cobble",
+  "selectedSlot": 0,
+  "paused": false,
+  "ended": false,
+  "particles": 3,
+  "burning": 10,
+  "ammoBodies": [],
+  "restingBlocks": 0,
+  "fps": 75,
+  "stepMs": 0.76,
+  "maxStepMs": 2.7,
+  "launcher": {
+    "x": 285,
+    "y": 545,
+    "vx": 1416.21079668191,
+    "vy": -346.5703094057394,
+    "angle": 0,
+    "phase": "ready",
+    "type": "slingshot"
+  },
+  "enemies": [
+    {
+      "skin": "pillager",
+      "hp": 100,
+      "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
+      "x": 1181.8699386108913,
+      "y": 434.01250000069444,
+      "facing": 1,
+      "walkDistance": 29.690838610891205,
+      "turns": 0,
+      "behavior": "walk",
+      "pose": {
+        "walkBlend": 1,
+        "headYaw": 0,
+        "headPitch": 0,
+        "gesture": 0
+      }
+    },
+    {
+      "skin": "pillager",
+      "hp": 100,
+      "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
+      "x": 1218.1300613891087,
+      "y": 434.01250000069444,
+      "facing": -1,
+      "walkDistance": 29.690838610891205,
+      "turns": 0,
+      "behavior": "walk",
+      "pose": {
+        "walkBlend": 1,
+        "headYaw": 0,
+        "headPitch": 0,
+        "gesture": 0
+      }
+    },
+    {
+      "skin": "pillager",
+      "hp": 100,
+      "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
+      "x": 1414.9611000000011,
+      "y": 434.01250000069444,
+      "facing": -1,
+      "walkDistance": 12.357900000004292,
+      "turns": 3,
+      "behavior": "walk",
+      "pose": {
+        "walkBlend": 1,
+        "headYaw": 0,
+        "headPitch": 0,
+        "gesture": 0
+      }
+    },
+    {
+      "skin": "zombie",
+      "hp": 100,
+      "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
+      "x": 1146.3160064504843,
+      "y": 626.0125000006944,
+      "facing": -1,
+      "walkDistance": 29.5048935495156,
+      "turns": 0,
+      "behavior": "walk",
+      "pose": {
+        "walkBlend": 1,
+        "headYaw": 0,
+        "headPitch": 0,
+        "gesture": 0
+      }
+    }
+  ],
+  "whiteParticles": 0,
+  "drawSound": {
+    "active": false,
+    "starts": 1,
+    "stops": 1,
+    "state": "running",
+    "signalRms": 0,
+    "source": "minecraft:crossbow_loading",
+    "failed": false
+  },
+  "preview": [],
+  "backgroundPixels": 34808,
+  "movingBackgroundPixels": 0,
+  "terrainPixels": 42816,
+  "debrisPixels": 0,
+  "sound": {
+    "played": {
+      "bow": 1,
+      "fire_ignite": 1
+    },
+    "failed": 0,
+    "lastError": null
+  },
+  "physicsParts": 447
+}

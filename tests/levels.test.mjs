@@ -5,9 +5,9 @@ import { buildLevel, LEVELS } from '../src/levels.mjs';
 import { SiegeWorld } from '../src/world.mjs';
 const Matter=createRequire(import.meta.url)('../vendor/matter.min.js');
 
-test('五个手工关卡从完整方块起步，装饰不参与承重，怪物开局站稳', () => {
-  assert.equal(LEVELS.length,5);
-  for(let level=0;level<5;level++){
+test('十个手工关卡从完整方块起步，装饰不参与承重，怪物开局站稳', () => {
+  assert.equal(LEVELS.length,10);
+  for(let level=0;level<10;level++){
     const scene=buildLevel(level),g=scene.grid;
     for(let ty=0;ty<18;ty++)for(let tx=0;tx<32;tx++){
       const initial=g.get(tx*16,ty*16);

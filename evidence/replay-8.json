@@ -1,0 +1,1418 @@
+{
+  "timeline": [
+    {
+      "assets": [
+        "grass_block_side",
+        "spruce_leaves",
+        "cherry_log",
+        "cherry_leaves",
+        "grass_block_side_overlay",
+        "dirt",
+        "stone",
+        "pillager",
+        "zombie",
+        "oak_log",
+        "stone_bricks",
+        "glass",
+        "bedrock",
+        "oak_leaves",
+        "iron_ore",
+        "deepslate",
+        "oak_planks",
+        "dark_oak_log",
+        "dark_oak_planks",
+        "spruce_log",
+        "warden",
+        "fire_0",
+        "spruce_planks",
+        "cobblestone",
+        "oak_door_top",
+        "oak_door_bottom",
+        "crafting_table_front",
+        "furnace_front",
+        "bookshelf",
+        "tnt_side",
+        "ender_pearl",
+        "crossbow_standby",
+        "fire_charge",
+        "ladder",
+        "tnt_top",
+        "slingshot_frame",
+        "ladder_wall"
+      ],
+      "time": 6.000000000000088,
+      "removed": 38,
+      "backgroundRemoved": 0,
+      "explosions": 0,
+      "portals": 0,
+      "physics": "Matter.js",
+      "bodies": 154,
+      "debris": 0,
+      "enemiesAlive": 4,
+      "projectiles": 1,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 8,
+      "shots": 8,
+      "inventory": [
+        2,
+        3,
+        2,
+        1
+      ],
+      "ammoCounts": {
+        "cobble": 2,
+        "tnt": 3,
+        "ender": 2,
+        "fire": 1
+      },
+      "screen": "play",
+      "unlocked": 10,
+      "launched": 1,
+      "selected": "cobble",
+      "selectedSlot": 0,
+      "paused": false,
+      "ended": false,
+      "particles": 0,
+      "burning": 0,
+      "ammoBodies": [
+        {
+          "id": "cobble",
+          "x": 1401.3578606362787,
+          "y": 322.01073951005696,
+          "angle": 9.425536443964557,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        }
+      ],
+      "restingBlocks": 1,
+      "fps": 63,
+      "stepMs": 0,
+      "maxStepMs": 0,
+      "launcher": {
+        "x": 285,
+        "y": 545,
+        "vx": 1133.7008979062227,
+        "vy": -916.7803848723123,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      },
+      "enemies": [
+        {
+          "skin": "pillager",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1025.1459932472635,
+          "y": 434.01250000069444,
+          "facing": -1,
+          "walkDistance": 104.54859324726908,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999999997577642,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1286.2396221677045,
+          "y": 290.01250000069444,
+          "facing": -1,
+          "walkDistance": 20.19853861088791,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1440.0704176531667,
+          "y": 290.01250000069444,
+          "facing": 1,
+          "walkDistance": 45.98235558770807,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1159.0324444122934,
+          "y": 578.0125000006944,
+          "facing": 1,
+          "walkDistance": 104.72715558772848,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999999905468396,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1109.1462904173827,
+          "y": 722.0125000006944,
+          "facing": 1,
+          "walkDistance": 100.78809041738305,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999998022753511,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1186.2569095826043,
+          "y": 722.0125000006944,
+          "facing": -1,
+          "walkDistance": 109.38489041739604,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.999999984911554,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        }
+      ],
+      "whiteParticles": 0,
+      "drawSound": {
+        "active": false,
+        "starts": 22,
+        "stops": 22,
+        "state": "running",
+        "signalRms": 0,
+        "source": "minecraft:crossbow_loading",
+        "failed": false
+      },
+      "preview": [],
+      "backgroundPixels": 37632,
+      "movingBackgroundPixels": 0,
+      "terrainPixels": 38106,
+      "debrisPixels": 0,
+      "sound": {
+        "played": {
+          "bow": 22,
+          "stone": 25,
+          "glass": 14,
+          "zombie_hurt": 16,
+          "fuse": 12,
+          "pillager_idle": 19,
+          "zombie_idle": 15,
+          "pillager_hurt": 18,
+          "explode": 12,
+          "portal": 3
+        },
+        "failed": 0,
+        "lastError": null
+      },
+      "physicsParts": 164
+    },
+    {
+      "assets": [
+        "grass_block_side",
+        "spruce_leaves",
+        "cherry_log",
+        "cherry_leaves",
+        "grass_block_side_overlay",
+        "dirt",
+        "stone",
+        "pillager",
+        "zombie",
+        "oak_log",
+        "stone_bricks",
+        "glass",
+        "bedrock",
+        "oak_leaves",
+        "iron_ore",
+        "deepslate",
+        "oak_planks",
+        "dark_oak_log",
+        "dark_oak_planks",
+        "spruce_log",
+        "warden",
+        "fire_0",
+        "spruce_planks",
+        "cobblestone",
+        "oak_door_top",
+        "oak_door_bottom",
+        "crafting_table_front",
+        "furnace_front",
+        "bookshelf",
+        "tnt_side",
+        "ender_pearl",
+        "crossbow_standby",
+        "fire_charge",
+        "ladder",
+        "tnt_top",
+        "slingshot_frame",
+        "ladder_wall"
+      ],
+      "time": 11.99999999999996,
+      "removed": 159,
+      "backgroundRemoved": 0,
+      "explosions": 0,
+      "portals": 0,
+      "physics": "Matter.js",
+      "bodies": 153,
+      "debris": 0,
+      "enemiesAlive": 2,
+      "projectiles": 2,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 8,
+      "shots": 7,
+      "inventory": [
+        1,
+        3,
+        2,
+        1
+      ],
+      "ammoCounts": {
+        "cobble": 1,
+        "tnt": 3,
+        "ender": 2,
+        "fire": 1
+      },
+      "screen": "play",
+      "unlocked": 10,
+      "launched": 2,
+      "selected": "cobble",
+      "selectedSlot": 0,
+      "paused": false,
+      "ended": false,
+      "particles": 0,
+      "burning": 0,
+      "ammoBodies": [
+        {
+          "id": "cobble",
+          "x": 1401.3578606362787,
+          "y": 322.01073951005696,
+          "angle": 9.425536443964557,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        },
+        {
+          "id": "cobble",
+          "x": 1093.060087749453,
+          "y": 754.0080817104812,
+          "angle": 10.99592860240815,
+          "speed": 2.393888362790355e-8,
+          "sleeping": false,
+          "uses": 0
+        }
+      ],
+      "restingBlocks": 1,
+      "fps": 63,
+      "stepMs": 0,
+      "maxStepMs": 0,
+      "launcher": {
+        "x": 285,
+        "y": 545,
+        "vx": 1085.636315917969,
+        "vy": -130.90517578125002,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      },
+      "enemies": [
+        {
+          "skin": "pillager",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 943.6543100475989,
+          "y": 434.01250000069444,
+          "facing": -1,
+          "walkDistance": 185.68207644693382,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9963508549824247,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1286.2396221677045,
+          "y": 290.01250000069444,
+          "facing": -1,
+          "walkDistance": 20.19853861088791,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1440.0704176531667,
+          "y": 290.01250000069444,
+          "facing": 1,
+          "walkDistance": 45.98235558770807,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1240.5241899480382,
+          "y": 578.0125000006944,
+          "facing": 1,
+          "walkDistance": 185.8607011234733,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.999796091545026,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1134.8922732616152,
+          "y": 722.0125000006944,
+          "facing": 1,
+          "walkDistance": 121.20549041739014,
+          "turns": 0,
+          "behavior": "idle",
+          "pose": {
+            "walkBlend": 0.007360870250904851,
+            "headYaw": 0.23525614131433997,
+            "headPitch": 0.1896662668801435,
+            "gesture": 0.672056230705656
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1123.05172277995,
+          "y": 722.0130863958028,
+          "facing": -1,
+          "walkDistance": 172.25018987170438,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.0751886212391518,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        }
+      ],
+      "whiteParticles": 0,
+      "drawSound": {
+        "active": false,
+        "starts": 23,
+        "stops": 23,
+        "state": "running",
+        "signalRms": 0,
+        "source": "minecraft:crossbow_loading",
+        "failed": false
+      },
+      "preview": [],
+      "backgroundPixels": 37632,
+      "movingBackgroundPixels": 0,
+      "terrainPixels": 37985,
+      "debrisPixels": 0,
+      "sound": {
+        "played": {
+          "bow": 23,
+          "stone": 28,
+          "glass": 14,
+          "zombie_hurt": 18,
+          "fuse": 12,
+          "pillager_idle": 19,
+          "zombie_idle": 15,
+          "pillager_hurt": 18,
+          "explode": 12,
+          "portal": 3
+        },
+        "failed": 0,
+        "lastError": null
+      },
+      "physicsParts": 182
+    },
+    {
+      "assets": [
+        "grass_block_side",
+        "spruce_leaves",
+        "cherry_log",
+        "cherry_leaves",
+        "grass_block_side_overlay",
+        "dirt",
+        "stone",
+        "pillager",
+        "zombie",
+        "oak_log",
+        "stone_bricks",
+        "glass",
+        "bedrock",
+        "oak_leaves",
+        "iron_ore",
+        "deepslate",
+        "oak_planks",
+        "dark_oak_log",
+        "dark_oak_planks",
+        "spruce_log",
+        "warden",
+        "fire_0",
+        "spruce_planks",
+        "cobblestone",
+        "oak_door_top",
+        "oak_door_bottom",
+        "crafting_table_front",
+        "furnace_front",
+        "bookshelf",
+        "tnt_side",
+        "ender_pearl",
+        "crossbow_standby",
+        "fire_charge",
+        "ladder",
+        "tnt_top",
+        "slingshot_frame",
+        "ladder_wall"
+      ],
+      "time": 17.99999999999962,
+      "removed": 951,
+      "backgroundRemoved": 0,
+      "explosions": 1,
+      "portals": 0,
+      "physics": "Matter.js",
+      "bodies": 150,
+      "debris": 0,
+      "enemiesAlive": 1,
+      "projectiles": 2,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 8,
+      "shots": 6,
+      "inventory": [
+        1,
+        2,
+        2,
+        1
+      ],
+      "ammoCounts": {
+        "cobble": 1,
+        "tnt": 2,
+        "ender": 2,
+        "fire": 1
+      },
+      "screen": "play",
+      "unlocked": 10,
+      "launched": 3,
+      "selected": "tnt",
+      "selectedSlot": 1,
+      "paused": false,
+      "ended": false,
+      "particles": 97,
+      "burning": 0,
+      "ammoBodies": [
+        {
+          "id": "cobble",
+          "x": 1401.3578606362787,
+          "y": 322.01073951005696,
+          "angle": 9.425536443964557,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        },
+        {
+          "id": "cobble",
+          "x": 1093.0609935118669,
+          "y": 754.0080818605697,
+          "angle": 10.995928603240046,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        }
+      ],
+      "restingBlocks": 2,
+      "fps": 63,
+      "stepMs": 0,
+      "maxStepMs": 0,
+      "launcher": {
+        "x": 285,
+        "y": 545,
+        "vx": 1293.2384892967966,
+        "vy": -673.274245609722,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      },
+      "enemies": [
+        {
+          "skin": "pillager",
+          "hp": -26.668067477327256,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1199.5276844710236,
+          "y": 194.32496096384736,
+          "facing": -1,
+          "walkDistance": 234.64076549748665,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999996587620286,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1286.2396221677045,
+          "y": 290.01250000069444,
+          "facing": -1,
+          "walkDistance": 20.19853861088791,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1440.0704176531667,
+          "y": 290.01250000069444,
+          "facing": 1,
+          "walkDistance": 45.98235558770807,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": 100,
+          "alive": true,
+          "dead": false,
+          "appearance": {
+            "hurt": false,
+            "angle": 0,
+            "visible": true
+          },
+          "x": 1316.8231898670883,
+          "y": 578.0125000006944,
+          "facing": -1,
+          "walkDistance": 270.5774010425264,
+          "turns": 2,
+          "behavior": "idle",
+          "pose": {
+            "walkBlend": 0.00016138904774872257,
+            "headYaw": 0.15328590500065203,
+            "headPitch": 0.034356073237450234,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1134.8922732616152,
+          "y": 722.0125000006944,
+          "facing": 1,
+          "walkDistance": 121.20549041739014,
+          "turns": 0,
+          "behavior": "idle",
+          "pose": {
+            "walkBlend": 0.007360870250904851,
+            "headYaw": 0.23525614131433997,
+            "headPitch": 0.1896662668801435,
+            "gesture": 0.672056230705656
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1123.05172277995,
+          "y": 722.0130863958028,
+          "facing": -1,
+          "walkDistance": 172.25018987170438,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.0751886212391518,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        }
+      ],
+      "whiteParticles": 0,
+      "drawSound": {
+        "active": false,
+        "starts": 24,
+        "stops": 24,
+        "state": "running",
+        "signalRms": 0,
+        "source": "minecraft:crossbow_loading",
+        "failed": false
+      },
+      "preview": [],
+      "backgroundPixels": 37632,
+      "movingBackgroundPixels": 0,
+      "terrainPixels": 37193,
+      "debrisPixels": 0,
+      "sound": {
+        "played": {
+          "bow": 24,
+          "stone": 28,
+          "glass": 14,
+          "zombie_hurt": 18,
+          "fuse": 13,
+          "pillager_idle": 21,
+          "zombie_idle": 15,
+          "pillager_hurt": 19,
+          "explode": 13,
+          "portal": 3
+        },
+        "failed": 0,
+        "lastError": null
+      },
+      "physicsParts": 191
+    },
+    {
+      "assets": [
+        "grass_block_side",
+        "spruce_leaves",
+        "cherry_log",
+        "cherry_leaves",
+        "grass_block_side_overlay",
+        "dirt",
+        "stone",
+        "pillager",
+        "zombie",
+        "oak_log",
+        "stone_bricks",
+        "glass",
+        "bedrock",
+        "oak_leaves",
+        "iron_ore",
+        "deepslate",
+        "oak_planks",
+        "dark_oak_log",
+        "dark_oak_planks",
+        "spruce_log",
+        "warden",
+        "fire_0",
+        "spruce_planks",
+        "cobblestone",
+        "oak_door_top",
+        "oak_door_bottom",
+        "crafting_table_front",
+        "furnace_front",
+        "bookshelf",
+        "tnt_side",
+        "ender_pearl",
+        "crossbow_standby",
+        "fire_charge",
+        "ladder",
+        "tnt_top",
+        "slingshot_frame",
+        "ladder_wall"
+      ],
+      "time": 20.441666666666148,
+      "removed": 951,
+      "backgroundRemoved": 0,
+      "explosions": 1,
+      "portals": 1,
+      "physics": "Matter.js",
+      "bodies": 150,
+      "debris": 0,
+      "enemiesAlive": 0,
+      "projectiles": 3,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 8,
+      "shots": 5,
+      "inventory": [
+        1,
+        2,
+        1,
+        1
+      ],
+      "ammoCounts": {
+        "cobble": 1,
+        "tnt": 2,
+        "ender": 1,
+        "fire": 1
+      },
+      "screen": "result",
+      "unlocked": 10,
+      "launched": 4,
+      "selected": "ender",
+      "selectedSlot": 2,
+      "paused": true,
+      "ended": true,
+      "particles": 0,
+      "burning": 0,
+      "ammoBodies": [
+        {
+          "id": "cobble",
+          "x": 1401.3578606362787,
+          "y": 322.01073951005696,
+          "angle": 9.425536443964557,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        },
+        {
+          "id": "cobble",
+          "x": 1093.0609935118669,
+          "y": 754.0080818605697,
+          "angle": 10.995928603240046,
+          "speed": 0,
+          "sleeping": true,
+          "uses": 0
+        },
+        {
+          "id": "ender",
+          "x": 1227.9821333465022,
+          "y": 610.0998818457138,
+          "angle": -3.038861905518025,
+          "speed": 26.762052719192386,
+          "sleeping": false,
+          "uses": 1
+        }
+      ],
+      "restingBlocks": 2,
+      "fps": 63,
+      "stepMs": 0,
+      "maxStepMs": 0,
+      "launcher": {
+        "x": 285,
+        "y": 545,
+        "vx": 0,
+        "vy": 0,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      },
+      "enemies": [
+        {
+          "skin": "pillager",
+          "hp": -26.668067477327256,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1199.5276844710236,
+          "y": 194.32496096384736,
+          "facing": -1,
+          "walkDistance": 234.64076549748665,
+          "turns": 1,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999996587620286,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1286.2396221677045,
+          "y": 290.01250000069444,
+          "facing": -1,
+          "walkDistance": 20.19853861088791,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1440.0704176531667,
+          "y": 290.01250000069444,
+          "facing": 1,
+          "walkDistance": 45.98235558770807,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 1,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "pillager",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1300.2145567230193,
+          "y": 578.0125000006944,
+          "facing": -1,
+          "walkDistance": 292.2484909944674,
+          "turns": 2,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.9999259921547933,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": 1.5707963267948966,
+            "visible": false
+          },
+          "x": 1134.8922732616152,
+          "y": 722.0125000006944,
+          "facing": 1,
+          "walkDistance": 121.20549041739014,
+          "turns": 0,
+          "behavior": "idle",
+          "pose": {
+            "walkBlend": 0.007360870250904851,
+            "headYaw": 0.23525614131433997,
+            "headPitch": 0.1896662668801435,
+            "gesture": 0.672056230705656
+          }
+        },
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "dead": true,
+          "appearance": {
+            "hurt": false,
+            "angle": -1.5707963267948966,
+            "visible": false
+          },
+          "x": 1123.05172277995,
+          "y": 722.0130863958028,
+          "facing": -1,
+          "walkDistance": 172.25018987170438,
+          "turns": 0,
+          "behavior": "walk",
+          "pose": {
+            "walkBlend": 0.0751886212391518,
+            "headYaw": 0,
+            "headPitch": 0,
+            "gesture": 0
+          }
+        }
+      ],
+      "whiteParticles": 0,
+      "drawSound": {
+        "active": false,
+        "starts": 25,
+        "stops": 25,
+        "state": "running",
+        "signalRms": 0,
+        "source": "minecraft:crossbow_loading",
+        "failed": false
+      },
+      "preview": [],
+      "backgroundPixels": 37632,
+      "movingBackgroundPixels": 0,
+      "terrainPixels": 37193,
+      "debrisPixels": 0,
+      "sound": {
+        "played": {
+          "bow": 25,
+          "stone": 28,
+          "glass": 14,
+          "zombie_hurt": 18,
+          "fuse": 13,
+          "pillager_idle": 21,
+          "zombie_idle": 15,
+          "pillager_hurt": 20,
+          "explode": 13,
+          "portal": 4
+        },
+        "failed": 0,
+        "lastError": null
+      },
+      "physicsParts": 191
+    }
+  ],
+  "final": {
+    "assets": [
+      "grass_block_side",
+      "spruce_leaves",
+      "cherry_log",
+      "cherry_leaves",
+      "grass_block_side_overlay",
+      "dirt",
+      "stone",
+      "pillager",
+      "zombie",
+      "oak_log",
+      "stone_bricks",
+      "glass",
+      "bedrock",
+      "oak_leaves",
+      "iron_ore",
+      "deepslate",
+      "oak_planks",
+      "dark_oak_log",
+      "dark_oak_planks",
+      "spruce_log",
+      "warden",
+      "fire_0",
+      "spruce_planks",
+      "cobblestone",
+      "oak_door_top",
+      "oak_door_bottom",
+      "crafting_table_front",
+      "furnace_front",
+      "bookshelf",
+      "tnt_side",
+      "ender_pearl",
+      "crossbow_standby",
+      "fire_charge",
+      "ladder",
+      "tnt_top",
+      "slingshot_frame",
+      "ladder_wall"
+    ],
+    "time": 20.441666666666148,
+    "removed": 951,
+    "backgroundRemoved": 0,
+    "explosions": 1,
+    "portals": 1,
+    "physics": "Matter.js",
+    "bodies": 150,
+    "debris": 0,
+    "enemiesAlive": 0,
+    "projectiles": 3,
+    "particlesPending": 0,
+    "ready": true,
+    "level": 8,
+    "shots": 5,
+    "inventory": [
+      1,
+      2,
+      1,
+      1
+    ],
+    "ammoCounts": {
+      "cobble": 1,
+      "tnt": 2,
+      "ender": 1,
+      "fire": 1
+    },
+    "screen": "result",
+    "unlocked": 10,
+    "launched": 4,
+    "selected": "ender",
+    "selectedSlot": 2,
+    "paused": true,
+    "ended": true,
+    "particles": 0,
+    "burning": 0,
+    "ammoBodies": [
+      {
+        "id": "cobble",
+        "x": 1401.3578606362787,
+        "y": 322.01073951005696,
+        "angle": 9.425536443964557,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 0
+      },
+      {
+        "id": "cobble",
+        "x": 1093.0609935118669,
+        "y": 754.0080818605697,
+        "angle": 10.995928603240046,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 0
+      },
+      {
+        "id": "ender",
+        "x": 1227.9821333465022,
+        "y": 610.0998818457138,
+        "angle": -3.038861905518025,
+        "speed": 26.762052719192386,
+        "sleeping": false,
+        "uses": 1
+      }
+    ],
+    "restingBlocks": 2,
+    "fps": 63,
+    "stepMs": 0,
+    "maxStepMs": 0,
+    "launcher": {
+      "x": 285,
+      "y": 545,
+      "vx": 0,
+      "vy": 0,
+      "angle": 0,
+      "phase": "ready",
+      "type": "slingshot"
+    },
+    "enemies": [
+      {
+        "skin": "pillager",
+        "hp": -26.668067477327256,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 1199.5276844710236,
+        "y": 194.32496096384736,
+        "facing": -1,
+        "walkDistance": 234.64076549748665,
+        "turns": 1,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.9999996587620286,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "pillager",
+        "hp": -150,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 1286.2396221677045,
+        "y": 290.01250000069444,
+        "facing": -1,
+        "walkDistance": 20.19853861088791,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "pillager",
+        "hp": -150,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 1440.0704176531667,
+        "y": 290.01250000069444,
+        "facing": 1,
+        "walkDistance": 45.98235558770807,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 1,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "pillager",
+        "hp": -150,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 1300.2145567230193,
+        "y": 578.0125000006944,
+        "facing": -1,
+        "walkDistance": 292.2484909944674,
+        "turns": 2,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.9999259921547933,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "zombie",
+        "hp": -150,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 1134.8922732616152,
+        "y": 722.0125000006944,
+        "facing": 1,
+        "walkDistance": 121.20549041739014,
+        "turns": 0,
+        "behavior": "idle",
+        "pose": {
+          "walkBlend": 0.007360870250904851,
+          "headYaw": 0.23525614131433997,
+          "headPitch": 0.1896662668801435,
+          "gesture": 0.672056230705656
+        }
+      },
+      {
+        "skin": "zombie",
+        "hp": -150,
+        "alive": false,
+        "dead": true,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 1123.05172277995,
+        "y": 722.0130863958028,
+        "facing": -1,
+        "walkDistance": 172.25018987170438,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.0751886212391518,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      }
+    ],
+    "whiteParticles": 0,
+    "drawSound": {
+      "active": false,
+      "starts": 25,
+      "stops": 25,
+      "state": "running",
+      "signalRms": 0,
+      "source": "minecraft:crossbow_loading",
+      "failed": false
+    },
+    "preview": [],
+    "backgroundPixels": 37632,
+    "movingBackgroundPixels": 0,
+    "terrainPixels": 37193,
+    "debrisPixels": 0,
+    "sound": {
+      "played": {
+        "bow": 25,
+        "stone": 28,
+        "glass": 14,
+        "zombie_hurt": 18,
+        "fuse": 13,
+        "pillager_idle": 21,
+        "zombie_idle": 15,
+        "pillager_hurt": 20,
+        "explode": 13,
+        "portal": 4
+      },
+      "failed": 0,
+      "lastError": null
+    },
+    "physicsParts": 191
+  }
+}

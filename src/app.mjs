@@ -4,9 +4,38 @@ import {SLING_HOME,pullSling} from './sling.mjs';import {DrawAudio} from './draw
 import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,totalAmmo,spendAmmo,rewardFor} from './campaign.mjs';
 import {mobAppearance} from './animation.mjs';
 import {updateOutcome} from './outcome.mjs';
+import {createOnlineClient} from './online.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
-let world,renderer,assets,scene,drawAudio,progress,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
+let world,renderer,assets,scene,drawAudio,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
+const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY='mc-block-launch.pending.v1',online=createOnlineClient();let profileReturn='levels',syncing=false,profileRevision=0;
+function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
+function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
+function pendingResults(){const raw=readLocal(PENDING_KEY,[]);return Array.isArray(raw)?raw.filter(s=>s&&Number.isInteger(s.stage)&&Number.isInteger(s.shots)&&Number.isInteger(s.timeMs)):[];}
+function profileLabel(){$('#profileBtn').textContent=profile?.nickname?`玩家：${profile.nickname}`:'设置昵称';}
+async function syncResults(){
+ if(syncing||!profile?.nickname||state.screen==='profile')return;syncing=true;const revision=profileRevision;
+ try{
+  if(profile.token&&profile.dirty){try{const reply=await online.updateProfile(profile.token,profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:profile.token};}catch(error){if(revision!==profileRevision)return;if(error.status!==401)throw error;profile.token=null;}}
+  if(!profile.token){const reply=await online.createProfile(profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:reply.token};}saveLocal(PROFILE_KEY,profile);profileLabel();
+  while(pendingResults().length){const score=pendingResults()[0];if(revision!==profileRevision)return;try{await online.submitResult(profile.token,score);}catch(error){if(revision!==profileRevision)return;if(error.status===401){profile.token=null;saveLocal(PROFILE_KEY,profile);}throw error;}if(revision!==profileRevision)return;const rest=pendingResults().filter(s=>s.stage!==score.stage||s.shots!==score.shots||s.timeMs!==score.timeMs);saveLocal(PENDING_KEY,rest);}
+ }catch(error){console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
+}
+function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?'levels':state.screen;cancelDrag();$('#saveProfile').disabled=false;$('#nickname').value=profile?.nickname||'';$('#profileStatus').textContent='昵称 1—16 个字符；不需要密码。';$('#profileBack').classList.toggle('hidden',!profile);menus('profile');}
+async function saveProfile(event){
+ event.preventDefault();if($('#saveProfile').disabled)return;const nickname=$('#nickname').value.normalize('NFKC').trim().replace(/ +/g,' ');if(!nickname||[...nickname].length>16||! /^[\p{L}\p{N}\p{M}_ -]+$/u.test(nickname)||!/[\p{L}\p{N}]/u.test(nickname)){$('#profileStatus').textContent='请输入 1—16 个字母、汉字或数字，可含空格、下划线和短横线。';return;}
+ const revision=++profileRevision,returnTo=profileReturn;$('#saveProfile').disabled=true;let nextProfile;
+ try{const reply=profile?.token?await online.updateProfile(profile.token,nickname):await online.createProfile(nickname);nextProfile={...reply.profile,token:reply.token||profile?.token};}
+ catch(error){if(revision!==profileRevision)return;if(error.status===400){$('#profileStatus').textContent='这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
+ if(revision!==profileRevision)return;profile=nextProfile;$('#saveProfile').disabled=false;saveLocal(PROFILE_KEY,profile);profileLabel();if(state.screen==='profile')menus(returnTo);void syncResults();
+}
+async function showLeaderboard(){
+ cancelDrag();menus('leaderboard');$('#leaderboardStatus').textContent='正在读取排行榜…';$('#rankingRows').replaceChildren();
+ try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard')return;$('#leaderboardStatus').textContent=entries.length?'只记录各关最佳通关成绩。':'还没有成绩，来成为第一位挑战者。';
+  for(const entry of entries){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,`${entry.completed}/10`,entry.totalShots,`${Math.floor(entry.totalTimeMs/60000)}分${Math.floor(entry.totalTimeMs/1000)%60}秒`]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
+ }catch{if(state.screen==='leaderboard')$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
+}
+async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock('landscape');}catch{/* A browser may require rotation by hand. */}}
 function iconUrl(i){const icon=assets.icons[AMMO[i].id];return icon instanceof HTMLCanvasElement?icon.toDataURL():icon.src;}
 function hud(){
  state.shots=totalAmmo(state.inventory);
@@ -18,38 +47,38 @@ function hud(){
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}
 function menus(screen){
  state.screen=screen;state.paused=screen!=='play';
- $('#levelMenu').classList.toggle('hidden',screen!=='levels');$('#pauseMenu').classList.toggle('hidden',screen!=='pause');$('#result').classList.toggle('hidden',screen!=='result');
+ for(const [id,name] of [['levelMenu','levels'],['pauseMenu','pause'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
  $('#gameRoot').classList.toggle('menu-open',screen!=='play');
 }
 function renderCards(){
  const container=$('#levelCards');container.replaceChildren();
  LEVELS.forEach((level,i)=>{
-  const b=document.createElement('button');b.className='level-card';b.dataset.level=i;b.id='level-'+i;b.disabled=!canEnter(progress,i);
+  const b=document.createElement('button');b.className='level-card';b.dataset.level=i;b.id='level-'+i;b.title=level.desc;b.disabled=!canEnter(progress,i);
   const number=document.createElement('span');number.className='level-number';number.textContent=String(i+1).padStart(2,'0');
-  const name=document.createElement('strong');name.textContent=level.title.replace(/^0\d \/ /,'');
+  const name=document.createElement('strong');name.textContent=level.title.replace(/^\d{2} \/ /,'');
   const supplies=document.createElement('span');supplies.textContent=b.disabled?'通过前一关解锁':inventoryFor(i).map((n,j)=>n?`${AMMO[j].label} ×${n}`:'').filter(Boolean).join(' · ');
   const flag=document.createElement('small');flag.textContent=b.disabled?'未解锁':progress.completed.includes(i)?'已通关 · 可重玩':i===progress.unlocked-1?'开始挑战':'已解锁';
   b.append(number,name,supplies,flag);b.addEventListener('click',()=>loadLevel(i));container.append(b);
  });
 }
-function cancelDrag(){drawAudio?.stop();state.drag=false;state.angle=0;state.power=0;state.vx=state.vy=0;if(!state.launch)state.pouch={...SLING_HOME};}
+function cancelDrag(){drawAudio?.stop();state.drag=false;$('#touchCancel').classList.add('hidden');state.angle=0;state.power=0;state.vx=state.vy=0;if(!state.launch)state.pouch={...SLING_HOME};}
 function loadLevel(n){
  if(!canEnter(progress,n))return false;cancelDrag();
  if(world){window.Matter.Events.off(world.engine);window.Matter.Composite.clear(world.engine.world,false);window.Matter.Engine.clear(world.engine);}
  scene=buildLevel(n);world=new SiegeWorld(window.Matter,{grid:scene.grid,rear:scene.rear});for(const e of scene.enemies)world.addEnemy(e.x,e.feet,e.skin);
  Object.assign(state,{level:n,inventory:inventoryFor(n),selected:0,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},launch:null,quiet:0,winWait:0,power:0,launched:0});
- renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gamehint').classList.remove('faded');$('#gamehint').textContent='拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();revealInventory(3200);return true;
+ renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gamehint').classList.remove('faded');$('#gamehint').textContent=matchMedia('(pointer:coarse)').matches?'拖住弹药，松手发射':'拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();revealInventory(3200);return true;
 }
 function showLevels(){cancelDrag();renderCards();menus('levels');}
 function pause(){if(state.screen==='play'){cancelDrag();menus('pause');}else if(state.screen==='pause'){menus('play');revealInventory();}}
 function launcher(){return {...state,ammo:AMMO[state.launch?.kind??state.selected]||AMMO[0],loaded:!!state.inventory[state.selected]&&!state.ended&&(!state.launch||!state.launch.released)};}
 function result(win){
  state.ended=true;cancelDrag();const first=!progress.completed.includes(state.level),reward=win&&first?rewardFor(state.level):null;
- if(win){progress=finishLevel(progress,state.level);try{localStorage.setItem(SAVE_KEY,JSON.stringify(progress));}catch{}}
- $('#resultFlag').textContent=win?'挑战成功':'再试一次';$('#resultTitle').textContent=reward?`已解锁 ${reward}`:win?(state.level===4?'全部关卡已通关':'敌对生物已清除'):'弹药用完了';
+ if(win){progress=finishLevel(progress,state.level);saveLocal(SAVE_KEY,progress);const score={stage:state.level,shots:state.launched,timeMs:Math.max(100,Math.round(world.time*1000))};const pending=pendingResults(),old=pending.find(s=>s.stage===score.stage);if(!old||score.shots<old.shots||score.shots===old.shots&&score.timeMs<old.timeMs)saveLocal(PENDING_KEY,[...pending.filter(s=>s.stage!==score.stage),score]);void syncResults();}
+ $('#resultFlag').textContent=win?'挑战成功':'再试一次';$('#resultTitle').textContent=reward?`已解锁 ${reward}`:win?(state.level===LEVELS.length-1?'主世界十关已通关':'敌对生物已清除'):'弹药用完了';
  $('#resultMsg').textContent=reward?'下一关可以使用这件新物品。':win?'可以继续下一关，也可以重玩当前关卡。':'调整角度，合理使用每一件物品。';
  $('#rewardIcon').classList.toggle('hidden',!reward);if(reward)$('#rewardIcon').src=iconUrl(state.level+1);
- $('#nextBtn').classList.toggle('hidden',!win||state.level===4);$('#nextBtn').textContent='进入下一关';menus('result');
+ $('#nextBtn').classList.toggle('hidden',!win||state.level===LEVELS.length-1);$('#nextBtn').textContent='进入下一关';menus('result');
 }
 function animateLauncher(dt){
  const a=state.launch;if(!a)return;a.age+=dt;const recoil=Math.cos(a.age*29)*Math.exp(-a.age*11);state.pouch={x:SLING_HOME.x+a.dx*recoil,y:SLING_HOME.y+a.dy*recoil};
@@ -66,9 +95,9 @@ function frame(now){
 }
 function point(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*WIDTH/r.width,y:(e.clientY-r.top)*864/r.height};}
 function beginDrag(e){
- if(e.button===2){cancelDrag();e.preventDefault();return;}if(e.button!==0||state.screen!=='play'||state.ended||state.launch||!state.inventory[state.selected])return;
- const p=point(e);if(Math.hypot(p.x-state.pouch.x,p.y-state.pouch.y)>55)return;
- state.drag=true;state.pointerId=e.pointerId;state.power=0;state.vx=state.vy=0;canvas.setPointerCapture(e.pointerId);e.preventDefault();if(assets.soundOn)drawAudio.begin();
+ if(e.button===2){cancelDrag();e.preventDefault();return;}if(e.button!==0||e.isPrimary===false||state.drag||state.screen!=='play'||state.ended||state.launch||!state.inventory[state.selected])return;
+ const p=point(e),radius=e.pointerType==='touch'?Math.max(55,24*WIDTH/canvas.getBoundingClientRect().width):55;if(Math.hypot(p.x-state.pouch.x,p.y-state.pouch.y)>radius)return;
+ state.drag=true;$('#touchCancel').classList.remove('hidden');state.pointerId=e.pointerId;state.power=0;state.vx=state.vy=0;canvas.setPointerCapture(e.pointerId);e.preventDefault();if(assets.soundOn)drawAudio.begin();
 }
 function moveDrag(e){
  if(!state.drag||e.pointerId!==state.pointerId)return;if(e.buttons&2){cancelDrag();return;}
@@ -76,7 +105,7 @@ function moveDrag(e){
  state.pouch=shot.origin;state.vx=shot.vx;state.vy=shot.vy;state.power=shot.power;if(assets.soundOn)drawAudio.update(shot.power,distance);
 }
 function endDrag(e){
- if(!state.drag||e.pointerId!==state.pointerId)return;state.drag=false;drawAudio.stop();const kind=state.selected;
+ if(!state.drag||e.pointerId!==state.pointerId)return;state.drag=false;$('#touchCancel').classList.add('hidden');drawAudio.stop();const kind=state.selected;
  if(!spendAmmo(state.inventory,kind))return;world.spawnProjectile(AMMO[kind].id,state.pouch.x,state.pouch.y,state.vx,state.vy);
  state.launch={age:0,kind,dx:state.pouch.x-SLING_HOME.x,dy:state.pouch.y-SLING_HOME.y,released:true};state.launched++;
  if(!state.inventory[kind])state.selected=Math.max(0,state.inventory.findIndex(n=>n>0));
@@ -85,7 +114,7 @@ function endDrag(e){
 function select(i){if(state.screen!=='play'||state.launch||state.drag)return;state.selected=clamp(i,0,8);hud();revealInventory();}
 function status(){
  const s=world.snapshot();return {...s,ready:true,level:state.level+1,shots:state.shots,inventory:[...state.inventory],ammoCounts:Object.fromEntries(AMMO.map((a,i)=>[a.id,state.inventory[i]])),screen:state.screen,unlocked:progress.unlocked,
- launched:state.launched,selected:AMMO[state.selected]?.id||'empty',selectedSlot:state.selected,paused:state.paused,ended:state.ended,particles:renderer.particles.length,projectiles:s.projectiles.length,ammoBodies:s.projectiles,restingBlocks:s.projectiles.filter(p=>p.sleeping).length,
+ launched:state.launched,selected:AMMO[state.selected]?.id||'empty',selectedSlot:state.selected,paused:state.paused,ended:state.ended,particles:renderer.particles.length,burning:world.fires.filter(f=>world.time>=f.startedAt).length,projectiles:s.projectiles.length,ammoBodies:s.projectiles,restingBlocks:s.projectiles.filter(p=>p.sleeping).length,
  fps:Math.round(fps),stepMs:+stepMs.toFixed(2),maxStepMs:+maxStepMs.toFixed(2),launcher:{x:state.pouch.x,y:state.pouch.y,vx:state.vx,vy:state.vy,angle:state.angle,phase:state.drag?'aim':state.launch?'recoil':'ready',type:'slingshot'}};
 }
 async function start(){
@@ -97,22 +126,29 @@ async function start(){
   if(i<AMMO.length){const img=document.createElement('img');img.src=iconUrl(i);img.alt='';const count=document.createElement('span');count.className='stack-count';b.append(img,count);}
   b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
  }
- loadLevel(progress.unlocked-1);showLevels();loadState.hidden=true;
+ profile=readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;profileLabel();
+ loadLevel(progress.unlocked-1);showLevels();if(!profile)showProfile();else void syncResults();loadState.hidden=true;
  canvas.addEventListener('pointerdown',beginDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);
  canvas.addEventListener('pointercancel',cancelDrag);canvas.addEventListener('lostpointercapture',()=>{if(state.drag)cancelDrag();});
  canvas.addEventListener('mousedown',e=>{if(e.button===2){cancelDrag();e.preventDefault();}});canvas.addEventListener('contextmenu',e=>{cancelDrag();e.preventDefault();});
  $('#resume').addEventListener('click',pause);for(const id of ['restart','retryBtn'])$('#'+id).addEventListener('click',()=>loadLevel(state.level));
  for(const id of ['levelMenuBtn','resultLevels'])$('#'+id).addEventListener('click',showLevels);$('#nextBtn').addEventListener('click',()=>loadLevel(state.level+1));
  $('#soundToggle').addEventListener('click',()=>{assets.soundOn=!assets.soundOn;drawAudio.setMuted(!assets.soundOn);$('#soundToggle').textContent=assets.soundOn?'音效：开':'音效：关';});
+ $('#profileForm').addEventListener('submit',saveProfile);$('#profileBtn').addEventListener('click',showProfile);$('#profileBack').addEventListener('click',()=>menus(profileReturn));
+ $('#leaderboardBtn').addEventListener('click',showLeaderboard);$('#leaderboardRefresh').addEventListener('click',showLeaderboard);$('#leaderboardBack').addEventListener('click',showLevels);
+ for(const id of ['fullscreenBtn','rotateFullscreen'])$('#'+id).addEventListener('click',fullscreen);
+ $('#touchPause').addEventListener('click',pause);$('#touchCancel').addEventListener('pointerdown',e=>{e.preventDefault();cancelDrag();});$('#touchInventory').addEventListener('click',()=>revealInventory(4000));
+ $('#gameRoot').addEventListener('pointerdown',e=>{if(state.screen!=='play'||state.drag)return;const r=canvas.getBoundingClientRect();if(e.clientY>r.bottom-r.height*.12)revealInventory(4000);});
+ if(matchMedia('(pointer:coarse)').matches)$('#menuHelp').textContent='拖动发射 · 右上角暂停 / 物品 · 横屏游玩更清楚';
  let lastWheel=-Infinity;$('#gameRoot').addEventListener('wheel',e=>{
   if(e.ctrlKey||!e.deltaY||state.screen!=='play')return;e.preventDefault();revealInventory();const now=performance.now();if(now-lastWheel<90)return;lastWheel=now;select((state.selected+Math.sign(e.deltaY)+9)%9);
  },{passive:false});
  $('#gameRoot').addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();if(state.screen==='play'&&e.clientY>r.bottom-r.height*.10)revealInventory();});
  window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){e.preventDefault();pause();return;}if(state.screen!=='play')return;
+  if(e.target instanceof HTMLInputElement)return;if(e.key==='Escape'){e.preventDefault();if(['profile','leaderboard'].includes(state.screen)){if(profile)showLevels();}else pause();return;}if(state.screen!=='play')return;
   if(e.key>='1'&&e.key<='9')select(Number(e.key)-1);if(e.key.toLowerCase()==='r')loadLevel(state.level);if(e.code==='Space'){e.preventDefault();pause();}
  });
- window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});
+ window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.screen==='play')pause();});window.addEventListener('online',()=>void syncResults());
  window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:loadLevel,select,
  getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),

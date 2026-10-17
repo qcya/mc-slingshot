@@ -1,15 +1,22 @@
-import test from 'node:test';import assert from 'node:assert/strict';
-import {readProgress,finishLevel,canEnter,inventoryFor,spendAmmo,totalAmmo} from '../src/campaign.mjs';
-
-test('新存档只开放第一关，过关逐步开放并保留重玩进度',()=>{
+﻿import test from 'node:test';import assert from 'node:assert/strict';
+import {readProgress,finishLevel,canEnter,inventoryFor,spendAmmo,totalAmmo,rewardFor,LOADOUTS} from '../src/campaign.mjs';
+test('progress opens ten stages in order and preserves replay progress',()=>{
  let p=readProgress(null);assert.equal(canEnter(p,0),true);assert.equal(canEnter(p,1),false);
- p=finishLevel(p,0);assert.equal(p.unlocked,2);assert.equal(canEnter(p,1),true);assert.equal(canEnter(p,2),false);
- p=finishLevel(p,1);assert.equal(p.unlocked,3);assert.equal(readProgress(JSON.stringify(p)).unlocked,3);
- assert.equal(finishLevel(p,0).unlocked,3);assert.equal(finishLevel(readProgress(null),4).unlocked,1);
- assert.equal(readProgress('{broken').unlocked,1);
+ for(let level=0;level<10;level++){assert.equal(canEnter(p,level),true);p=finishLevel(p,level);assert.equal(p.unlocked,Math.min(10,level+2));}
+ assert.deepEqual(p.completed,[0,1,2,3,4,5,6,7,8,9]);assert.equal(canEnter(p,10),false);
+ assert.equal(finishLevel(p,0).unlocked,10);assert.equal(finishLevel(readProgress(null),4).unlocked,1);
+ assert.deepEqual(readProgress('{broken'),{unlocked:1,completed:[]});
 });
-test('第一关五圆石，第二关四圆石一TNT；只扣当前物品且不能透支',()=>{
- const first=inventoryFor(0),second=inventoryFor(1);assert.deepEqual(first,[5,0,0]);assert.deepEqual(second,[4,1,0]);
- assert.equal(spendAmmo(second,1),true);assert.deepEqual(second,[4,0,0]);assert.equal(spendAmmo(second,1),false);
- assert.equal(totalAmmo(second),4);assert.deepEqual(inventoryFor(1),[4,1,0]);
+test('original five-clear save migrates to stage six; invalid entries are filtered and progress is clamped',()=>{
+ assert.deepEqual(readProgress(JSON.stringify({unlocked:5,completed:[4,3,2,1,0,2]})),{unlocked:6,completed:[0,1,2,3,4]});
+ assert.equal(readProgress(JSON.stringify({unlocked:5,completed:[0,1,2,3]})).unlocked,5);
+ assert.deepEqual(readProgress(JSON.stringify({unlocked:99,completed:[9,2,0,2,10,-1,3.5]})),{unlocked:10,completed:[0,2,9]});
+});
+test('four finite ammo slots unlock TNT, pearl and fire after stages one, two and three',()=>{
+ assert.equal(LOADOUTS.length,10);assert.deepEqual(inventoryFor(0),[4,0,0,0]);assert.deepEqual(inventoryFor(1),[3,1,0,0]);
+ assert.equal(inventoryFor(2)[3],0);assert.ok(inventoryFor(3)[3]>0);
+ assert.deepEqual([0,1,2,3].map(rewardFor),['TNT','末影珍珠','烈焰弹',null]);
+ const ammo=inventoryFor(1);assert.equal(spendAmmo(ammo,1),true);assert.equal(spendAmmo(ammo,1),false);
+ assert.equal(totalAmmo(ammo),3);assert.deepEqual(inventoryFor(1),[3,1,0,0]);
+ for(const loadout of LOADOUTS){assert.equal(loadout.length,4);assert.ok(loadout.every(n=>Number.isInteger(n)&&n>=0));}
 });

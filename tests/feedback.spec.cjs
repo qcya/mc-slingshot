@@ -1,7 +1,7 @@
-﻿const {test,expect}=require('@playwright/test');const {ready,aim}=require('./browser-helpers.cjs');
+const {test,expect}=require('@playwright/test');const {ready,aim}=require('./browser-helpers.cjs');
 test('独立堆叠库存、方块三面图标、物品栏自动隐藏及滚轮唤回',async({page})=>{
  await ready(page,{level:1});expect(await page.locator('#ballbar button').count()).toBe(9);expect(await page.locator('.topbar,#ammo').count()).toBe(0);
- expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([4,1,0]);expect(await page.locator('#ballbar .stack-count').nth(0).textContent()).toBe('4');
+ expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([3,1,0,0]);expect(await page.locator('#ballbar .stack-count').nth(0).textContent()).toBe('3');
  expect(await page.locator('#ballbar img').nth(0).evaluate(e=>e.naturalWidth)).toBe(64);
  await page.screenshot({path:'evidence/hotbar-first-slot.png'});
  await expect(page.locator('#inventory')).toHaveClass(/tucked/,{timeout:5000});await page.locator('#stage').hover({position:{x:500,y:100}});await page.mouse.wheel(0,-120);

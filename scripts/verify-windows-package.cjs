@@ -16,12 +16,13 @@ const hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).diges
   assert.notEqual(new URL(url).port,env.PORT);assert.equal(await (await fetch(`http://127.0.0.1:${env.PORT}`)).text(),'occupied test port');
   browser=await chromium.launch({channel:'msedge',headless:true});const context=await browser.newContext({baseURL:url,viewport:{width:1536,height:1000}}),page=await context.newPage(),errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});await ready(page);
-  const levels=[];for(let n=0;n<5;n++){if(n)await chooseLevel(page,n);const state=await page.evaluate(()=>MCBlockLaunch.getStatus());assert.equal(state.level,n+1);assert.equal(state.physics,'Matter.js');levels.push({level:state.level,inventory:state.inventory});}
+  const levels=[];for(let n=0;n<10;n++){if(n)await chooseLevel(page,n);const state=await page.evaluate(()=>MCBlockLaunch.getStatus());assert.equal(state.level,n+1);assert.equal(state.physics,'Matter.js');levels.push({level:state.level,inventory:state.inventory});}
   await chooseLevel(page,2);const weapons=[];
   for(const [slot,id] of [[1,'cobble'],[2,'tnt'],[3,'ender']]){
    await restart(page);await shot(page,slot);
    await page.waitForFunction(kind=>{const s=MCBlockLaunch.getStatus();return kind==='tnt'?s.explosions>0:kind==='ender'?s.portals>0:s.removed>0;},id,{timeout:8000});weapons.push({id,...await page.evaluate(()=>MCBlockLaunch.getStatus())});
   }
+  await chooseLevel(page,3);await shot(page,4,135*Math.cos(.24),135*Math.sin(.24));await page.waitForFunction(()=>MCBlockLaunch.getStatus().burning>0,null,{timeout:8000});weapons.push({id:'fire',...await page.evaluate(()=>MCBlockLaunch.getStatus())});
   await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();await page.screenshot({path:'evidence/windows-player-menu.png'});
   assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
   const report={version:manifest.gameVersion,zip:path.basename(zip),zipSha256:hash(zip),runtime:manifest.runtime.version,verifiedFiles:Object.keys(manifest.files).length,isolatedPath:true,unicodeAndAmpersandPath:true,occupiedPortFallback:true,levels,weapons,consoleErrors:errors,failedResources:failed};

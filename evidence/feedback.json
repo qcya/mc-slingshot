@@ -1,7 +1,20 @@
 {
   "assets": [
     "grass_block_side",
+    "dirt",
+    "stone",
+    "oak_log",
+    "stone_bricks",
+    "cherry_leaves",
+    "glass",
+    "bedrock",
+    "oak_leaves",
+    "iron_ore",
+    "oak_planks",
+    "grass_block_side_overlay",
+    "deepslate",
     "dark_oak_log",
+    "zombie",
     "dark_oak_planks",
     "spruce_log",
     "spruce_planks",
@@ -10,32 +23,22 @@
     "oak_door_bottom",
     "crafting_table_front",
     "furnace_front",
+    "pillager",
     "bookshelf",
     "tnt_side",
-    "dirt",
-    "stone",
-    "oak_log",
-    "stone_bricks",
-    "glass",
-    "oak_leaves",
-    "bedrock",
-    "iron_ore",
-    "oak_planks",
     "ender_pearl",
-    "deepslate",
+    "warden",
+    "fire_charge",
     "ladder",
     "tnt_top",
     "spruce_leaves",
     "cherry_log",
-    "cherry_leaves",
-    "grass_block_side_overlay",
-    "zombie",
-    "pillager",
+    "fire_0",
     "crossbow_standby",
     "slingshot_frame",
     "ladder_wall"
   ],
-  "time": 2.8416666666666592,
+  "time": 2.999999999999992,
   "removed": 0,
   "backgroundRemoved": 0,
   "explosions": 0,
@@ -48,30 +51,33 @@
   "particlesPending": 0,
   "ready": true,
   "level": 3,
-  "shots": 7,
+  "shots": 6,
   "inventory": [
-    4,
+    3,
     2,
-    1
+    1,
+    0
   ],
   "ammoCounts": {
-    "cobble": 4,
+    "cobble": 3,
     "tnt": 2,
-    "ender": 1
+    "ender": 1,
+    "fire": 0
   },
   "screen": "play",
-  "unlocked": 5,
+  "unlocked": 10,
   "launched": 0,
   "selected": "cobble",
   "selectedSlot": 0,
   "paused": false,
   "ended": false,
   "particles": 0,
+  "burning": 0,
   "ammoBodies": [],
   "restingBlocks": 0,
   "fps": 75,
-  "stepMs": 0.09,
-  "maxStepMs": 2.5,
+  "stepMs": 0.12,
+  "maxStepMs": 2.8,
   "launcher": {
     "x": 285,
     "y": 545,
@@ -99,9 +105,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.05168753774993686,
-        "headYaw": 0.18482870034615673,
-        "headPitch": 0.1231664438201428,
+        "walkBlend": 0.011751106603872305,
+        "headYaw": 0.05616177354741746,
+        "headPitch": 0.19153428952081886,
         "gesture": 0
       }
     },
@@ -122,9 +128,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.1799360242083545,
-        "headYaw": 0.05193949010486874,
-        "headPitch": 0.04114084707551555,
+        "walkBlend": 0.040908263275743,
+        "headYaw": -0.058974997817178305,
+        "headPitch": 0.12137418672245237,
         "gesture": 0
       }
     },
@@ -145,9 +151,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.5794181953918458,
-        "headYaw": -0.003798255551729266,
-        "headPitch": 0.005189931875597931,
+        "walkBlend": 0.1317301090102945,
+        "headYaw": -0.14240561948955535,
+        "headPitch": 0.07779404960656133,
         "gesture": 0
       }
     },
@@ -161,16 +167,16 @@
         "angle": 0,
         "visible": true
       },
-      "x": 1234.7941444122866,
+      "x": 1233.1822444122859,
       "y": 578.0125000006944,
       "facing": -1,
-      "walkDistance": 61.026755587713296,
+      "walkDistance": 62.638655587713856,
       "turns": 0,
-      "behavior": "walk",
+      "behavior": "idle",
       "pose": {
-        "walkBlend": 1,
-        "headYaw": 0,
-        "headPitch": 0,
+        "walkBlend": 0.458582341424737,
+        "headYaw": -0.06272033957505793,
+        "headPitch": 0.009484933693529082,
         "gesture": 0
       }
     }
@@ -193,7 +199,7 @@
   "sound": {
     "played": {
       "pillager_idle": 2,
-      "zombie_idle": 1
+      "zombie_idle": 2
     },
     "failed": 0,
     "lastError": null
