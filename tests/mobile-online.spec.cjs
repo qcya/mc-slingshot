@@ -63,10 +63,10 @@ test('an occupied nickname stays in the form with a clear message',async({page})
  await page.screenshot({path:'evidence/leaderboard-menu-background.png'});
 });
 
-test('the sample score is visibly labelled as a test record',async({page})=>{
- await page.route('**/api/leaderboard',r=>r.fulfill({json:{entries:[{id:'sample',rank:1,nickname:'星海',completed:10,totalTimeMs:397000,demo:true}]}}));
+test('the sample uses the requested nickname without an extra display suffix',async({page})=>{
+ await page.route('**/api/leaderboard',r=>r.fulfill({json:{entries:[{id:'sample',rank:1,nickname:'星海_Astra',completed:10,totalTimeMs:397000,demo:true}]}}));
  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('SampleViewer');await page.locator('#saveProfile').click();await page.locator('#leaderboardBtn').click();
- await expect(page.locator('#rankingRows tr')).toContainText('星海');await expect(page.locator('.demo-badge')).toHaveText('测试');await expect(page.locator('#rankingRows tr')).toContainText('06:37.000');await page.screenshot({path:'evidence/demo-leaderboard-preview.png'});
+ await expect(page.locator('#rankingRows tr td').nth(1)).toHaveText('星海_Astra');await expect(page.locator('.demo-badge')).toHaveCount(0);await expect(page.locator('#rankingRows tr')).toContainText('06:37.000');await page.screenshot({path:'evidence/demo-leaderboard-preview.png'});
 });
 
 test.describe('Android 触屏布局与实际输入',()=>{

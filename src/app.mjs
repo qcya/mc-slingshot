@@ -41,7 +41,7 @@ async function showLeaderboard(){
  cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision;
  $('#leaderboardStatus').textContent='正在读取排行榜…';
  try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?'十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。':'还没有全通成绩，来成为第一位挑战者。';
-  for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const [i,value] of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)].entries()){const cell=document.createElement('td');cell.textContent=value;if(i===1&&entry.demo){const badge=document.createElement('small');badge.className='demo-badge';badge.textContent='测试';cell.append(' ',badge);}row.append(cell);}$('#rankingRows').append(row);}
+  for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
  }catch{if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
 async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock('landscape');}catch{/* A browser may require rotation by hand. */}}

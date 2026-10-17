@@ -19,7 +19,6 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair;i
 .stack-count{position:absolute;z-index:3;right:3%;bottom:0;font:700 clamp(10px,1.4cqw,22px)/1 monospace;text-shadow:2px 2px #111,-1px -1px #111}
 .menu-screen,.result{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#0009}
 #levelMenu,#leaderboardMenu{background:linear-gradient(#000a,#000a),url('assets/textures/dirt.png') repeat;background-size:auto,64px 64px;image-rendering:pixelated}
-.demo-badge{font-size:.8em;color:#aaa;white-space:nowrap}
 .campaign-panel{width:76%;text-align:center}
 h1{margin:0;font-size:clamp(24px,4.2cqw,64px);font-weight:900;letter-spacing:.15cqw;text-shadow:3px 3px #3f3f3f,5px 5px #151515}
 .menu-subtitle,.menu-help{font-size:clamp(9px,1.1cqw,17px);color:#ddd;line-height:1.5;text-shadow:2px 2px #111}
