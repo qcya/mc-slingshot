@@ -1,10 +1,10 @@
-﻿# 实际测试记录 — Alpha 0.7
+# 实际测试记录 — Alpha 0.7.1
 
 日期：2026-10-17。Windows，Node.js 24，Edge，本地 Matter.js 0.20.0。没有物理降级模式。
 
 ## 最终全量结果
 
-`npm run check`：**41/41 核心测试、13/13 Edge 浏览器场景通过**。浏览器部分约 1.6 分钟。全部结果来自本次最终代码；远端 CI 是否成功不包含在此结论中。
+`npm run check`：**41/41 核心测试、13/13 Edge 浏览器场景通过**。浏览器部分约 1.4 分钟。全部结果来自本次最终代码；远端 CI 是否成功不包含在此结论中。
 
 核心覆盖：完整材质像素与孔洞碰撞、方形弹药停稳、无支撑建筑及后墙固定、玻璃接触整片破碎及连续穿越、四秒 TNT 引信和全程加速闪白、爆炸唤醒睡眠圆石并炸飞其他 TNT、独立引信、珍珠薄厚墙、黑洞预算和引力、怪物直接命中击杀与受力、怪物互穿/停步/观望/抬手、自由方向与小力度、五关完整初始化和攻击获胜回放、服务器资源和私有路径隔离。
 
@@ -34,8 +34,8 @@
 
 ## 五关可获胜复现
 
-`tests/playability.test.mjs` 使用生产 SiegeWorld 和完整 Matter 世界回放 [攻击序列](../evidence/playability-search.json)，五关分别使用 2、2、3、7、4 发，不超过各关弹药数。此数据仅用于开发测试，没有加入游戏自动瞄准或固定剧情。可运行 `node scripts/check-playability.mjs` 重新搜索。
+`tests/playability.test.mjs` 使用生产 SiegeWorld 和完整 Matter 世界回放 [攻击序列](../evidence/playability-search.json)，五关分别使用 1、2、2、5、5 发，不超过各关弹药数。此数据仅用于开发测试，没有加入游戏自动瞄准或固定剧情。可运行 `node scripts/check-playability.mjs` 重新搜索。
 
-独立只读审查复核了新规则及关键实现，未发现 Critical / Important 问题，并独立通过 41 项核心测试。Windows Playwright trace 曾发生 EBUSY，当前关闭 trace，保留截图和 JSON。便捷启动器在前一阶段已使用独立端口实际启动验收；本版打包后另做解压文件和服务响应检查。
+0.7 阶段的独立只读审查复核了新规则及关键实现，未发现 Critical / Important 问题，并独立通过 41 项核心测试。Windows Playwright trace 曾发生 EBUSY，当前关闭 trace，保留截图和 JSON。便捷启动器在前一阶段已使用独立端口实际启动验收；本版打包后另做解压文件和服务响应检查。
 
 当前玩法边界见 README。人物没有主动攻击和复杂寻路；建筑不坍塌是用户最新指定的规则。

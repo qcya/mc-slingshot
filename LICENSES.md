@@ -19,4 +19,4 @@
 
 - `assets/textures/cherry_log.png`、`cherry_leaves.png`：上述 Default-Java `1.20.4` 分支的原版方块纹理。
 - `assets/sfx/bow.ogg`、`zombie_idle.ogg`、`pillager_idle.ogg`：Mojang 1.20.4 官方 assetIndex 对应 `random/bow.ogg`、`mob/zombie/say1.ogg`、`mob/pillager/idle1.ogg`，来源为 `resources.download.minecraft.net`。
-- `assets/sprites/slingshot-frame.png`：本次通过内置 imagegen 生成的透明 RGBA PNG，非 Minecraft 上游纹理。生成提示词保存在同目录 `slingshot-frame.prompt.md`。皮筋拉伸声音由本项目 WebAudio 程序生成。
+- `assets/sprites/slingshot-frame.png`：0.7.1 换为用户提供的透明 RGBA PNG，原样复制且保留 alpha，非 Minecraft 上游纹理。来源见同目录 `slingshot-frame.source.md`。皮筋拉伸声音由本项目 WebAudio 程序生成。

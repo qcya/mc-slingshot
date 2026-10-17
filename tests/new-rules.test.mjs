@@ -23,8 +23,8 @@ test('先爆的 TNT 会炸飞后一颗 TNT 和落地睡眠圆石，引信不被�
  w.blast(230,270,98);step(w,.25);
  assert.ok(tnt.body.position.x>x+15);assert.ok(stone.body.position.x>345);assert.ok(tnt.fuse<fuse&&tnt.fuse>fuse-.4);
 });
-test('只有两侧樱花树，树木不进入预览碰撞列表',()=>{
- const scene=buildLevel(0);assert.equal(scene.trees.length,2);assert.ok(scene.trees.every(t=>t.kind==='cherry'&&(t.x<4||t.x>28)));
+test('只保留右侧樱花树，树木不进入预览碰撞列表',()=>{
+ const scene=buildLevel(0);assert.equal(scene.trees.length,1);assert.ok(scene.trees.every(t=>t.kind==='cherry'&&t.x>28));
  const w=new SiegeWorld(M,{grid:scene.grid,rear:scene.rear}),p=predictArc(w,'cobble',{x:205,y:545},1100,-500);
  assert.equal(M.Query.point(M.Composite.allBodies(w.engine.world),{x:11*48+24,y:11*48}).length,0);
  w.scene={trees:[{x:8,base:14,height:10,kind:'cherry'}]};assert.deepEqual(predictArc(w,'cobble',{x:205,y:545},1100,-500),p);

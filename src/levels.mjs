@@ -61,6 +61,6 @@ export function buildLevel(number){
     room(20,7,1,6,5,13,[19,6,22,14]);room(29,7,1,6,5,13,[28,6,31,14]);room(23,11,4,2,5,13,[22,10,28,14]);
   }
   // Background objects never enter the destructible/support grid.
-  const trees=[{x:1,base:14,height:4,kind:'cherry'},{x:31,base:14,height:5,kind:'cherry'}];
+  const trees=[{x:31,base:14,height:5,kind:'cherry'}];
   return {...LEVELS[level],number:level,grid,rear,enemies,trees};
 }

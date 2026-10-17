@@ -21,7 +21,7 @@ test('左下蓄力不反向，九格物品栏、立体行走人物与静态云�
  await page.mouse.move(b.x+p.x*b.width/1536,b.y+p.y*b.height/864);await page.mouse.down();
  await page.mouse.move(b.x+110*b.width/1536,b.y+660*b.height/864,{steps:12});
  const aimed=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher);
- expect(aimed.x).toBeLessThan(205);expect(aimed.y).toBeGreaterThan(607);
+ expect(aimed.x).toBeLessThan(p.x);expect(aimed.y).toBeGreaterThan(p.y);
  await page.screenshot({path:'evidence/left-below-aim.png'});await page.mouse.up();
  await page.waitForTimeout(600);await page.getByRole('button',{name:'↻ 重开',exact:true}).click();
  const cloud=()=>page.evaluate(()=>Array.from(document.querySelector('#stage').getContext('2d').getImageData(400,30,400,90).data));

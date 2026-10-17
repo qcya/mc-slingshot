@@ -13,7 +13,7 @@ test('五个手工关卡从完整方块起步，装饰不参与承重，怪物�
       const initial=g.get(tx*16,ty*16);
       for(let y=0;y<16;y++)for(let x=0;x<16;x++)assert.equal(g.get(tx*16+x,ty*16+y),initial,`level ${level}, partial tile ${tx},${ty}`);
     }
-    assert.ok(scene.trees.length>=2);
+    assert.equal(scene.trees.length,1);assert.ok(scene.trees[0].x>28);
     const w=new SiegeWorld(Matter,{grid:g});
     for(const e of scene.enemies)w.addEnemy(e.x,e.feet,e.skin);
     const before=g.count();g.set(0,0,1);g.set(0,0,0);w.synchronize();

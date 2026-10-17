@@ -2,6 +2,7 @@ import { WIDTH,HEIGHT,PIXEL,TILE,AMMO,MATERIALS,clamp } from './config.mjs';
 import {predictArc,arcRevision} from './aim.mjs';
 import {MobSprites} from './mobs.mjs';
 import {tntFlash} from './animation.mjs';
+import {SLING_HOME,SLING_FRAME} from './sling.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -84,10 +85,12 @@ export class Renderer {
   tree(tree){
     const {x,base,height,kind}=tree,top=base-height,log=kind==='spruce'?'spruce_log':'oak_log',leaf=kind==='spruce'?'spruce_leaves':'oak_leaves';
     if(kind==='cherry'){
-      for(let y=top;y<base;y++)this.image('cherry_log',x*TILE,y*TILE);
-      for(const dx of [-1,1]){this.image('cherry_log',(x+dx)*TILE,(top+1)*TILE);this.image('cherry_log',(x+dx)*TILE,top*TILE);}
-      for(const [dy,r] of [[-2,1],[-1,3],[0,3],[1,2]])for(let dx=-r;dx<=r;dx++){
-        if(dy===1&&Math.abs(dx)<2)continue;this.image('cherry_leaves',(x+dx)*TILE,(top+dy)*TILE);
+      // One-block trunk with short staggered forks, not a filled 3x2 log slab.
+      for(let y=top+1;y<base;y++)this.image('cherry_log',x*TILE,y*TILE);
+      for(const [dx,dy] of [[-1,1],[-2,0],[1,0]])this.image('cherry_log',(x+dx)*TILE,(top+dy)*TILE);
+      // Broad, uneven block canopy conceals the branch tips.
+      for(const [dy,lo,hi] of [[-2,-2,1],[-1,-4,3],[0,-4,4],[1,-3,2]])for(let dx=lo;dx<=hi;dx++){
+        if(dy===1&&(dx===-1||dx===0))continue;this.image('cherry_leaves',(x+dx)*TILE,(top+dy)*TILE);
       }return;
     }
     for(let y=top;y<base;y++)this.image(log,x*TILE,y*TILE);
@@ -132,9 +135,10 @@ export class Renderer {
     c.fillStyle='#38291e';c.fillRect(-2,-width/2-3,length+4,width+6);c.fillStyle=this.wood;c.fillRect(0,-width/2,length,width);c.restore();
   }
   launcher(state,world){
-    const c=this.ctx,p=state.pouch,left={x:171,y:535},right={x:239,y:520};
+    const c=this.ctx,p=state.pouch,{left,right}=SLING_FRAME;
     const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
-    c.save();c.imageSmoothingEnabled=true;c.drawImage(this.assets.images.slingshot_frame,137,488,138,184);c.restore();
+    c.save();c.beginPath();c.rect(0,0,WIDTH,SLING_FRAME.ground);c.clip();
+    c.drawImage(this.assets.images.slingshot_frame,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
     band(left,p,8,'#34251c');band(left,p,4,'#98765b');
     c.fillStyle='#563824';c.beginPath();c.roundRect(p.x-18,p.y-9,36,22,7);c.fill();c.strokeStyle='#b68b5d';c.lineWidth=2;c.stroke();
     if(state.loaded)this.ball(p.x,p.y,state.ammo);
@@ -143,7 +147,7 @@ export class Renderer {
       const key=`${state.ammo.id}:${p.x.toFixed(1)}:${p.y.toFixed(1)}:${state.vx.toFixed(1)}:${state.vy.toFixed(1)}:${arcRevision(world)}`;
       if(key!==this.arcKey){this.arcKey=key;this.arc=predictArc(world,state.ammo.id,p,state.vx,state.vy);}
       c.fillStyle='#ffffffbb';for(const {x,y} of this.arc)c.fillRect(Math.round(x/3)*3,Math.round(y/3)*3,6,6);
-      c.fillStyle='#202a32c9';c.fillRect(116,697,120,30);c.fillStyle='#fff';c.font='16px system-ui';c.fillText(`${Math.round(state.power*100)}%`,145,719);
+      c.fillStyle='#202a32c9';c.fillRect(SLING_HOME.x-60,697,120,30);c.fillStyle='#fff';c.font='16px system-ui';c.fillText(`${Math.round(state.power*100)}%`,SLING_HOME.x-31,719);
     }
   }
   draw(world,launcher,paused=false){

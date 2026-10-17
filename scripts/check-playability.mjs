@@ -4,7 +4,7 @@ import {createRequire} from 'node:module';import fs from 'node:fs';
 import {SiegeWorld} from '../src/world.mjs';import {buildLevel} from '../src/levels.mjs';import {SLING_HOME,pullSling} from '../src/sling.mjs';
 const M=createRequire(import.meta.url)('../vendor/matter.min.js');
 const candidates=[];
-for(const kind of ['tnt','ender','blackhole','cobble'])for(const angle of [.12,.28,.44,.60,.76,.92,1.06]){
+for(const kind of ['tnt','ender','blackhole','cobble'])for(const angle of [.12,.20,.28,.36,.44,.52,.60,.68,.76,.84,.92,1,1.06]){
  const shot=pullSling({x:SLING_HOME.x-135*Math.cos(angle),y:SLING_HOME.y+135*Math.sin(angle)});candidates.push({kind,...shot,angle});
 }
 function setup(level){const s=buildLevel(level),w=new SiegeWorld(M,{grid:s.grid,rear:s.rear});for(const e of s.enemies)w.addEnemy(e.x,e.feet,e.skin);return w;}
@@ -12,7 +12,7 @@ function simulate(w,shot){w.spawnProjectile(shot.kind,shot.origin.x,shot.origin.
 const result=[];
 for(let level=0;level<5;level++){
  const history=[];let current=setup(level);
- for(let shot=0;shot<Math.min(7,buildLevel(level).shots);shot++){
+ for(let shot=0;shot<buildLevel(level).shots;shot++){
   let best=null;
   for(const candidate of candidates){
    const w=setup(level);for(const previous of history)simulate(w,previous);simulate(w,candidate);

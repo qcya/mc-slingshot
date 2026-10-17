@@ -26,7 +26,7 @@ test('两次真实落下的 TNT 会相互炸飞，后一颗保留自己的引信
  const d=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(d.debris).toBe(0);expect(d.ammoBodies.some(p=>p.id==='tnt')).toBe(true);
  require('node:fs').writeFileSync('evidence/tnt-interaction.json',JSON.stringify(d,null,2));
 });
-test('透明 PNG 弹弓、樱花两侧背景与怪物停顿抬手实际显示',async({page})=>{
+test('用户透明 PNG 弹弓、右侧樱花背景与怪物停顿抬手实际显示',async({page})=>{
  await ready(page);await page.locator('#stage').click({position:{x:500,y:100}});
  const alpha=await page.evaluate(async()=>{const im=new Image();im.src='/assets/sprites/slingshot-frame.png';await im.decode();const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);return [[0,0],[im.width-1,0],[0,im.height-1],[im.width-1,im.height-1]].map(([a,b])=>x.getImageData(a,b,1,1).data[3]);});expect(alpha).toEqual([0,0,0,0]);
  await page.screenshot({path:'evidence/ai-sling-overview.png'});

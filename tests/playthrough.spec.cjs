@@ -1,10 +1,10 @@
 const {test,expect}=require('@playwright/test');
 const M=require('../vendor/matter.min.js');
-function aimAt(enemy){
+function aimAt(enemy,home){
  let best={angle:.44,error:Infinity};
  for(let angle=.16;angle<1.13;angle+=.02){
-  const engine=M.Engine.create({gravity:{x:0,y:1,scale:.001}}),b=M.Bodies.circle(205+Math.cos(.91)*98,607-Math.sin(.91)*98,12,{frictionAir:.0015});M.Composite.add(engine.world,b);
-  const dx=135*Math.cos(angle),dy=Math.min(103,135*Math.sin(angle));M.Body.setPosition(b,{x:205-dx,y:545+dy});
+  const engine=M.Engine.create({gravity:{x:0,y:1,scale:.001}}),b=M.Bodies.circle(home.x,home.y,12,{frictionAir:.0015});M.Composite.add(engine.world,b);
+  const dx=135*Math.cos(angle),dy=Math.min(103,135*Math.sin(angle));M.Body.setPosition(b,{x:home.x-dx,y:home.y+dy});
   M.Body.setVelocity(b,{x:Math.min(1430,dx*10.8)/60,y:Math.max(-1200,-dy*10.8)/60});
   for(let i=0;i<360;i++){
    M.Engine.update(engine,1000/120);if(b.position.x>=enemy.x){const error=Math.abs(b.position.y-enemy.y);if(error<best.error)best={angle,error};break;}
@@ -23,7 +23,7 @@ test('实际鼠标高抛与黑洞攻击可以完成木屋、哨塔挑战',async(
   if(await page.evaluate(()=>MCBlockLaunch.getStatus().enemiesAlive===0))break;
   if(await page.evaluate(()=>MCBlockLaunch.getStatus().shots===0))break;
   let shot=plans[level].history[turn];
-  if(!shot){const enemy=await page.evaluate(()=>MCBlockLaunch.getDiagnostics().enemies.find(e=>e.alive)),aim=aimAt(enemy);shot={kind:aim.error<65?'ender':'blackhole',angle:aim.angle};}
+  if(!shot){const enemy=await page.evaluate(()=>MCBlockLaunch.getDiagnostics().enemies.find(e=>e.alive)),home=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),aim=aimAt(enemy,home);shot={kind:aim.error<65?'ender':'blackhole',angle:aim.angle};}
   const angle=shot.angle,kind={cobble:1,tnt:2,ender:3,blackhole:4}[shot.kind];await page.keyboard.press(String(kind));
   const b=await page.locator('#stage').boundingBox(),s=await page.evaluate(()=>MCBlockLaunch.getStatus()),p=s.launcher;
   const x=b.x+p.x*b.width/1536,y=b.y+p.y*b.height/864;
