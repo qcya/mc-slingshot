@@ -71,7 +71,7 @@ npm run check
 
 测试使用完整 Matter.js 和 Edge / CI Chromium。实际结果与截图见[测试记录](docs/TEST_RESULTS.md)，素材见[LICENSES](LICENSES.md)和[战斗素材](docs/combat-assets.md)，修改见[CHANGELOG](CHANGELOG.md)。两个素材来源仓库保持只读。
 
-Toy 构建运行 `npm run build:toy`，输出普通脚本的独立前端目录；使用 B 站账号、官方云存档和原生计时排行榜，排名精度 0.01 秒，不依赖家庭服务器。与自建网站榜单独立。平台预览尚在验证，未提交审核；接口与实际验证状态见 [Toy 说明](docs/TOY.md)。
+Toy 构建运行 `npm run build:toy`，输出普通脚本的独立前端目录；使用 B 站账号、官方云存档和原生计时排行榜，排名精度 0.01 秒，不依赖家庭服务器。与自建网站榜单独立。2026-10-18 经用户确认已提交首次审核，作品 ID `45029104285696`，当前审核中；原生排行榜仍需在带作品 ID 的平台页面验证，详见 [Toy 说明](docs/TOY.md)。
 
 Node 服务默认绑定 127.0.0.1:8766，可设置 HOST、PORT、MC_DATA_DIR。排行榜目录必须在游戏目录之外，每个数据目录只能运行一个进程，重启保留成绩。公网通过反向代理部署，见[部署说明](docs/DEPLOYMENT.md)。不要把连接凭据、成绩文件或开发依赖放进公开目录。
 
