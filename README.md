@@ -38,3 +38,12 @@ A Minecraft-style flat-map siege game: launch blocks and stones from the left to
 - `START_GAME.bat`：Windows 本地启动辅助
 
 相关素材来源与许可见 `LICENSES.md`，开发用两个原仓库均不修改。
+
+
+## Alpha 0.4 视觉修复
+- 使用原版僵尸/掠夺者实体贴图图集切片绘制敌人，替换手绘守卫。
+- 调整村庄木屋、塔楼和哨站，全部由整块 16×16 材质块搭建。
+- 改为方块状橡树和分段式 Minecraft 云层。
+- 选择弹药按钮直接显示圆石、TNT、末影珍珠物品纹理。
+
+说明：该版本仅是像素物理玩法的早期原型，不等于已实现完整 Minecraft 世界生成。
