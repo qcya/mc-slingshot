@@ -34,3 +34,8 @@
 ## Alpha 0.10 菜单素材
 
 - `assets/gui/button.png`、`button_disabled.png`、`button_highlighted.png`：同一 Default-Java `1.20.4` 分支的 `assets/minecraft/textures/gui/sprites/widget/`，原始尺寸 200×20，按边框切片缩放。菜单背景复用项目已有原版泥土纹理。
+
+## Alpha 0.10.1 Windows 运行环境
+
+- 试玩包 `runtime/node.exe`：官方 Node.js v24.14.0 Windows x64，发布地址见 `scripts/windows-runtime.json`。分发前与官方 `SHASUMS256.txt` 中 `win-x64/node.exe` 的 SHA-256 核对一致；原文件 OpenJS Foundation 签名有效。
+- 完整 Node.js 与其第三方组件许可证随包位于 `vendor/node-runtime-LICENSE.txt`，来源为官方 `nodejs/node` 的 `v24.14.0/LICENSE`。运行环境不加入源码 Git 历史，由构建脚本从经校验的官方本地文件打包。

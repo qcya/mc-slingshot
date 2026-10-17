@@ -4,3 +4,5 @@ playwright-report/
 *.log
 .superpowers/
 __pycache__/
+runtime/
+releases/

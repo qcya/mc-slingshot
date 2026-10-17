@@ -1,0 +1,5 @@
+
+启动失败：这是源码包，当前电脑没有找到可用的 Node.js 或 Python。
+请改用 Windows 免安装试玩包，完整解压后双击 START_GAME.bat。
+试玩包内应有 runtime/node.exe，无需另行安装开发工具。
+不要只提取启动器，也不要直接打开 index.html。

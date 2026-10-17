@@ -1,10 +1,20 @@
-﻿# 实际测试结果 — Alpha 0.10.0
+# 实际测试结果 — Alpha 0.10.1
 
 2026-10-17，Windows / Node.js 24 / Edge / Matter.js 0.20.0。完整物理模式，无降级路径。
 
 ## 最终执行
 
-`npm run check`：**49/49 核心测试、16/16 Edge 浏览器场景通过**；浏览器部分约 1.9 分钟。此结论来自本地执行，不代表远端 CI 已执行。
+`npm run check`：**52/52 核心测试、16/16 Edge 浏览器场景通过**；浏览器部分约 1.9 分钟。此结论来自本地执行，不代表远端 CI 已执行。
+
+## Windows 试玩包启动修复
+
+- 原启动器在没有可用运行环境时未启动服务，最终仍返回成功并停在 pause；已先由回归复现，再修复检测、错误说明及退出码。
+- 三项 Windows 启动回归：移除进程 PATH 中的 Node/Python，只保留 Windows System32；在中文、空格及 `&` 路径分别测试纯 CRLF、纯 LF 批处理；没有包内运行环境时明确报错且返回非零。
+- 实际交付 `MC_Block_Launch_0.10.1_Windows.zip`：约 35 MB，含官方 Node.js v24.14.0 x64。EXE SHA-256 与官方清单一致，OpenJS Foundation 数字签名有效，完整许可证随包分发。
+- `scripts/verify-windows-package.cjs` 直接解压这份 ZIP，核对 102 个文件哈希，使用清空开发工具 PATH 的进程启动解压出来的 BAT；中文特殊目录可用，故意占用首选端口后正确换端口，未影响原监听服务。
+- 从该包提供的页面打开 Edge：五关逐一进入，实际发射圆石、TNT、珍珠，检测到像素破坏、爆炸、穿墙；控制台错误与失败资源均为零。
+- 记录：`evidence/windows-player-package.json`、`evidence/windows-player-menu.png`。这是隔离 PATH 的本机 Windows 验证，不冒充在朋友电脑或全新虚拟机上的测试。
+- 启动/打包代码独立只读审查没有阻断问题；修正了 CRLF 测试样本的换行归一化。游戏规则沿用 0.10.0。
 
 ## 本次反馈验证
 

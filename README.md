@@ -1,12 +1,18 @@
 ﻿# MC方块弹射 / MC Block Launch
 
-用弹弓发射 Minecraft 方块与物品，逐像素破坏建筑，清除怪物。**Alpha 0.10.0**，五关闯关模式，仅有圆石、TNT、末影珍珠。
+用弹弓发射 Minecraft 方块与物品，逐像素破坏建筑，清除怪物。**Alpha 0.10.1**，五关闯关模式，仅有圆石、TNT、末影珍珠。
 
 ![第三关与地窖](evidence/level-3-initial.png)
 
-## Windows 启动
+## 玩家启动（推荐）
 
-解压完整源码，双击 **START_GAME.bat**。电脑需要 **Node.js 20+ 或 Python 3**；游戏素材和 Matter.js 均已附带，玩游戏无需安装 npm 依赖或联网。保留服务窗口。端口被占用时自动换空闲端口，使用启动器打开的实际网址。
+下载 [Windows 64 位免安装试玩包](https://github.com/qcya/mc-block-launch/releases/tag/v0.10.1)，**完整解压**后双击 `START_GAME.bat`。包内含经过官方 SHA-256 校验的 Node.js 运行环境，不用安装 Node、Python 或 npm，不用联网、不用管理员权限。适用 Windows 10/11 64 位系统。
+
+请保留启动窗口。浏览器未自动打开时，复制窗口中实际显示的完整 `http://127.0.0.1:端口` 地址。端口占用时自动换空闲端口。不要只解压一个启动器，不要在压缩包中直接运行，不要直接打开 HTML。给朋友应发整个 Windows 试玩 ZIP；本机的 127.0.0.1 地址不能用于别人电脑。
+
+## 源码启动
+
+GitHub 的 Code → Download ZIP 是源码包，**不含便携运行环境**。完整解压后双击 **START_GAME.bat**，电脑需要 **Node.js 20+ 或 Python 3**；无可用环境时会明确报错，不再悄悄返回成功。游戏素材和 Matter.js 均已附带，玩游戏无需安装 npm 依赖或联网。
 
 也可执行 `npm start`。不要直接双击 HTML。
 
@@ -54,5 +60,7 @@ npm run check
 ```
 
 本机使用 Edge，CI 使用 Playwright Chromium。实测结果和截图见 [测试记录](docs/TEST_RESULTS.md)，改动见 [CHANGELOG](CHANGELOG.md)，素材见 [LICENSES](LICENSES.md)。素材来源仓库保持只读。
+
+Windows 试玩包构建：`node scripts/package-windows.cjs 输出.zip 官方node.exe`。使用 `scripts/windows-runtime.json` 固定的官方 Node.js v24.14.0 Windows x64，构建前校验 SHA-256。便携包只包含游戏、素材、服务脚本、运行环境和许可证，不包含 Git、开发依赖、测试缓存或截图证据。
 
 边界：人物有立体外观，物理仍为二维；尚无复杂寻路和敌人主动攻击。梯子、家具和阁楼位于可破坏后景，角色不会沿梯子爬行。瞄准点显示自由飞行趋势，不提前模拟撞击后的反弹。存档随浏览器站点数据保存，更换端口或浏览器会使用独立存档。
