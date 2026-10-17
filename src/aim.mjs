@@ -4,7 +4,7 @@ export function arcRevision(world){return String(world.grid.version);}
 // Eight samples of free flight. Geometry never truncates the aiming guide.
 export function predictArc(world,kind,origin,vx,vy){
  const M=world.M,ammo=AMMO.find(a=>a.id===kind),engine=M.Engine.create({gravity:{...world.engine.gravity}});
- const options={frictionAir:.0015},b=kind==='ender'?M.Bodies.circle(origin.x,origin.y,ammo.size/2,options,16):M.Bodies.rectangle(origin.x,origin.y,ammo.size,ammo.size,options);
+ const options={frictionAir:.0015},b=['ender','fire'].includes(kind)?M.Bodies.circle(origin.x,origin.y,ammo.size/2,options,16):M.Bodies.rectangle(origin.x,origin.y,ammo.size,ammo.size,options);
  M.Body.setMass(b,ammo.mass);M.Body.setVelocity(b,{x:vx/60,y:vy/60});M.Composite.add(engine.world,b);
  const samples=[];
  for(let step=1;step<=96;step++){

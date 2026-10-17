@@ -57,7 +57,7 @@ export function foregroundPixel(assets,m,x,y,grid,visual){
 export function contactShadows(ctx,world,sling){
   ctx.save();
   for(const e of world.enemies){
-    if(!e.alive)continue;const x=e.body.position.x,feet=e.body.position.y+46;
+    if(!e.alive)continue;const x=e.body.position.x,feet=e.body.position.y+(e.feetOffset||46);
     for(let drop=0;drop<=30;drop+=PIXEL){
       if(!world.grid.get(x/PIXEL,(feet+drop)/PIXEL))continue;
       const y=Math.floor((feet+drop)/PIXEL)*PIXEL;ctx.globalAlpha=.27*(1-drop/36);ctx.fillStyle='#19201c';

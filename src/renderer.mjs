@@ -73,6 +73,7 @@ export class Renderer {
       }else if(event.type==='explosion'){this.effects.push({...event,life:.6,total:.6});this.assets.play('explode',.55);}
       else if(event.type==='portal'){this.effects.push({...event,life:.45,total:.45});this.assets.play('portal',.5);}
       else if(event.type==='fuse')this.assets.play('fuse',.35);
+      else if(event.type==='fire')this.assets.play(event.sound||'fire_burn',.25);
       else if(event.type==='impact')this.assets.play(event.sound||MATERIALS[event.m]?.sound||'stone',clamp(event.speed/2200,.12,.4));
       else if(event.type==='hurt')this.assets.play(event.sound,.18);
       else if(event.type==='ambient'&&navigator.userActivation?.hasBeenActive)this.assets.play(event.sound,.075);
@@ -130,9 +131,9 @@ export class Renderer {
     const angle=state.drag||state.launch?pouchRotation(state.vx,state.vy):.15;
     const a={x:p.x-Math.cos(angle)*15,y:p.y-Math.sin(angle)*15},b={x:p.x+Math.cos(angle)*15,y:p.y+Math.sin(angle)*15};
     const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
+    band(left,a,8,'#34251c');band(left,a,4,'#98765b');
     c.save();c.beginPath();c.rect(0,0,WIDTH,SLING_FRAME.ground);c.clip();
     c.drawImage(this.assets.images.slingshot_frame,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
-    band(left,a,8,'#34251c');band(left,a,4,'#98765b');
     c.save();c.translate(p.x,p.y);c.rotate(angle);c.fillStyle='#563824';c.beginPath();c.roundRect(-18,-9,36,18,5);c.fill();c.strokeStyle='#b68b5d';c.lineWidth=2;c.stroke();c.restore();
     if(state.loaded)this.ball(p.x,p.y,state.ammo);
     band(right,b,9,'#39271c');band(right,b,4,'#b48c63');
@@ -149,6 +150,10 @@ export class Renderer {
     contactShadows(c,world,SLING_HOME);
     for(const e of world.debris){if(e.dead)continue;c.save();c.translate(e.body.position.x,e.body.position.y);c.rotate(e.body.angle);c.drawImage(this.cachePiece(e),e.offset.x,e.offset.y,e.w*PIXEL,e.h*PIXEL);c.restore();}
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
+    for(const fire of world.fires||[]){
+      if(world.time<fire.startedAt)continue;const atlas=this.assets.images.fire_0,frame=Math.floor((world.time-fire.startedAt)*12+fire.tx*3+fire.ty)%32;
+      c.save();c.globalAlpha=Math.min(1,(fire.endsAt-world.time)*2);c.drawImage(atlas,0,frame*16,16,16,fire.x,fire.y-12,fire.size,fire.size+12);c.restore();
+    }
     this.launcher(launcher,world);
     for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.rotate(p.body.angle);
       this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){const s=p.ammo.size;c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-s/2,-s/2,s,s);}c.restore();}

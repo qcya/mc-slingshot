@@ -39,3 +39,7 @@
 
 - 试玩包 `runtime/node.exe`：官方 Node.js v24.14.0 Windows x64，发布地址见 `scripts/windows-runtime.json`。分发前与官方 `SHASUMS256.txt` 中 `win-x64/node.exe` 的 SHA-256 核对一致；原文件 OpenJS Foundation 签名有效。
 - 完整 Node.js 与其第三方组件许可证随包位于 `vendor/node-runtime-LICENSE.txt`，来源为官方 `nodejs/node` 的 `v24.14.0/LICENSE`。运行环境不加入源码 Git 历史，由构建脚本从经校验的官方本地文件打包。
+
+## Alpha 0.11 战斗素材
+
+- 烈焰弹、火焰动画图集、监守者皮肤及四种配套 OGG 均为 Minecraft 原版资源。逐项来源、版本、音效 SHA-1 和模型 UV 参考见 [docs/combat-assets.md](docs/combat-assets.md)。

@@ -3,6 +3,7 @@ import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDama
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
+import {igniteWood,advanceFire} from './fire.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -13,7 +14,7 @@ export class SiegeWorld {
     this.width=grid.width*pixelSize;this.height=grid.height*pixelSize;
     this.engine=Matter.Engine.create({enableSleeping:true,positionIterations:8,velocityIterations:8,gravity:{x:0,y:1,scale:.001}});
     this.staticTiles=new Map();this.projectiles=[];this.debris=[];this.enemies=[];
-    this.events=[];this.contacts=[];this.cooldowns=new Map();
+    this.events=[];this.contacts=[];this.cooldowns=new Map();this.fires=[];this.fireSerial=0;
     this.time=0;this.serial=0;this.stats={removed:0,backgroundRemoved:0,explosions:0,portals:0,enemyDamage:0};
     Matter.Events.on(this.engine,'collisionStart',event=>{
       for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
@@ -44,9 +45,10 @@ export class SiegeWorld {
     this.projectiles.push(p);return p;
   }
   addEnemy(x,feetY,skin='zombie'){
-    const body=this.M.Bodies.rectangle(x,feetY-46,32,92,{friction:.85,frictionStatic:1,restitution:0,frictionAir:.01,slop:.025,inertia:Infinity,collisionFilter:{category:2,mask:0xfffffffd}});
-    this.M.Body.setMass(body,1.2);
-    const e=this.register({type:'enemy',skin,hp:100,alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);
+    const dimensions=skin==='warden'?{width:58,height:132}:{width:32,height:92},feetOffset=dimensions.height/2;
+    const body=this.M.Bodies.rectangle(x,feetY-feetOffset,dimensions.width,dimensions.height,{friction:.85,frictionStatic:1,restitution:0,frictionAir:.01,slop:.025,inertia:Infinity,collisionFilter:{category:2,mask:0xfffffffd}});
+    this.M.Body.setMass(body,skin==='warden'?3.6:1.2);
+    const e=this.register({type:'enemy',skin,hp:skin==='warden'?300:100,dimensions,feetOffset,projectileHits:new Set(),alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);
     Object.assign(e,actorState(e.id,this.time));this.enemies.push(e);return e;
   }
   patrol(dt){
@@ -54,13 +56,13 @@ export class SiegeWorld {
       if(e.dead||!e.alive)continue;const b=e.body,x=b.position.x,feet=b.bounds.max.y;
       const distance=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
       const influenced=this.time<e.externalUntil;
-      const ground=this.sample(x-10,feet+3)||this.sample(x+10,feet+3);
+      const half=e.dimensions.width/2,ground=this.sample(x-half*.65,feet+3)||this.sample(x+half*.65,feet+3);
       const grounded=!!ground&&Math.abs(b.velocity.y)<.65&&Math.abs(b.velocity.x)<2.2&&!influenced;
       const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded);
-      if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:e.skin==='pillager'?'pillager_idle':'zombie_idle'});
+      if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:`${e.skin}_idle`});
       if(!grounded)continue;
       if(!walking){this.M.Body.setVelocity(b,{x:b.velocity.x*.7,y:b.velocity.y});continue;}e.walkDistance+=distance;
-      const ahead=x+e.facing*23,wall=this.sample(ahead,feet-24)||this.sample(ahead,feet-65),edge=!this.sample(ahead,feet+5);
+      const ahead=x+e.facing*(half+7),wall=this.sample(ahead,feet-e.dimensions.height*.26)||this.sample(ahead,feet-e.dimensions.height*.71),edge=!this.sample(ahead,feet+5);
       if((wall||edge)&&this.time>e.turnAt){e.facing*=-1;e.turnAt=this.time+.4;e.turns++;}
       if(wall||edge){this.M.Body.setVelocity(b,{x:0,y:b.velocity.y});continue;}
       this.M.Sleeping.set(b,false);this.M.Body.setVelocity(b,{x:e.facing*.36,y:b.velocity.y});
@@ -164,7 +166,7 @@ export class SiegeWorld {
   }
   hurt(e,damage){
     if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
-    this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:e.skin==='pillager'?'pillager_hurt':'zombie_hurt'});
+    this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:`${e.skin}_hurt`});
     if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setAngularVelocity(e.body,0);}
   }
   blast(x,y,radius=98,power=160){
@@ -176,7 +178,7 @@ export class SiegeWorld {
       this.M.Sleeping.set(e.body,false);
       this.M.Body.setVelocity(e.body,{x:e.body.velocity.x+ux*speed/60,y:e.body.velocity.y+(uy-.5)*speed/60});
       e.externalUntil=this.time+.8;
-      if(e.type==='enemy')this.hurt(e,Math.max(0,180*(1-d/reach)));
+      if(e.type==='enemy')this.hurt(e,e.skin==='warden'?150:Math.max(0,180*(1-d/reach)));
     }
   }
   processContact(pair){
@@ -192,13 +194,26 @@ export class SiegeWorld {
     const bvx=vb.x-omegaB*(point.y-b.position.y),bvy=vb.y+omegaB*(point.x-b.position.x);
     const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
     // TNT has no direct damage. Ender pearls hurt creatures, never materials.
-    const contactDamage=(entity,mass,targetMass)=>entity?.type==='ammo'?(entity.ammo.id==='tnt'?0:250):impactDamage(speed,mass,targetMass);
-    if(ea?.type==='enemy')this.hurt(ea,contactDamage(eb,b.mass,a.mass));
-    if(eb?.type==='enemy')this.hurt(eb,contactDamage(ea,a.mass,b.mass));
+    const contactDamage=(target,entity,mass,targetMass)=>{
+      // The Warden's armored body ignores incidental debris and landing damage;
+      // blast knockback must not turn one TNT explosion into two damage sources.
+      if(entity?.type!=='ammo')return target.skin==='warden'?0:impactDamage(speed,mass,targetMass);
+      if(['tnt','fire'].includes(entity.ammo.id))return 0;
+      if(target.skin==='warden'){
+        if(target.projectileHits.has(entity.id))return 0;target.projectileHits.add(entity.id);
+        return entity.ammo.id==='cobble'?100:75;
+      }
+      return 250;
+    };
+    if(ea?.type==='enemy')this.hurt(ea,contactDamage(ea,eb,b.mass,a.mass));
+    if(eb?.type==='enemy')this.hurt(eb,contactDamage(eb,ea,a.mass,b.mass));
     const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
     const other=ammo===ea?eb:ea,otherBody=ammo===ea?b:a;
     if(ammo){
       const kind=ammo.ammo.id;
+      if(kind==='fire'){
+        this.ignite(point.x,point.y,ammo.ammo.size/2+this.s*2);this.remove(ammo);return;
+      }
       if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
       if(kind==='ender'&&ammo.uses===0&&(otherBody.plugin.terrain||other?.type==='debris')){
@@ -219,13 +234,14 @@ export class SiegeWorld {
       this.events.push({type:'impact',x:point.x,y:point.y,m:material,speed,sound:striker.type==='ammo'&&striker.ammo.id==='cobble'?'stone':MATERIALS[material]?.sound});
     }
   }
+  ignite(x,y,reach){return igniteWood(this,x,y,reach);}
   shatterGlass(body,point,speed){
     const id=body.plugin.tileId,cols=Math.ceil(this.grid.width/16),tx=id%cols*16,ty=Math.floor(id/cols)*16;let count=0;
     for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.grid.set(x,y,0);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
     this.stats.removed+=count;if(count)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});
   }
   step(dt){
-    this.time+=dt;this.synchronize();this.patrol(dt);
+    this.time+=dt;advanceFire(this);this.synchronize();this.patrol(dt);
     this.before=new Map();
     for(const e of this.allMoving()){
       const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y);
@@ -237,11 +253,20 @@ export class SiegeWorld {
     for(const pair of this.contacts)this.processContact(pair);
     for(const p of this.projectiles){
       if(p.dead)continue;p.age+=dt;p.fuse-=dt;
+      if(p.ammo.id==='fire'){
+        // Rear walls intentionally have no Matter body. Sweep the projectile's
+        // path so a fire charge can still touch and ignite those wooden pixels.
+        const from=p.lastFirePosition||p.body.position,to=p.body.position,length=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(length/this.s));
+        for(let k=0;k<=steps;k++)if(this.ignite(from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2)){
+          this.remove(p);break;
+        }
+        p.lastFirePosition={...to};
+      }
       if(p.ammo.id==='tnt'&&p.fuse<=0){const pos={...p.body.position};this.remove(p);this.blast(pos.x,pos.y);}
     }
     for(const e of this.allMoving()){
       const {x,y}=e.body.position;
-      if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,250);this.remove(e);}
+      if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,e.hp+1);this.remove(e);}
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
@@ -251,7 +276,7 @@ export class SiegeWorld {
     this.synchronize();
     if(this.cooldowns.size>1000)for(const [key,t] of this.cooldowns)if(this.time-t>1)this.cooldowns.delete(key);
   }
-  active(){return this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
+  active(){return this.fires.length>0||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,
