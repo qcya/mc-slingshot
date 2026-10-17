@@ -1,7 +1,6 @@
-.DS_Store
-Thumbs.db
+node_modules/
+test-results/
+playwright-report/
+*.log
+.superpowers/
 __pycache__/
-*.pyc
-*.mp4
-renders/
-.cache/

@@ -1,0 +1,45 @@
+{
+  "errors": [],
+  "failed": [
+    {
+      "url": "http://127.0.0.1:8766/assets/textures/oak_leaves.png",
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8766/assets/textures/iron_ore.png",
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8766/assets/textures/deepslate.png",
+      "status": 404
+    }
+  ],
+  "before": {
+    "level": 1,
+    "shots": 7,
+    "enemiesAlive": 2,
+    "removed": 0,
+    "bodies": 0,
+    "projectiles": 0,
+    "restingBlocks": 0,
+    "blackholes": 0,
+    "physics": "Matter.js",
+    "particles": 0,
+    "paused": false,
+    "ended": false
+  },
+  "after": {
+    "level": 1,
+    "shots": 7,
+    "enemiesAlive": 2,
+    "removed": 362,
+    "bodies": 0,
+    "projectiles": 0,
+    "restingBlocks": 0,
+    "blackholes": 0,
+    "physics": "Matter.js",
+    "particles": 18,
+    "paused": false,
+    "ended": false
+  }
+}
