@@ -8,13 +8,13 @@
 <body>
 <div class="page">
   <header class="top">
-    <div class="brand"><span class="brandmark">▦</span><div><strong>MC方块弹射</strong><small>MC BLOCK LAUNCH · ALPHA 0.2</small></div></div>
-    <div class="headline">16 × 16 像素方块 <span>·</span> 独立破坏 <span>·</span> 结构倒塌</div>
+    <div class="brand"><span class="brandmark">▦</span><div><strong>MC方块弹射</strong><small>MC BLOCK LAUNCH · ALPHA 0.3</small></div></div>
+    <div class="headline">原版 16 × 16 方块纹理 <span>·</span> 独立破坏 <span>·</span> 结构倒塌</div>
     <div class="actions"><button id="soundToggle" title="切换音效">♫ 音效开</button><button id="restart">↻ 重开</button></div>
   </header>
   <main class="main">
     <div class="levelbar"><div><span class="tiny">当前任务</span><strong id="levelTitle">01 / 草地小屋</strong><span id="levelDesc" class="leveldesc">摧毁建筑，击败全部守卫</span></div><div class="metrics"><div>剩余弹药 <b id="ammo">5</b></div><div>守卫 <b id="targets">2</b></div><div>击毁像素 <b id="destroyed">0</b></div></div></div>
-    <div class="stagebox"><canvas id="stage" width="1280" height="720" aria-label="像素攻城二维物理游戏"></canvas><div class="gamehint" id="gamehint">向左后方拖动发射器上的方块，松手发射</div><div class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">过关</span><h2 id="resultTitle">建筑清除</h2><p id="resultMsg">漂亮的一击。</p><div class="result-buttons"><button id="retryBtn">重试</button><button class="primary" id="nextBtn">下一关 →</button></div></div></div></div>
+    <div class="stagebox"><canvas id="stage" width="1280" height="720" aria-label="像素攻城二维物理游戏"></canvas><div class="gamehint" id="gamehint">拖动投石车上的弹药向左拉，松手发射</div><div class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">过关</span><h2 id="resultTitle">建筑清除</h2><p id="resultMsg">漂亮的一击。</p><div class="result-buttons"><button id="retryBtn">重试</button><button class="primary" id="nextBtn">下一关 →</button></div></div></div></div>
     <div class="controls"><div class="ballbar" id="ballbar"></div><div class="controlright"><button id="skip" title="进入下一关">切换关卡 →</button><button id="pause">Ⅱ 暂停</button></div></div>
     <p class="foot">操作：拖动弹药并松开发射 · 1–4 选择弹药 · R 重开 · N 下一关 · 空格暂停。<span>地形逐像素破坏 · 独立残骸使用 Matter.js 刚体运动</span></p>
   </main>
