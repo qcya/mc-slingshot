@@ -11,7 +11,7 @@ const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState'
 const coarsePointer=matchMedia('(pointer:coarse)'),cancelledTouchClicks=new Set();
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
 let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
-const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=createOnlineClient();let profileReturn='levels',syncing=false,profileRevision=0,bestTimes;
+const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=createOnlineClient();let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
 function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
 function saveLocal(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}
 function pendingResults(){const raw=readLocal(PENDING_KEY,[]);return Array.isArray(raw)?raw.map(parseTimeBundle).filter(Boolean):[];}
@@ -38,13 +38,11 @@ async function saveProfile(event){
  if(revision!==profileRevision)return;profile=nextProfile;$('#saveProfile').disabled=false;saveLocal(PROFILE_KEY,profile);profileLabel();if(state.screen==='profile')menus(returnTo);void syncResults();
 }
 async function showLeaderboard(){
- cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const unlocked=!!timeBundle(bestTimes);
- for(const id of ['rankingTable','leaderboardRefresh'])$('#'+id).classList.toggle('hidden',!unlocked);
- if(!unlocked){$('#leaderboardStatus').textContent='全通关后展示';return;}
+ cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision;
  $('#leaderboardStatus').textContent='正在读取排行榜…';
- try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard')return;$('#leaderboardStatus').textContent=entries.length?'十关个人最快时间之和，用时越短排名越高。':'还没有全通成绩，来成为第一位挑战者。';
-  for(const entry of entries){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
- }catch{if(state.screen==='leaderboard')$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
+ try{const {entries}=await online.leaderboard();if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?'十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。':'还没有全通成绩，来成为第一位挑战者。';
+  for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
+ }catch{if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent='暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
 async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();if(screen.orientation?.lock)await screen.orientation.lock('landscape');}catch{/* A browser may require rotation by hand. */}}
 function iconUrl(i){const icon=assets.icons[AMMO[i].id];return icon instanceof HTMLCanvasElement?icon.toDataURL():icon.src;}

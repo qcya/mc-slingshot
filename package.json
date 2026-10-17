@@ -1,6 +1,6 @@
 {
   "name": "mc-block-launch",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "private": true,
   "description": "Minecraft 风格的二维逐像素物理攻城游戏",
   "scripts": {

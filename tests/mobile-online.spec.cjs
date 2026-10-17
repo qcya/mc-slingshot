@@ -13,7 +13,7 @@ test('开局昵称、共享排行榜和改名能实际往返服务器',async({pa
  await expect(page.locator('#profileMenu')).toBeVisible();await page.locator('#nickname').fill('在线测试玩家');await page.locator('#saveProfile').click();
  await expect(page.locator('#levelMenu')).toBeVisible();const p=await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.profile.v1')));expect(p.token).toBeTruthy();
  let reads=0;page.on('request',r=>{if(r.url().endsWith('/api/leaderboard'))reads++;});
- await page.locator('#leaderboardBtn').click();await expect(page.locator('#leaderboardStatus')).toHaveText('全通关后展示');expect(reads).toBe(0);await expect(page.locator('#rankingTable')).toBeHidden();
+ await page.locator('#leaderboardBtn').click();await expect.poll(()=>reads).toBe(1);await expect(page.locator('#rankingTable')).toBeVisible();await expect(page.locator('#leaderboardStatus')).not.toHaveText('全通关后展示');await expect(page.locator('#rankingRows tr.self')).toHaveCount(0);
  const partial=await page.request.post('/api/results',{headers:{Authorization:`Bearer ${p.token}`},data:{stages:[{stage:0,timeMs:4500}]}});expect(partial.status()).toBe(400);
  const submit=await page.request.post('/api/results',{headers:{Authorization:`Bearer ${p.token}`},data:{stages:Array.from({length:10},(_,stage)=>({stage,timeMs:4500}))}});expect(submit.ok()).toBe(true);
  await page.reload();await page.waitForFunction(()=>window.MCBlockLaunch);await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1'))?.filter(Number.isInteger).length)).toBe(10);
@@ -33,6 +33,23 @@ test('leaving nickname editing retries a discarded delayed full-record restore',
  const response=page.waitForResponse(r=>r.url().endsWith('/api/profile')&&r.request().method()==='GET');release();await response;await page.waitForTimeout(50);
  await page.locator('#profileBack').click();await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1'))?.filter(Number.isInteger).length)).toBe(10);
  expect(reads).toBeGreaterThanOrEqual(2);
+});
+
+test('a new player can view a board capped at one hundred people',async({page})=>{
+ await page.route('**/api/leaderboard',r=>r.fulfill({json:{entries:Array.from({length:105},(_,i)=>({id:`other${i}`,rank:i+1,nickname:`Player${i+1}`,completed:10,totalTimeMs:10000+i}))}}));
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('NewViewer');await page.locator('#saveProfile').click();await page.locator('#leaderboardBtn').click();
+ await expect(page.locator('#rankingRows tr')).toHaveCount(100);await expect(page.locator('#rankingRows tr').last()).toContainText('Player100');await expect(page.locator('#rankingRows tr.self')).toHaveCount(0);await page.screenshot({path:'evidence/leaderboard-public-top100.png'});
+});
+
+test('overlapping board refreshes cannot append duplicate rows or replace newer results',async({page})=>{
+ let reads=0,release;await page.route('**/api/leaderboard',async r=>{
+  const first=++reads===1;if(first)await new Promise(resolve=>release=resolve);
+  await r.fulfill({json:{entries:Array.from({length:100},(_,i)=>({id:`p${i}`,rank:i+1,nickname:`${first?'Old':'Latest'}${i}`,completed:10,totalTimeMs:10000+i}))}});
+ });
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#nickname').fill('RefreshTester');await page.locator('#saveProfile').click();await page.locator('#leaderboardBtn').click();await expect.poll(()=>reads).toBe(1);
+ await page.locator('#leaderboardRefresh').click();await expect(page.locator('#rankingRows tr')).toHaveCount(100);await expect(page.locator('#rankingRows tr').first()).toContainText('Latest0');
+ const response=page.waitForResponse(r=>r.url().endsWith('/api/leaderboard'));release();await response;await page.waitForTimeout(50);
+ await expect(page.locator('#rankingRows tr')).toHaveCount(100);await expect(page.locator('#rankingRows tr').first()).toContainText('Latest0');
 });
 
 test.describe('Android 触屏布局与实际输入',()=>{

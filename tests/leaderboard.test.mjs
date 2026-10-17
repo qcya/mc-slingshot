@@ -83,6 +83,13 @@ test('profiles appear only after a complete ten-stage bundle',async t=>{
   assert.equal((await f.request('/api/leaderboard')).data.entries[0].nickname,'Waiting');
 });
 
+test('the public board contains only the fastest 100 full clears',async t=>{
+ const profiles=Array.from({length:105},(_,i)=>({id:crypto.randomBytes(16).toString('base64url'),nickname:`Rank${i}`,tokenHash:crypto.createHash('sha256').update(String(i)).digest('hex'),stages:Object.fromEntries(stages(1000+i).map(s=>[s.stage,s]))}));
+ profiles.push({id:crypto.randomBytes(16).toString('base64url'),nickname:'NotFinished',tokenHash:crypto.createHash('sha256').update('partial').digest('hex'),stages:{}});
+ const f=await fixture(t,{}, {version:2,profiles}),response=await f.request('/api/leaderboard'),entries=response.data.entries;
+ assert.equal(response.status,200);assert.equal(entries.length,100);assert.equal(entries[0].nickname,'Rank0');assert.equal(entries[99].nickname,'Rank99');assert.equal(entries[99].rank,100);assert.ok(entries.every(e=>e.completed===10));
+});
+
 test('concurrent complete bundles atomically preserve independent stage bests and profiles',async t=>{
   const f=await fixture(t),players=await Promise.all(Array.from({length:12},(_,i)=>create(f,`Player${i}`)));
   const responses=await Promise.all(players.flatMap(p=>Array.from({length:10},(_,index)=>submit(f,p.data.token,stages(stage=>index===stage?100+stage:1000)))));

@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {Renderer} from '../src/renderer.mjs';
+test('rendered band endpoints stay on the two annotated binding points in every pull direction',()=>{
+ for(const [vx,vy] of [[1000,0],[-1000,0],[0,1000],[0,-1000],[700,700],[-700,-700]]){
+  const starts=[],ctx=new Proxy({moveTo(x,y){starts.push({x,y});}},{get:(o,k)=>o[k]||(()=>{})});
+  Renderer.prototype.launcher.call({ctx,assets:{images:{slingshot_frame:{}}}}, {pouch:{x:285-vx/10,y:545-vy/10},vx,vy,launch:{},loaded:false},{});
+  assert.deepEqual(starts,[{x:255,y:522},{x:255,y:522},{x:327,y:546},{x:327,y:546}],`${vx}/${vy}`);
+ }
+});
