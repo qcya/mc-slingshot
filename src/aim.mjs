@@ -1,5 +1,6 @@
 import {AMMO,clamp} from './config.mjs';
 export function aimAngle(point,pivot){let a=Math.atan2(point.y-pivot.y,point.x-pivot.x);if(a>0)a-=Math.PI*2;return clamp(a,-3.65,-.35);}
+export function arcRevision(world){return `${world.grid.version}|${world.debris.filter(e=>!e.dead).map(e=>`${e.id}:${e.body.position.x.toFixed(1)},${e.body.position.y.toFixed(1)},${e.body.angle.toFixed(3)}`).join(';')}`;}
 // A disposable Matter body uses the same fixed step, gravity and air drag as play.
 // Stop at the first solid obstruction and expose only the first half of that path.
 export function predictArc(world,kind,origin,vx,vy){

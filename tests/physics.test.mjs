@@ -113,3 +113,17 @@ test('静止弹药脚下的泥土被挖掉后重新下落', () => {
   grid.fill(40,128,32,16,0);w.synchronize();step(w,.5);
   assert.ok(p.body.position.y>y+20);
 });
+test('翻倒长梁的旋转端点可造成伤害，不能只看重心速度',()=>{
+ const w=fixture(),e=w.addEnemy(300,256);
+ w.addDebris(new Uint8Array(100*8).fill(3),100,8,{x:292,y:140},{x:0,y:0},0,{x:0,y:0},-.15);
+ for(let i=0;i<20;i++)w.step(1/120);
+ assert.ok(e.hp<100,`hp=${e.hp}`);
+});
+test('炸断屋脊后重新检查整个屋顶承重，远离爆点的悬臂也会落下',async()=>{
+ const {buildLevel}=await import('../src/levels.mjs');const s=buildLevel(0),w=new SiegeWorld(Matter,{grid:s.grid,rear:s.rear});
+ // Break the ridge only. The two roof halves can no longer balance each other.
+ w.damageDisk(1176,264,42,500);w.synchronize();
+ const leftRoof=w.debris.find(e=>e.texture.y<144&&e.texture.x<384&&e.count>1000);
+ assert.ok(leftRoof,'left overhanging roof should detach even though its base is outside the blast tiles');
+ const y=leftRoof.body.position.y;step(w,.45);assert.ok(leftRoof.body.position.y>y+3);
+});

@@ -46,6 +46,7 @@ export class SiegeWorld {
     for(const e of this.enemies){
       if(e.dead||!e.alive)continue;const b=e.body,x=b.position.x,feet=b.bounds.max.y;
       e.walkDistance+=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
+      if(this.vortices.some(v=>Math.hypot(v.x-x,v.y-b.position.y)<v.radius*1.7))continue;
       const ground=this.sample(x-10,feet+3)||this.sample(x+10,feet+3);
       if(!ground||Math.abs(b.velocity.y)>.65||Math.abs(b.velocity.x)>2.2)continue;
       const occupied=this.enemies.some(other=>other!==e&&other.alive&&!other.dead&&Math.abs(other.body.position.y-b.position.y)<40&&(other.body.position.x-x)*e.facing>0&&(other.body.position.x-x)*e.facing<45);
@@ -61,6 +62,9 @@ export class SiegeWorld {
     if(detach){
       this.rear.rebindMissing(this.grid);
       const cuts=new Set();for(const id of this.grid.dirty){const y=Math.floor(id/cols)*16;if(y>0&&y<=this.groundRow)cuts.add(y);if(y+16<=this.groundRow)cuts.add(y+16);}
+      // A broken ridge redistributes load down to supports outside the blast.
+      // Inspect those unchanged sections too, not only the damaged tile rows.
+      for(let y=16;y<=this.groundRow;y+=16)cuts.add(y);
       this.detachUnsupported();this.releaseUnbalanced([...cuts].sort((a,b)=>b-a));
     }
     for(const id of this.grid.dirty){
@@ -112,7 +116,10 @@ export class SiegeWorld {
     for(const indices of islands){
       const piece=cropPixels(cells,w,indices);
       for(const k of indices)this.grid.set(k%w,Math.floor(k/w),0);
-      if(indices.length<6){for(const k of indices)this.emitPixel(k%w*this.s,Math.floor(k/w)*this.s,piece.mask.find(m=>m));continue;}
+      if(indices.length<6){
+        for(const k of indices)this.emitPixel(k%w*this.s,Math.floor(k/w)*this.s,piece.mask.find(m=>m));
+        const back=this.rear.take(indices,0,0);for(let i=0;i<back.length;i+=5){const p=back[i];this.emitPixel(p.x*this.s,p.y*this.s,p.m);}continue;
+      }
       const e=this.addDebris(piece.mask,piece.w,piece.h,{x:piece.x*this.s,y:piece.y*this.s},{x:piece.x,y:piece.y});
       e.backPixels=this.rear.take(indices,piece.x,piece.y);
     }
@@ -219,9 +226,12 @@ export class SiegeWorld {
     if(this.time-(this.cooldowns.get(key)??-100)<.14)return;this.cooldowns.set(key,this.time);
     const ea=a.plugin.entity,eb=b.plugin.entity;if(ea?.dead||eb?.dead)return;
     const va=this.before.get(a.id)||a.velocity,vb=this.before.get(b.id)||b.velocity,n=pair.collision.normal;
-    const speed=Math.abs((va.x-vb.x)*n.x+(va.y-vb.y)*n.y)*60;
     const supports=pair.collision.supports.filter(Boolean);
     const point=supports.length?{x:supports.reduce((t,p)=>t+p.x,0)/supports.length,y:supports.reduce((t,p)=>t+p.y,0)/supports.length}:{x:(a.position.x+b.position.x)/2,y:(a.position.y+b.position.y)/2};
+    const omegaA=va.omega??a.angularVelocity,omegaB=vb.omega??b.angularVelocity;
+    const avx=va.x-omegaA*(point.y-a.position.y),avy=va.y+omegaA*(point.x-a.position.x);
+    const bvx=vb.x-omegaB*(point.y-b.position.y),bvy=vb.y+omegaB*(point.x-b.position.x);
+    const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
     if(ea?.type==='enemy')this.hurt(ea,eb?.type==='ammo'?250:impactDamage(speed,b.mass,a.mass));
     if(eb?.type==='enemy')this.hurt(eb,ea?.type==='ammo'?250:impactDamage(speed,a.mass,b.mass));
     const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
@@ -257,7 +267,7 @@ export class SiegeWorld {
       if(v.tick>=.1&&v.life>0){v.tick-=.1;this.damageDisk(v.x,v.y,Math.min(v.radius,20+v.age*28),100,{budget:64,background:true,backgroundBudget:32});}
       for(const e of this.allMoving()){
         const dx=v.x-e.body.position.x,dy=v.y-e.body.position.y,d=Math.hypot(dx,dy);if(d>v.radius*1.7)continue;
-        const acceleration=.0018*clamp(1-d/(v.radius*2),.2,1);
+        const acceleration=.0045*clamp(1-d/(v.radius*2),.2,1);
         this.M.Sleeping.set(e.body,false);this.M.Body.applyForce(e.body,e.body.position,{x:dx/(d||1)*e.body.mass*acceleration,y:dy/(d||1)*e.body.mass*acceleration});
         if(e.type==='enemy'&&d<26)this.hurt(e,250);
       }
@@ -271,7 +281,7 @@ export class SiegeWorld {
       const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y);
       if(speed>26)this.M.Body.setVelocity(b,{x:b.velocity.x/speed*26,y:b.velocity.y/speed*26});
       if(Math.abs(b.angularVelocity)>.28)this.M.Body.setAngularVelocity(b,Math.sign(b.angularVelocity)*.28);
-      this.before.set(b.id,{...b.velocity});
+      this.before.set(b.id,{...b.velocity,omega:b.angularVelocity});
     }
     this.contacts.length=0;this.M.Engine.update(this.engine,dt*1000);
     for(const pair of this.contacts)this.processContact(pair);

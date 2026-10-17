@@ -5,8 +5,8 @@ export class RearLayer{
  room(tx,ty,w,h,m,floorY,bounds){
   const g=this.grid;g.fill(tx*16,ty*16,w*16,h*16,m);
   for(let x=tx*16;x<(tx+w)*16;x++){
-   const key=floorY*g.width+x,pixels=[];for(let y=ty*16;y<(ty+h)*16;y++)pixels.push(y*g.width+x);
-   this.links.set(key,{pixels,bounds});
+   const anchorY=typeof floorY==='function'?floorY(x):floorY,key=anchorY*g.width+x,pixels=[];for(let y=ty*16;y<(ty+h)*16;y++)pixels.push(y*g.width+x);
+   const existing=this.links.get(key);if(existing)existing.pixels.push(...pixels);else this.links.set(key,{pixels,bounds});
   }
  }
  rebindMissing(fore){

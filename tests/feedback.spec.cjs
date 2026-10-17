@@ -1,4 +1,18 @@
 const {test,expect}=require('@playwright/test');
+test('滚轮循环切换九格，首尾物品框对齐且空格不发射',async({page})=>{
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
+ await page.locator('#stage').hover();await page.mouse.wheel(0,-120);
+ await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().selectedSlot)).toBe(8);
+ await page.screenshot({path:'evidence/hotbar-last-slot.png'});
+ const rects=await page.locator('#ballbar').evaluate(bar=>{
+  const b=bar.getBoundingClientRect();return [...bar.children].map(e=>{const r=e.getBoundingClientRect();return {w:r.width,h:r.height,left:r.left-b.left,right:r.right-b.left,limit:b.width};});
+ });
+ expect(Math.abs(rects[0].w-rects[0].h)).toBeLessThan(.2);expect(rects[0].left).toBeGreaterThan(0);expect(rects[8].right).toBeLessThan(rects[8].limit);
+ const shots=await page.evaluate(()=>MCBlockLaunch.getStatus().shots);
+ await page.keyboard.press('9');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('empty');
+ expect(await page.evaluate(()=>MCBlockLaunch.getStatus().shots)).toBe(shots);
+ await page.keyboard.press('1');await page.screenshot({path:'evidence/hotbar-first-slot.png'});
+});
 test('左下蓄力不反向，九格物品栏、立体行走人物与静态云实际显示',async({page})=>{
  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
  const initial=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());

@@ -17,3 +17,9 @@ test('楼板脱离时后墙进入同一残骸，不增加碰撞形状',()=>{
  const pos=w.worldPoint(piece,piece.backPixels[0].x,piece.backPixels[0].y);for(let i=0;i<36;i++)w.step(1/120);
  const after=w.worldPoint(piece,piece.backPixels[0].x,piece.backPixels[0].y);assert.ok(after.y>pos.y);
 });
+test('最后支点只剩微小孤岛时，不留下永久悬空后墙',()=>{
+ const grid=new PixelGrid(64,64);grid.fill(0,48,64,16,7);grid.fill(32,32,16,16,10);
+ const rear=new RearLayer(64,64);rear.room(2,1,1,1,10,32,{x0:32,y0:16,x1:48,y1:48});
+ const w=new SiegeWorld(M,{grid,rear,pixelSize:2});grid.fill(32,32,16,16,0);grid.set(40,32,10);w.synchronize();
+ assert.equal(rear.grid.count(),0);assert.equal(rear.links.size,0);
+});

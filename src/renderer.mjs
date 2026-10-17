@@ -1,8 +1,7 @@
 import { WIDTH,HEIGHT,PIXEL,TILE,AMMO,MATERIALS,clamp } from './config.mjs';
-import {predictArc} from './aim.mjs';
+import {predictArc,arcRevision} from './aim.mjs';
 import {MobSprites} from './mobs.mjs';
-export const PIVOT={x:205,y:607}, ARM=98, REST=-1.12, RELEASE=-.91;
-export const armTip=angle=>({x:PIVOT.x+Math.cos(angle)*ARM,y:PIVOT.y+Math.sin(angle)*ARM});
+import {tntFlash} from './animation.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -11,8 +10,9 @@ export class Renderer {
     this.wood=this.ctx.createPattern(assets.images.oak_planks,'repeat');this.wood.setTransform(new DOMMatrix().scale(3));
     this.mobSprites=new MobSprites(assets);this.rearCanvas=document.createElement('canvas');this.rearCanvas.width=512;this.rearCanvas.height=288;
     this.rearPictures=new WeakMap();this.rearVersion=-1;this.arcKey='';
+    this.background=document.createElement('canvas');this.background.width=WIDTH;this.background.height=HEIGHT;this.backgroundReady=false;
   }
-  reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.arcKey='';this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
+  reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.arcKey='';this.backgroundReady=false;this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
   drawRear(world){
     const g=world.rear.grid;
     if(g.version!==this.rearVersion){
@@ -124,31 +124,36 @@ export class Renderer {
     c.fillStyle='#38291e';c.fillRect(-2,-width/2-3,length+4,width+6);c.fillStyle=this.wood;c.fillRect(0,-width/2,length,width);c.restore();
   }
   launcher(state,world){
-    const c=this.ctx;for(const x of [151,266]){
-      c.save();c.translate(x,647);c.beginPath();for(let i=0;i<8;i++){const a=Math.PI/8+i*Math.PI/4;c.lineTo(Math.cos(a)*25,Math.sin(a)*25);}c.closePath();c.fillStyle='#33261d';c.fill();c.clip();c.fillStyle=this.wood;c.fillRect(-20,-20,40,40);
-      c.fillStyle='#443223';c.fillRect(-3,-24,6,48);c.fillRect(-24,-3,48,6);c.fillStyle='#b9a27a';c.fillRect(-5,-5,10,10);c.restore();
-    }
-    this.beam(121,627,294,627,15);this.beam(146,622,PIVOT.x,PIVOT.y-5,11);this.beam(270,622,PIVOT.x,PIVOT.y-5,11);
-    const tip=armTip(state.angle),back={x:PIVOT.x-Math.cos(state.angle)*32,y:PIVOT.y-Math.sin(state.angle)*32};
-    this.beam(back.x,back.y,tip.x,tip.y,11);c.fillStyle=this.wood;c.fillRect(back.x-15,back.y-13,30,26);
-    c.fillStyle='#b9a27a';c.fillRect(PIVOT.x-8,PIVOT.y-8,16,16);c.fillStyle='#473628';c.fillRect(PIVOT.x-3,PIVOT.y-3,6,6);
-    this.beam(tip.x-22,tip.y+16,tip.x+22,tip.y+16,7);this.beam(tip.x-22,tip.y+16,tip.x-26,tip.y+1,5);this.beam(tip.x+22,tip.y+16,tip.x+26,tip.y+1,5);
-    if(state.loaded)this.ball(tip.x,tip.y,state.ammo);
+    const c=this.ctx,p=state.pouch,left={x:171,y:526},right={x:239,y:526};
+    const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
+    c.save();c.lineCap='round';c.lineJoin='round';
+    const wood=(color,width,offset=0)=>{c.strokeStyle=color;c.lineWidth=width;
+      c.beginPath();c.moveTo(205+offset,659);c.bezierCurveTo(202+offset,630,209+offset,600,204+offset,578);c.bezierCurveTo(196+offset,559,181+offset,545,left.x+offset,left.y);c.stroke();
+      c.beginPath();c.moveTo(204+offset,578);c.bezierCurveTo(216+offset,559,231+offset,548,right.x+offset,right.y);c.stroke();};
+    wood('#57371f',25);wood('#ad7542',20);wood('#ca965d',12,-2);wood('#dfb27a',4,-4);
+    c.strokeStyle='#9b693c';c.lineWidth=1.5;c.beginPath();c.moveTo(208,647);c.bezierCurveTo(205,625,212,605,207,591);c.stroke();
+    c.restore();
+    band(left,p,10,'#34251c');band(left,p,5,'#98765b');
+    c.fillStyle='#563824';c.beginPath();c.roundRect(p.x-18,p.y-9,36,22,7);c.fill();c.strokeStyle='#b68b5d';c.lineWidth=2;c.stroke();
+    if(state.loaded)this.ball(p.x,p.y,state.ammo);
+    band(right,{x:p.x+13,y:p.y+10},9,'#39271c');band(right,{x:p.x+13,y:p.y+10},4,'#b48c63');
+    c.save();c.lineCap='round';c.strokeStyle='#654733';c.lineWidth=9;for(const tip of [left,right]){c.beginPath();c.moveTo(tip.x-5,tip.y-2);c.lineTo(tip.x+5,tip.y+2);c.stroke();}c.restore();
     if(state.drag){
-      const p=armTip(RELEASE);c.fillStyle='#ffffffbb';
-      const key=`${state.ammo.id}:${state.vx.toFixed(1)}:${state.vy.toFixed(1)}:${world.grid.version}`;
+      const key=`${state.ammo.id}:${p.x.toFixed(1)}:${p.y.toFixed(1)}:${state.vx.toFixed(1)}:${state.vy.toFixed(1)}:${arcRevision(world)}`;
       if(key!==this.arcKey){this.arcKey=key;this.arc=predictArc(world,state.ammo.id,p,state.vx,state.vy);}
-      for(const {x,y} of this.arc)c.fillRect(Math.round(x/3)*3,Math.round(y/3)*3,6,6);
-      c.fillStyle='#202a32c9';c.fillRect(118,701,184,30);c.fillStyle='#fff';c.font='16px system-ui';c.fillText(`力度 ${Math.round(state.power*100)}%`,133,723);
+      c.fillStyle='#ffffffbb';for(const {x,y} of this.arc)c.fillRect(Math.round(x/3)*3,Math.round(y/3)*3,6,6);
+      c.fillStyle='#202a32c9';c.fillRect(116,697,120,30);c.fillStyle='#fff';c.font='16px system-ui';c.fillText(`${Math.round(state.power*100)}%`,145,719);
     }
   }
   draw(world,launcher,paused=false){
-    const c=this.ctx;c.imageSmoothingEnabled=false;this.backdrop(world.time);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
+    const c=this.ctx;c.imageSmoothingEnabled=false;
+    if(!this.backgroundReady){this.ctx=this.background.getContext('2d',{alpha:false});this.ctx.imageSmoothingEnabled=false;this.backdrop(0);this.ctx=c;this.backgroundReady=true;}
+    c.drawImage(this.background,0,0);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
     for(const e of world.debris){if(e.dead)continue;c.save();c.translate(e.body.position.x,e.body.position.y);c.rotate(e.body.angle);c.drawImage(this.cachePiece(e),e.offset.x,e.offset.y,e.w*PIXEL,e.h*PIXEL);c.restore();}
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
     this.launcher(launcher,world);
     for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.rotate(p.body.angle);
-      this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&p.fuse<1&&Math.floor(p.fuse*12)%2===0){c.globalAlpha=.4;c.fillStyle='#fff';c.fillRect(-16,-16,32,32);}c.restore();}
+      this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-16,-16,32,32);}c.restore();}
     for(const p of this.particles){c.globalAlpha=Math.min(1,p.life/.8);c.fillStyle=p.color;c.fillRect(Math.round(p.x/3)*3,Math.round(p.y/3)*3,p.size,p.size);}c.globalAlpha=1;
     for(const v of world.vortices){c.save();c.globalAlpha=Math.min(1,v.life/.4);this.hole(v.x,v.y,world.time,20+Math.min(65,v.age*20));c.restore();}
     for(const e of this.effects){

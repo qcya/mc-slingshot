@@ -12,7 +12,7 @@ async function dragShot(page,kind=1,dx=128,dy=34){
   await page.mouse.move(x-dx*b.width/1536,y+dy*b.height/864,{steps:16});
   await page.mouse.up();
 }
-test('实际拖拽带动投石臂，弹药从臂端脱离并进入完整 Matter 世界',async({page})=>{
+test('实际拖拽拉开弹弓，弹药从弹药兜脱离并进入完整 Matter 世界',async({page})=>{
   await ready(page);
   const before=await page.evaluate(()=>MCBlockLaunch.getStatus());
   await dragShot(page);

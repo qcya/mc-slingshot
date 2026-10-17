@@ -32,22 +32,30 @@ export function mobGeometry(skin,phase,direction){
  return faces.sort((a,b)=>b.depth-a.depth);
 }
 export class MobSprites{
- constructor(assets){this.assets=assets;this.cache=new Map();}
- frame(skin,phase,direction){
-  const index=((Math.round(phase/(Math.PI*2)*24)%24)+24)%24,key=`${skin}:${index}:${direction}`;
-  if(this.cache.has(key))return this.cache.get(key);
-  const canvas=document.createElement('canvas');canvas.width=108;canvas.height=120;
-  const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.translate(54,110);c.scale(2.7,2.7);
-  for(const f of mobGeometry(skin,index/24*Math.PI*2,direction)){
+ constructor(assets){this.assets=assets;this.cache=new Map();this.scratch=new WeakMap();}
+ paint(c,skin,phase,direction){
+  for(const f of mobGeometry(skin,phase,direction)){
    const [u,v,w,h]=f.uv,[a,b,,d]=f.vertices;c.save();
    c.transform((b.x-a.x)/w,(b.y-a.y)/w,(d.x-a.x)/h,(d.y-a.y)/h,a.x,a.y);
    c.drawImage(this.assets.images[skin],u,v,w,h,0,0,w,h);
    if(f.face==='side'){c.fillStyle='#0002';c.fillRect(0,0,w,h);}c.restore();
   }
+ }
+ frame(skin,phase,direction){
+  const key=`${skin}:${phase.toFixed(4)}:${direction}`;
+  if(this.cache.has(key))return this.cache.get(key);
+  const canvas=document.createElement('canvas');canvas.width=108;canvas.height=120;
+  const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.translate(54,110);c.scale(2.7,2.7);
+  this.paint(c,skin,phase,direction);
+  if(this.cache.size>=64)this.cache.delete(this.cache.keys().next().value);
   this.cache.set(key,canvas);return canvas;
  }
  draw(c,e,world){
-  const b=e.body,phase=e.alive?e.walkDistance/14:0,frame=this.frame(e.skin,phase,e.facing||1);
+  const b=e.body,phase=e.alive?e.walkDistance/14:0;
+  let frame=this.scratch.get(e);
+  if(!frame){frame=document.createElement('canvas');frame.width=108;frame.height=120;this.scratch.set(e,frame);}
+  const paint=frame.getContext('2d');paint.setTransform(1,0,0,1,0,0);paint.clearRect(0,0,108,120);paint.imageSmoothingEnabled=false;
+  paint.translate(54,110);paint.scale(2.7,2.7);this.paint(paint,e.skin,phase,e.facing||1);
   c.save();c.translate(b.position.x,b.position.y);c.rotate(b.angle);
   if(!e.alive)c.globalAlpha=Math.max(0,1-(world.time-e.deathAt)/3);
   c.drawImage(frame,-54,46-110);c.restore();

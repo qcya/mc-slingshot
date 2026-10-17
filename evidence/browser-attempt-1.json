@@ -1,0 +1,126 @@
+[
+  {
+    "kind": "ender",
+    "origin": {
+      "x": 75.25751582804594,
+      "y": 582.3080125561554
+    },
+    "vx": 1401.218829057104,
+    "vy": -402.9265356064784,
+    "power": 1,
+    "angle": 0.28,
+    "score": 12082.87300666012,
+    "alive": 1,
+    "hp": 26.427249444990053,
+    "removed": 0,
+    "after": {
+      "assets": [
+        "grass_block_side",
+        "spruce_planks",
+        "stone",
+        "cobblestone",
+        "dirt",
+        "oak_log",
+        "oak_door_top",
+        "oak_door_bottom",
+        "stone_bricks",
+        "glass",
+        "bedrock",
+        "oak_leaves",
+        "iron_ore",
+        "oak_planks",
+        "deepslate",
+        "dark_oak_log",
+        "tnt_side",
+        "dark_oak_planks",
+        "spruce_log",
+        "ender_pearl",
+        "spruce_leaves",
+        "grass_block_side_overlay",
+        "zombie",
+        "crossbow_standby",
+        "pillager"
+      ],
+      "time": 1.0499999999999987,
+      "removed": 0,
+      "backgroundRemoved": 0,
+      "explosions": 0,
+      "portals": 1,
+      "physics": "Matter.js",
+      "bodies": 165,
+      "debris": 0,
+      "blackholes": 0,
+      "enemiesAlive": 0,
+      "projectiles": 1,
+      "particlesPending": 0,
+      "ready": true,
+      "level": 1,
+      "shots": 7,
+      "launched": 1,
+      "selected": "ender",
+      "selectedSlot": 2,
+      "paused": false,
+      "ended": false,
+      "particles": 0,
+      "ammoBodies": [
+        {
+          "id": "ender",
+          "x": 1147.2058385546088,
+          "y": 582.0047775044076,
+          "angle": -2.014496360030557,
+          "speed": 100.48545579998344,
+          "sleeping": false,
+          "uses": 1
+        }
+      ],
+      "restingBlocks": 0,
+      "fps": 75,
+      "stepMs": 0.14,
+      "maxStepMs": 0.7,
+      "launcher": {
+        "x": 205,
+        "y": 545,
+        "angle": 0,
+        "phase": "ready",
+        "type": "slingshot"
+      },
+      "enemies": [
+        {
+          "skin": "zombie",
+          "hp": -150,
+          "alive": false,
+          "x": 1191.0536905743304,
+          "y": 582.997703220315,
+          "facing": 1,
+          "walkDistance": 19.66123861088772,
+          "turns": 0
+        },
+        {
+          "skin": "pillager",
+          "hp": -2.8673084804623556,
+          "alive": false,
+          "x": 1252.2352231362484,
+          "y": 577.8661706447491,
+          "facing": -1,
+          "walkDistance": 22.16179354951305,
+          "turns": 0
+        }
+      ],
+      "backgroundPixels": 42240,
+      "movingBackgroundPixels": 0,
+      "terrainPixels": 41472,
+      "debrisPixels": 0,
+      "sound": {
+        "played": {
+          "wood": 1,
+          "portal": 1,
+          "stone": 1,
+          "zombie_hurt": 1
+        },
+        "failed": 0,
+        "lastError": null
+      },
+      "physicsParts": 165
+    }
+  }
+]

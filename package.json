@@ -1,6 +1,6 @@
 {
   "name": "mc-block-launch",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Minecraft 风格的二维逐像素物理攻城游戏",
   "scripts": {
@@ -10,6 +10,6 @@
     "check": "npm test && npm run test:browser"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1"
+    "@playwright/test": "1.64.1"
   }
 }

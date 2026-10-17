@@ -17,11 +17,17 @@ export function buildLevel(number){
   const tile=(x,y,m)=>grid.tile(x,y,m);
   const enemy=(x,y,skin='pillager')=>enemies.push({x:x*TILE,feet:y*TILE,skin});
   const roof=(x0,x1,y,m=10)=>{
+    const sections=[];
     for(let step=0;x0+step<=x1-step;step++){
       const left=x0+step,right=x1-step;
       if(right-left<=2){row(left,right,y-step,m);break;}
       row(left,left+1,y-step,m);row(right-1,right,y-step,m);
+      sections.push({x:left+2,y:y-step,w:right-left-3});
     }
+    // The gable is a non-colliding rear wall, carried by its own roof beams.
+    for(const part of sections)if(part.w>0)rear.room(part.x,part.y,part.w,1,m,x=>{
+      let yy=part.y*16-1;while(yy>0&&!grid.get(x,yy))yy--;return yy;
+    },{x0:x0*16,y0:Math.max(0,y-Math.ceil((x1-x0)/2))*16,x1:(x1+1)*16,y1:(y+1)*16});
   };
   for(let x=0;x<32;x++){tile(x,14,1);tile(x,15,2);tile(x,16,3);tile(x,17,7);rear.grid.tile(x,14,2);rear.grid.tile(x,15,2);rear.grid.tile(x,16,3);rear.grid.tile(x,17,7);}
   if(level===0){
