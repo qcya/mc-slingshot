@@ -2,6 +2,8 @@
 import {Assets} from './assets.mjs';import {buildLevel,LEVELS} from './levels.mjs';import {SiegeWorld} from './world.mjs';import {Renderer} from './renderer.mjs';
 import {SLING_HOME,pullSling} from './sling.mjs';import {DrawAudio} from './draw-audio.mjs';
 import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,totalAmmo,spendAmmo,rewardFor} from './campaign.mjs';
+import {mobAppearance} from './animation.mjs';
+import {updateOutcome} from './outcome.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
 let world,renderer,assets,scene,drawAudio,progress,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0;
@@ -23,10 +25,11 @@ function renderCards(){
  const container=$('#levelCards');container.replaceChildren();
  LEVELS.forEach((level,i)=>{
   const b=document.createElement('button');b.className='level-card';b.dataset.level=i;b.id='level-'+i;b.disabled=!canEnter(progress,i);
+  const number=document.createElement('span');number.className='level-number';number.textContent=String(i+1).padStart(2,'0');
   const name=document.createElement('strong');name.textContent=level.title.replace(/^0\d \/ /,'');
   const supplies=document.createElement('span');supplies.textContent=b.disabled?'通过前一关解锁':inventoryFor(i).map((n,j)=>n?`${AMMO[j].label} ×${n}`:'').filter(Boolean).join(' · ');
   const flag=document.createElement('small');flag.textContent=b.disabled?'未解锁':progress.completed.includes(i)?'已通关 · 可重玩':i===progress.unlocked-1?'开始挑战':'已解锁';
-  b.append(name,supplies,flag);b.addEventListener('click',()=>loadLevel(i));container.append(b);
+  b.append(number,name,supplies,flag);b.addEventListener('click',()=>loadLevel(i));container.append(b);
  });
 }
 function cancelDrag(){drawAudio?.stop();state.drag=false;state.angle=0;state.power=0;state.vx=state.vy=0;if(!state.launch)state.pouch={...SLING_HOME};}
@@ -54,10 +57,7 @@ function animateLauncher(dt){
 }
 function update(dt){
  animateLauncher(dt);const start=performance.now();world.step(dt);const duration=performance.now()-start;stepMs=stepMs*.97+duration*.03;maxStepMs=Math.max(maxStepMs,duration);renderer.update(world,dt);
- if(!state.ended){
-  if(world.enemies.every(e=>!e.alive)){state.winWait+=dt;if(state.winWait>.9)result(true);}else state.winWait=0;
-  if(!state.ended&&state.shots===0&&!state.launch&&!world.active()){state.quiet+=dt;if(state.quiet>2)result(false);}else state.quiet=0;
- }
+ if(!state.ended){const outcome=updateOutcome(state,world,dt);if(outcome!==null)result(outcome);}
 }
 function frame(now){
  const elapsed=previous?Math.min(.1,(now-previous)/1000):0;previous=now;if(elapsed>0)fps=fps*.95+(1/elapsed)*.05;
@@ -114,7 +114,7 @@ async function start(){
  });
  window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});
  window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:loadLevel,select,
- getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),
+ getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),
  sound:{...assets.audioStats,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
  requestAnimationFrame(frame);

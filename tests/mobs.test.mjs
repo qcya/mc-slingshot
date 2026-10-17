@@ -1,6 +1,19 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';
 import {PixelGrid} from '../src/pixels.mjs';import {SiegeWorld} from '../src/world.mjs';import {mobGeometry} from '../src/mobs.mjs';
+import {mobAppearance} from '../src/animation.mjs';
 const M=createRequire(import.meta.url)('../vendor/matter.min.js');
+
+test('受伤红闪，死亡先倒地、随后仅发出一次白色消散事件并移除碰撞',()=>{
+ const grid=new PixelGrid(240,160);grid.fill(0,128,240,32,7);const w=new SiegeWorld(M,{grid,pixelSize:2}),e=w.addEnemy(200,256);
+ w.hurt(e,20);assert.ok(e.hurtUntil>w.time);assert.equal(e.alive,true);
+ w.hurt(e,250);assert.equal(e.alive,false);assert.equal(e.dead,undefined);
+ assert.equal(mobAppearance(e,w.time).hurt,true);assert.equal(mobAppearance(e,w.time+.31).hurt,false);
+ assert.ok(Math.abs(mobAppearance(e,w.time+.5).angle)>=Math.PI/2-.01);
+ for(let i=0;i<50;i++)w.step(1/120);assert.ok(!e.dead,'corpse must remain for the topple');
+ for(let i=0;i<40;i++)w.step(1/120);assert.equal(e.dead,true);assert.equal(w.events.filter(v=>v.type==='death').length,1);
+ assert.ok(!M.Composite.allBodies(w.engine.world).includes(e.body));
+ for(let i=0;i<180;i++)w.step(1/120);assert.equal(w.events.filter(v=>v.type==='death').length,1);
+});
 test('僵尸与掠夺者都由完整立方体四肢构成，并有侧面和走路姿态',()=>{
  for(const skin of ['zombie','pillager']){
   const idle=mobGeometry(skin,0,1),walk=mobGeometry(skin,1.2,1);

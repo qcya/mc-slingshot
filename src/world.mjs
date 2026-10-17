@@ -2,6 +2,7 @@ import { AMMO, MATERIALS, clamp } from './config.mjs';
 import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDamage } from './pixels.mjs';
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
+import {DEATH_TOPPLE} from './animation.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -162,9 +163,9 @@ export class SiegeWorld {
     }
   }
   hurt(e,damage){
-    if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;this.stats.enemyDamage+=damage;
+    if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
     this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:e.skin==='pillager'?'pillager_hurt':'zombie_hurt'});
-    if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setInertia(e.body,1600);this.M.Body.setAngularVelocity(e.body,.05);}
+    if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setAngularVelocity(e.body,0);}
   }
   blast(x,y,radius=98,power=160){
     this.stats.explosions++;this.events.push({type:'explosion',x,y,radius});
@@ -190,8 +191,10 @@ export class SiegeWorld {
     const avx=va.x-omegaA*(point.y-a.position.y),avy=va.y+omegaA*(point.x-a.position.x);
     const bvx=vb.x-omegaB*(point.y-b.position.y),bvy=vb.y+omegaB*(point.x-b.position.x);
     const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
-    if(ea?.type==='enemy')this.hurt(ea,eb?.type==='ammo'?250:impactDamage(speed,b.mass,a.mass));
-    if(eb?.type==='enemy')this.hurt(eb,ea?.type==='ammo'?250:impactDamage(speed,a.mass,b.mass));
+    // TNT has no direct damage. Ender pearls hurt creatures, never materials.
+    const contactDamage=(entity,mass,targetMass)=>entity?.type==='ammo'?(entity.ammo.id==='tnt'?0:250):impactDamage(speed,mass,targetMass);
+    if(ea?.type==='enemy')this.hurt(ea,contactDamage(eb,b.mass,a.mass));
+    if(eb?.type==='enemy')this.hurt(eb,contactDamage(ea,a.mass,b.mass));
     const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
     const other=ammo===ea?eb:ea,otherBody=ammo===ea?b:a;
     if(ammo){
@@ -206,6 +209,7 @@ export class SiegeWorld {
           this.M.Sleeping.set(ammo.body,false);ammo.uses++;this.stats.portals++;this.events.push({type:'portal',x:old.x,y:old.y,to:exit});return;
         }
       }
+      if(kind==='ender')return;
     }
     const striker=ammo||((ea?.type==='debris'&&b.plugin.terrain)?ea:(eb?.type==='debris'&&a.plugin.terrain)?eb:null);
     if(striker&&speed>180){
@@ -238,7 +242,9 @@ export class SiegeWorld {
     for(const e of this.allMoving()){
       const {x,y}=e.body.position;
       if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,250);this.remove(e);}
-      if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>3)this.remove(e);
+      if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
+        this.events.push({type:'death',x,y:y+22});this.remove(e);
+      }
       if(e.type==='ammo'&&e.age>18&&e.ammo.id!=='cobble')this.remove(e);
     }
     this.projectiles=this.projectiles.filter(e=>!e.dead);this.debris=this.debris.filter(e=>!e.dead);

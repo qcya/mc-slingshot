@@ -1,5 +1,6 @@
 // Orthographic cuboids with the original Java skin box UV layout. Physics stays 2D.
 // Every face is a different region of the skin, never a flat skin atlas billboard.
+import {mobAppearance} from './animation.mjs';
 export function mobGeometry(skin,phase,direction,pose={}){
  const ill=skin==='pillager',headH=ill?10:8,faces=[],yaw=-direction*1.08,cy=Math.cos(yaw),sy=Math.sin(yaw);
  const swing=Math.sin(phase)*.64*(pose.walkBlend??1);
@@ -55,13 +56,13 @@ export class MobSprites{
   this.cache.set(key,canvas);return canvas;
  }
  draw(c,e,world){
-  const b=e.body,phase=e.alive?e.walkDistance/14:0;
+  const b=e.body,phase=e.alive?e.walkDistance/14:0,appearance=mobAppearance(e,world.time);if(!appearance.visible)return;
   let frame=this.scratch.get(e);
   if(!frame){frame=document.createElement('canvas');frame.width=108;frame.height=120;this.scratch.set(e,frame);}
   const paint=frame.getContext('2d');paint.setTransform(1,0,0,1,0,0);paint.clearRect(0,0,108,120);paint.imageSmoothingEnabled=false;
   paint.translate(54,110);paint.scale(2.7,2.7);this.paint(paint,e.skin,phase,e.facing||1,e.pose);
-  c.save();c.translate(b.position.x,b.position.y);c.rotate(b.angle);
-  if(!e.alive)c.globalAlpha=Math.max(0,1-(world.time-e.deathAt)/3);
-  c.drawImage(frame,-54,46-110);c.restore();
+  if(appearance.hurt){paint.setTransform(1,0,0,1,0,0);paint.globalCompositeOperation='source-atop';paint.fillStyle='#ff303080';paint.fillRect(0,0,108,120);paint.globalCompositeOperation='source-over';}
+  c.save();c.translate(b.position.x,b.position.y+46-Math.sin(Math.abs(appearance.angle))*14);c.rotate(b.angle+appearance.angle);
+  c.drawImage(frame,-54,-110);c.restore();
  }
 }

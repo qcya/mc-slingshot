@@ -27,10 +27,20 @@ test('TNT 固定四秒引信，撞击木材不挖洞，爆炸才破坏具体像�
   assert.ok(w.stats.removed<16*88); // 远离爆心的部分可成为残骸，但不能整柱消失。
 });
 
-test('弹药直接碰怪即击杀，慢速 TNT 也不例外', () => {
+test('圆石与珍珠直接碰怪击杀，TNT 接触不伤怪、爆炸才伤怪', () => {
   for(const kind of ['cobble','tnt','ender']){
     const w=fixture(),e=w.addEnemy(160,256);w.spawnProjectile(kind,125,210,80,0);step(w,.35);
-    assert.equal(e.alive,false,kind);
+    assert.equal(e.alive,kind==='tnt',kind);
+    if(kind==='tnt'){assert.equal(e.hp,100);w.blast(e.body.position.x,e.body.position.y);assert.equal(e.alive,false);}
+  }
+});
+
+test('珍珠不会损伤门、玻璃或石墙，包括穿墙失败和已用过穿墙的撞击',()=>{
+  for(const material of [17,18,6,5])for(const width of [16,48])for(const uses of [0,1]){
+    const w=fixture();w.grid.fill(140,45,width,83,material);w.synchronize();
+    const before=w.grid.cells.slice(),hp=w.grid.hp.slice(),p=w.spawnProjectile('ender',220,190,900,0);p.uses=uses;
+    step(w,.45);assert.deepEqual(w.grid.cells,before,`${material}/${width}/${uses}`);assert.deepEqual(w.grid.hp,hp);
+    assert.equal(w.stats.removed,0);assert.equal(w.stats.backgroundRemoved,0);
   }
 });
 

@@ -1,7 +1,7 @@
 import { WIDTH,HEIGHT,PIXEL,TILE,AMMO,MATERIALS,clamp } from './config.mjs';
 import {predictArc,arcRevision} from './aim.mjs';
 import {MobSprites} from './mobs.mjs';
-import {tntFlash} from './animation.mjs';
+import {tntFlash,DEATH_POOF} from './animation.mjs';
 import {SLING_HOME,SLING_FRAME,pouchRotation} from './sling.mjs';
 import {skyAndLandscape,driftingClouds,rearPixel,foregroundPixel,contactShadows} from './scenery.mjs';
 export class Renderer {
@@ -65,6 +65,11 @@ export class Renderer {
         if(this.particles.length>=850)continue;
         const p=this.assets.pixel(event.m||3,Math.floor(event.x/PIXEL),Math.floor(event.y/PIXEL)),a=Math.random()*Math.PI*2,v=70+Math.random()*140;
         this.particles.push({x:event.x,y:event.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-70,color:`rgb(${p[0]},${p[1]},${p[2]})`,life:1.4+Math.random()*1.5,size:3});
+      }else if(event.type==='death'){
+        for(let i=0;i<26;i++){
+          const a=i*2.39996,v=18+Math.random()*65,life=DEATH_POOF*(.75+Math.random()*.25);
+          this.particles.push({x:event.x+(Math.random()-.5)*42,y:event.y+(Math.random()-.5)*50,vx:Math.cos(a)*v,vy:Math.sin(a)*v-38,color:i%3?'#fff':'#d9d9d9',life,total:life,size:i%2?6:9,poof:true});
+        }
       }else if(event.type==='explosion'){this.effects.push({...event,life:.6,total:.6});this.assets.play('explode',.55);}
       else if(event.type==='portal'){this.effects.push({...event,life:.45,total:.45});this.assets.play('portal',.5);}
       else if(event.type==='fuse')this.assets.play('fuse',.35);
@@ -77,6 +82,7 @@ export class Renderer {
     this.consume(world);
     for(const p of this.particles){
       p.life-=dt;
+      if(p.poof){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.exp(-dt*3);continue;}
       p.vy+=550*dt;const lastY=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;
       if(world.grid.get(p.x/PIXEL,(p.y+3)/PIXEL)&&p.vy>0){p.y=lastY;p.vy=Math.abs(p.vy)<35?0:-p.vy*.18;p.vx*=.65;}
     }
@@ -145,8 +151,8 @@ export class Renderer {
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
     this.launcher(launcher,world);
     for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.rotate(p.body.angle);
-      this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-16,-16,32,32);}c.restore();}
-    for(const p of this.particles){c.globalAlpha=Math.min(1,p.life/.8);c.fillStyle=p.color;c.fillRect(Math.round(p.x/3)*3,Math.round(p.y/3)*3,p.size,p.size);}c.globalAlpha=1;
+      this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){const s=p.ammo.size;c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-s/2,-s/2,s,s);}c.restore();}
+    for(const p of this.particles){c.globalAlpha=Math.min(1,p.life/(p.poof ? .15 : .8));c.fillStyle=p.color;c.fillRect(Math.round(p.x/3)*3,Math.round(p.y/3)*3,p.size,p.size);}c.globalAlpha=1;
     for(const e of this.effects){
       if(e.type==='explosion'){const frame=Math.min(15,Math.floor((1-e.life/e.total)*16)),size=e.radius*2;c.drawImage(this.assets.explosions[frame],e.x-size/2,e.y-size/2,size,size);}
       else if(e.type==='portal'){c.fillStyle='#ad65dc';c.globalAlpha=e.life/e.total;for(const p of [e,e.to])for(let i=0;i<14;i++){const a=i/14*Math.PI*2,r=20+(1-e.life/e.total)*30;c.fillRect(p.x+Math.cos(a)*r,p.y+Math.sin(a)*r,6,6);}c.globalAlpha=1;}

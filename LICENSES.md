@@ -30,3 +30,7 @@
 - `ladder.png`、`tnt_top.png`：同一 Default-Java `1.20.4` 分支方块纹理。
 - `crossbow_pull.ogg`：Mojang 官方 1.20.4 assetIndex 中的 `minecraft/sounds/item/crossbow/loading_middle1.ogg`，SHA-1 `2f1f5a923c19c6864b3a63f2310b24586eafa7a5`，来源 `resources.download.minecraft.net`。替换此前程序生成的皮筋噪声。
 - 物品栏方块图标由原版纹理按顶面、两个侧面组合，没有生成新的方块纹理。梯子后墙使用原版梯子透明纹理与木板后墙合成，并随同一后景像素数据破坏。
+
+## Alpha 0.10 菜单素材
+
+- `assets/gui/button.png`、`button_disabled.png`、`button_highlighted.png`：同一 Default-Java `1.20.4` 分支的 `assets/minecraft/textures/gui/sprites/widget/`，原始尺寸 200×20，按边框切片缩放。菜单背景复用项目已有原版泥土纹理。

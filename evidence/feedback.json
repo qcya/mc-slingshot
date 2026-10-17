@@ -5,15 +5,16 @@
     "stone",
     "oak_log",
     "stone_bricks",
+    "bookshelf",
+    "tnt_side",
+    "ender_pearl",
+    "ladder",
+    "tnt_top",
     "glass",
     "bedrock",
     "oak_leaves",
     "iron_ore",
     "oak_planks",
-    "furnace_front",
-    "bookshelf",
-    "tnt_side",
-    "ender_pearl",
     "deepslate",
     "dark_oak_log",
     "dark_oak_planks",
@@ -21,27 +22,26 @@
     "spruce_planks",
     "cobblestone",
     "oak_door_top",
+    "spruce_leaves",
     "oak_door_bottom",
     "crafting_table_front",
-    "ladder",
-    "tnt_top",
-    "spruce_leaves",
+    "furnace_front",
     "cherry_log",
     "cherry_leaves",
+    "pillager",
     "grass_block_side_overlay",
     "zombie",
-    "pillager",
     "crossbow_standby",
     "slingshot_frame",
     "ladder_wall"
   ],
-  "time": 2.7999999999999927,
+  "time": 2.858333333333326,
   "removed": 0,
   "backgroundRemoved": 0,
   "explosions": 0,
   "portals": 0,
   "physics": "Matter.js",
-  "bodies": 187,
+  "bodies": 154,
   "debris": 0,
   "enemiesAlive": 4,
   "projectiles": 0,
@@ -70,8 +70,8 @@
   "ammoBodies": [],
   "restingBlocks": 0,
   "fps": 75,
-  "stepMs": 0.11,
-  "maxStepMs": 2.3,
+  "stepMs": 0.07,
+  "maxStepMs": 2.5,
   "launcher": {
     "x": 285,
     "y": 545,
@@ -86,6 +86,12 @@
       "skin": "pillager",
       "hp": 100,
       "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
       "x": 1110.400055587711,
       "y": 434.01250000069444,
       "facing": 1,
@@ -93,9 +99,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.07632682204151595,
-        "headYaw": 0.18835082379618723,
-        "headPitch": 0.09900647641772238,
+        "walkBlend": 0.04422514948728973,
+        "headYaw": 0.17953975694719523,
+        "headPitch": 0.13252189933376987,
         "gesture": 0
       }
     },
@@ -103,6 +109,12 @@
       "skin": "pillager",
       "hp": 100,
       "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
       "x": 1238.734344412288,
       "y": 434.01250000069444,
       "facing": -1,
@@ -110,9 +122,9 @@
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.2657109527068884,
-        "headYaw": 0.05566825085993938,
-        "headPitch": 0.02466326504167492,
+        "walkBlend": 0.15395776071327333,
+        "headYaw": 0.04722093168407584,
+        "headPitch": 0.04859690988400261,
         "gesture": 0
       }
     },
@@ -120,16 +132,22 @@
       "skin": "zombie",
       "hp": 100,
       "alive": true,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
       "x": 1163.9521555877132,
-      "y": 578.0125000006944,
+      "y": 722.0125000006944,
       "facing": 1,
       "walkDistance": 59.77305558771286,
       "turns": 0,
       "behavior": "idle",
       "pose": {
-        "walkBlend": 0.8556250000000001,
-        "headYaw": 0.000990191970871586,
-        "headPitch": 0.00014540844589792102,
+        "walkBlend": 0.4957646934321481,
+        "headYaw": -0.010181477956316671,
+        "headPitch": 0.009163260142224123,
         "gesture": 0
       }
     },
@@ -137,10 +155,16 @@
       "skin": "zombie",
       "hp": 100,
       "alive": true,
-      "x": 1235.689644412287,
+      "dead": false,
+      "appearance": {
+        "hurt": false,
+        "angle": 0,
+        "visible": true
+      },
+      "x": 1234.4359444122865,
       "y": 578.0125000006944,
       "facing": -1,
-      "walkDistance": 60.131255587712985,
+      "walkDistance": 61.38495558771342,
       "turns": 0,
       "behavior": "walk",
       "pose": {
@@ -151,6 +175,7 @@
       }
     }
   ],
+  "whiteParticles": 0,
   "drawSound": {
     "active": false,
     "starts": 1,
@@ -161,16 +186,17 @@
     "failed": false
   },
   "preview": [],
-  "backgroundPixels": 50688,
+  "backgroundPixels": 49920,
   "movingBackgroundPixels": 0,
-  "terrainPixels": 46848,
+  "terrainPixels": 38400,
   "debrisPixels": 0,
   "sound": {
     "played": {
-      "pillager_idle": 2
+      "pillager_idle": 2,
+      "zombie_idle": 1
     },
     "failed": 0,
     "lastError": null
   },
-  "physicsParts": 187
+  "physicsParts": 154
 }

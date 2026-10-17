@@ -5,7 +5,7 @@ import {LOADOUTS} from './campaign.mjs';
 export const LEVELS=[
   {title:'01 / 村庄小木屋',desc:'击碎窗户，让弹药进入房间'},
   {title:'02 / 石质哨塔',desc:'穿过窗户，瞄准不同高度的守卫'},
-  {title:'03 / 双层村庄建筑',desc:'楼板可破坏，剩余房屋保持固定'},
+  {title:'03 / 双层村庄建筑',desc:'注意入口下方的地窖与守卫'},
   {title:'04 / 掠夺者前哨站',desc:'穿过木墙，攻击高架平台上的守卫'},
   {title:'05 / 小型堡垒',desc:'爆破打开射界，利用爆炸推动其他弹药'}
 ];
@@ -32,6 +32,19 @@ export function buildLevel(number){
     for(const part of sections)if(part.w>0){rear.room(part.x,part.y,part.w,1,m);for(let tx=part.x;tx<part.x+part.w;tx++)visual.gables.add(part.y*32+tx);}
   };
   for(let x=0;x<32;x++){tile(x,14,1);tile(x,15,2);tile(x,16,3);tile(x,17,7);rear.grid.tile(x,14,2);rear.grid.tile(x,15,2);rear.grid.tile(x,16,3);rear.grid.tile(x,17,7);}
+  // Entire 16x16 blocks form the playable terrain, including every step.
+  const surface=(x,top)=>{
+    for(let y=Math.min(top,14);y<17;y++){tile(x,y,y<top?0:y===top?1:y<top+2?2:3);rear.grid.tile(x,y,y<top?0:y<top+2?2:3);}
+  };
+  if(level===1)for(const [x,y] of [[11,13],[12,13],[13,12],[14,12],[15,13],[16,13]])surface(x,y);
+  if(level===2){
+    // Descending entrance, with a two-block-high cellar below the house.
+    surface(12,15);surface(13,16);
+    for(let x=14;x<=28;x++)for(let y=14;y<=15;y++)tile(x,y,0);
+    room(19,14,10,2,5);rear.grid.tile(21,15,20);rear.grid.tile(27,15,21);
+  }
+  if(level===3)for(const [x,y] of [[12,15],[13,15],[14,16],[15,16],[16,15],[17,15]])surface(x,y);
+  if(level===4)for(const [x,y] of [[10,13],[11,12],[12,12],[13,12],[14,13]])surface(x,y);
   if(level===0){
     row(20,28,13,16);column(20,10,12,4);column(28,10,12,4);
     tile(20,11,6);tile(28,11,6);roof(19,29,9);
@@ -49,7 +62,7 @@ export function buildLevel(number){
     row(20,28,10,10);roof(18,30,6,15);
     tile(19,8,6);tile(29,8,6);tile(19,11,6);tile(29,11,6);
     tile(29,11,17);tile(29,12,18);
-    enemy(22,10);enemy(27,10);enemy(23,13,'zombie');enemy(27,13,'zombie');
+    enemy(22,10);enemy(27,10);enemy(23,16,'zombie');enemy(27,13,'zombie');
     room(20,7,9,3,10,10,[19,6,30,11]);room(20,11,9,2,10,13,[19,10,30,14]);
   }else if(level===3){
     column(22,6,13,12);column(27,6,13,12);row(20,29,10,13);
