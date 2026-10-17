@@ -18,12 +18,16 @@ export const MATERIALS={
   15:{name:'云杉木板',sprite:'spruce_planks',hard:23,density:1.2,sound:'wood'},
   16:{name:'圆石',sprite:'cobblestone',hard:45,density:3,sound:'stone'},
   17:{name:'木门上半',sprite:'oak_door_top',hard:18,density:.8,sound:'wood'},
-  18:{name:'木门下半',sprite:'oak_door_bottom',hard:18,density:.8,sound:'wood'}
+  18:{name:'木门下半',sprite:'oak_door_bottom',hard:18,density:.8,sound:'wood'},
+  19:{name:'工作台',sprite:'crafting_table_front',hard:22,density:1.1,sound:'wood'},
+  20:{name:'熔炉',sprite:'furnace_front',hard:48,density:3.1,sound:'stone'},
+  21:{name:'书架',sprite:'bookshelf',hard:22,density:1.1,sound:'wood'},
+  22:{name:'橡木台阶',sprite:'oak_planks',hard:22,density:1.1,sound:'wood'},
+  23:{name:'梯子后墙',sprite:'ladder_wall',hard:22,density:1.1,sound:'wood'}
 };
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:32,mass:4,detail:'实心方块 · 冲量撞击'},
   {id:'tnt',label:'TNT',sprite:'tnt_side',size:32,mass:2.4,detail:'四秒引信 · 碰撞仅碎玻璃'},
-  {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:24,mass:1.1,detail:'测量墙厚 · 寻找安全出口'},
-  {id:'blackhole',label:'黑洞',sprite:null,size:24,mass:1.8,detail:'黏附表面 · 引力与吞噬'}
+  {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:24,mass:1.1,detail:'测量墙厚 · 寻找安全出口'}
 ];
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));

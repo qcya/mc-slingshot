@@ -20,3 +20,13 @@
 - `assets/textures/cherry_log.png`、`cherry_leaves.png`：上述 Default-Java `1.20.4` 分支的原版方块纹理。
 - `assets/sfx/bow.ogg`、`zombie_idle.ogg`、`pillager_idle.ogg`：Mojang 1.20.4 官方 assetIndex 对应 `random/bow.ogg`、`mob/zombie/say1.ogg`、`mob/pillager/idle1.ogg`，来源为 `resources.download.minecraft.net`。
 - `assets/sprites/slingshot-frame.png`：0.7.1 换为用户提供的透明 RGBA PNG，原样复制且保留 alpha，非 Minecraft 上游纹理。来源见同目录 `slingshot-frame.source.md`。皮筋拉伸声音由本项目 WebAudio 程序生成。
+
+## Alpha 0.8 室内素材
+
+- `crafting_table_front.png`、`furnace_front.png`、`bookshelf.png`：同一 Faithful-Pack/Default-Java `1.20.4` 分支的 `assets/minecraft/textures/block/` 原版资源。远景继续使用已有原版草、泥土、石头纹理，经过背景着色以降低对比度。
+
+## Alpha 0.9 闯关素材
+
+- `ladder.png`、`tnt_top.png`：同一 Default-Java `1.20.4` 分支方块纹理。
+- `crossbow_pull.ogg`：Mojang 官方 1.20.4 assetIndex 中的 `minecraft/sounds/item/crossbow/loading_middle1.ogg`，SHA-1 `2f1f5a923c19c6864b3a63f2310b24586eafa7a5`，来源 `resources.download.minecraft.net`。替换此前程序生成的皮筋噪声。
+- 物品栏方块图标由原版纹理按顶面、两个侧面组合，没有生成新的方块纹理。梯子后墙使用原版梯子透明纹理与木板后墙合成，并随同一后景像素数据破坏。

@@ -1,4 +1,10 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {SLING_HOME,pullSling} from '../src/sling.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import {SLING_HOME,pullSling,pouchRotation} from '../src/sling.mjs';
+
+test('弹药兜长轴始终垂直于发射方向',()=>{
+ for(const [vx,vy] of [[1000,0],[0,-1000],[-600,-400],[700,500]]){
+  const angle=pouchRotation(vx,vy);assert.ok(Math.abs(Math.cos(angle)*vx+Math.sin(angle)*vy)<1e-8);
+ }
+});
 test('弹弓向左下拉时弹药兜与实际发射原点一致，且不拉进地面',()=>{
  const p=pullSling({x:30,y:760});assert.ok(p.origin.x<SLING_HOME.x&&p.origin.y>SLING_HOME.y);
  assert.ok(p.origin.y+16<672);assert.ok(p.vx>0&&p.vy<0);assert.ok(p.power<=1);

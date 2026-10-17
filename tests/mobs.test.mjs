@@ -35,8 +35,3 @@ test('人物相邻显示帧连续插值，不量化成每周期24张图片',asyn
  sprites.paint(ctx,e.skin,e.walkDistance/14,e.facing);const first=JSON.stringify(calls);calls.length=0;e.walkDistance+=.05;sprites.paint(ctx,e.skin,e.walkDistance/14,e.facing);
  assert.notEqual(JSON.stringify(calls),first);
 });
-test('黑洞吸引时巡逻不覆盖外力，怪物会被实际拉向核心',()=>{
- const grid=new PixelGrid(240,160);grid.fill(0,128,240,32,7);const w=new SiegeWorld(M,{grid,pixelSize:2}),e=w.addEnemy(250,256);
- w.vortices.push({x:170,y:210,age:0,life:3,tick:0,radius:112,anchor:null});
- for(let i=0;i<96;i++)w.step(1/120);assert.ok(e.body.position.x<240,`x=${e.body.position.x}`);
-});

@@ -43,16 +43,6 @@ test('TNT 接触可碎玻璃，不能接触打碎木材或石头', () => {
   }
 });
 
-test('黑洞逐步吞噬并吸引真实刚体，结束后不遗留活动黑洞', () => {
-  const w=fixture();w.grid.fill(150,80,16,48,4);w.synchronize();
-  w.spawnProjectile('blackhole',260,180,350,0);step(w,.2);
-  assert.equal(w.vortices.length,1);
-  const removed=w.stats.removed;step(w,.3);
-  assert.ok(w.stats.removed>removed);
-  assert.ok(w.stats.removed<4000);
-  step(w,5);assert.equal(w.vortices.length,0);
-  assert.ok(Matter.Composite.allBodies(w.engine.world).every(b=>Number.isFinite(b.position.x)&&Number.isFinite(b.position.y)));
-});
 
 test('静态与旋转残骸的孔洞同时更新真实碰撞形状', () => {
   const w=fixture();w.grid.fill(60,80,48,48,5);w.synchronize();
@@ -88,7 +78,7 @@ test('实际刚体碰撞中沉重石块能压死怪物，轻小碎片不会', ()
   }
 });
 
-test('吞噬预算对地形和所有残骸合计生效', () => {
+test('像素破坏预算对地形和所有残骸合计生效', () => {
   const w=fixture();w.grid.fill(60,80,48,48,5);w.synchronize();
   w.addDebris(new Uint8Array(256).fill(10),16,16,{x:220,y:190});
   assert.equal(w.damageDisk(210,208,50,500,{budget:10}),10);

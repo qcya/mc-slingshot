@@ -12,7 +12,7 @@ export class SiegeWorld {
     this.width=grid.width*pixelSize;this.height=grid.height*pixelSize;
     this.engine=Matter.Engine.create({enableSleeping:true,positionIterations:8,velocityIterations:8,gravity:{x:0,y:1,scale:.001}});
     this.staticTiles=new Map();this.projectiles=[];this.debris=[];this.enemies=[];
-    this.vortices=[];this.events=[];this.contacts=[];this.cooldowns=new Map();
+    this.events=[];this.contacts=[];this.cooldowns=new Map();
     this.time=0;this.serial=0;this.stats={removed:0,backgroundRemoved:0,explosions:0,portals:0,enemyDamage:0};
     Matter.Events.on(this.engine,'collisionStart',event=>{
       for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
@@ -52,7 +52,7 @@ export class SiegeWorld {
     for(const e of this.enemies){
       if(e.dead||!e.alive)continue;const b=e.body,x=b.position.x,feet=b.bounds.max.y;
       const distance=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
-      const influenced=this.time<e.externalUntil||this.vortices.some(v=>Math.hypot(v.x-x,v.y-b.position.y)<v.radius*1.7);
+      const influenced=this.time<e.externalUntil;
       const ground=this.sample(x-10,feet+3)||this.sample(x+10,feet+3);
       const grounded=!!ground&&Math.abs(b.velocity.y)<.65&&Math.abs(b.velocity.x)<2.2&&!influenced;
       const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded);
@@ -178,11 +178,6 @@ export class SiegeWorld {
       if(e.type==='enemy')this.hurt(e,Math.max(0,180*(1-d/reach)));
     }
   }
-  attachHole(p,target,point){
-    const anchor=target?.type==='debris'?target:null;
-    const v={x:point.x,y:point.y,age:0,life:4.2,tick:0,radius:112,anchor,local:anchor?this.localPoint(anchor,point.x,point.y):null};
-    this.vortices.push(v);this.remove(p);this.events.push({type:'hole',x:v.x,y:v.y});
-  }
   processContact(pair){
     const a=pair.bodyA.parent,b=pair.bodyB.parent;if(a===b)return;
     const key=a.id<b.id?`${a.id}:${b.id}`:`${b.id}:${a.id}`;
@@ -203,7 +198,6 @@ export class SiegeWorld {
       const kind=ammo.ammo.id;
       if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
-      if(kind==='blackhole'){if(otherBody.plugin.terrain||other?.type==='debris')this.attachHole(ammo,other,point);return;}
       if(kind==='ender'&&ammo.uses===0&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
         const exit=findSafeExit((x,y)=>!!this.sample(x,y),ammo.body.position,velocity,ammo.ammo.size/2,64,this.s/2);
@@ -226,22 +220,8 @@ export class SiegeWorld {
     for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.grid.set(x,y,0);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
     this.stats.removed+=count;if(count)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});
   }
-  updateHoles(dt){
-    for(const v of this.vortices){
-      v.age+=dt;v.life-=dt;v.tick+=dt;
-      if(v.anchor&&!v.anchor.dead){const p=this.worldPoint(v.anchor,v.local.x,v.local.y);v.x=p.x;v.y=p.y;}
-      if(v.tick>=.1&&v.life>0){v.tick-=.1;this.damageDisk(v.x,v.y,Math.min(v.radius,20+v.age*28),100,{budget:64,background:true,backgroundBudget:32});}
-      for(const e of this.allMoving()){
-        const dx=v.x-e.body.position.x,dy=v.y-e.body.position.y,d=Math.hypot(dx,dy);if(d>v.radius*1.7)continue;
-        const acceleration=.0045*clamp(1-d/(v.radius*2),.2,1);
-        this.M.Sleeping.set(e.body,false);this.M.Body.applyForce(e.body,e.body.position,{x:dx/(d||1)*e.body.mass*acceleration,y:dy/(d||1)*e.body.mass*acceleration});
-        if(e.type==='enemy'&&d<26)this.hurt(e,250);
-      }
-    }
-    this.vortices=this.vortices.filter(v=>v.life>0);
-  }
   step(dt){
-    this.time+=dt;this.synchronize();this.updateHoles(dt);this.patrol(dt);
+    this.time+=dt;this.synchronize();this.patrol(dt);
     this.before=new Map();
     for(const e of this.allMoving()){
       const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y);
@@ -265,10 +245,10 @@ export class SiegeWorld {
     this.synchronize();
     if(this.cooldowns.size>1000)for(const [key,t] of this.cooldowns)if(this.time-t>1)this.cooldowns.delete(key);
   }
-  active(){return this.vortices.length>0||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
+  active(){return this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
-    debris:this.debris.length,blackholes:this.vortices.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,
+    debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,
     projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses})),
     particlesPending:this.events.length};}
 }

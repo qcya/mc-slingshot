@@ -1,41 +1,20 @@
-const {test,expect}=require('@playwright/test');
-const M=require('../vendor/matter.min.js');
-function aimAt(enemy,home){
- let best={angle:.44,error:Infinity};
- for(let angle=.16;angle<1.13;angle+=.02){
-  const engine=M.Engine.create({gravity:{x:0,y:1,scale:.001}}),b=M.Bodies.circle(home.x,home.y,12,{frictionAir:.0015});M.Composite.add(engine.world,b);
-  const dx=135*Math.cos(angle),dy=Math.min(103,135*Math.sin(angle));M.Body.setPosition(b,{x:home.x-dx,y:home.y+dy});
-  M.Body.setVelocity(b,{x:Math.min(1430,dx*10.8)/60,y:Math.max(-1200,-dy*10.8)/60});
-  for(let i=0;i<360;i++){
-   M.Engine.update(engine,1000/120);if(b.position.x>=enemy.x){const error=Math.abs(b.position.y-enemy.y);if(error<best.error)best={angle,error};break;}
-   if(b.position.y>1000)break;
-  }M.Composite.clear(engine.world,false);M.Engine.clear(engine);
- }return best;
-}
-test('实际鼠标高抛与黑洞攻击可以完成木屋、哨塔挑战',async({page})=>{
+﻿const {test,expect}=require('@playwright/test');const {ready,shot}=require('./browser-helpers.cjs');
+test('新存档锁关，实际圆石通关解锁TNT，第二关解锁珍珠并保存',async({page})=>{
  test.setTimeout(150000);await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
- const reports=[];
- const plans=require('../evidence/playability-search.json');
+ await expect(page.locator('#level-1')).toBeDisabled();await expect(page.locator('#level-2')).toBeDisabled();expect(await page.evaluate(()=>MCBlockLaunch.playLevel(4))).toBe(false);
+ await page.locator('#level-0').click();const reports=[],plans=require('../evidence/playability-search.json');
  for(const level of [0,1]){
-  await page.getByLabel('选择关卡',{exact:true}).selectOption(String(level));
-  const played=[];
-  for(let turn=0;turn<8;turn++){
-  if(await page.evaluate(()=>MCBlockLaunch.getStatus().enemiesAlive===0))break;
-  if(await page.evaluate(()=>MCBlockLaunch.getStatus().shots===0))break;
-  let shot=plans[level].history[turn];
-  if(!shot){const enemy=await page.evaluate(()=>MCBlockLaunch.getDiagnostics().enemies.find(e=>e.alive)),home=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),aim=aimAt(enemy,home);shot={kind:aim.error<65?'ender':'blackhole',angle:aim.angle};}
-  const angle=shot.angle,kind={cobble:1,tnt:2,ender:3,blackhole:4}[shot.kind];await page.keyboard.press(String(kind));
-  const b=await page.locator('#stage').boundingBox(),s=await page.evaluate(()=>MCBlockLaunch.getStatus()),p=s.launcher;
-  const x=b.x+p.x*b.width/1536,y=b.y+p.y*b.height/864;
-  await page.mouse.move(x,y);await page.mouse.down();
-  await page.mouse.move(x-135*Math.cos(angle)*b.width/1536,y+135*Math.sin(angle)*b.height/864,{steps:12});await page.mouse.up();
-  await page.waitForFunction(time=>MCBlockLaunch.getStatus().time>=time+6.4||MCBlockLaunch.getStatus().enemiesAlive===0,s.time,{timeout:11000});
-  played.push({...shot,after:await page.evaluate(()=>MCBlockLaunch.getDiagnostics())});
-  require('node:fs').writeFileSync(`evidence/browser-attempt-${level+1}.json`,JSON.stringify(played,null,2));
+  for(const move of plans[level].history){
+   if(await page.evaluate(()=>MCBlockLaunch.getStatus().ended))break;const before=await page.evaluate(()=>MCBlockLaunch.getStatus()),power=move.pull??1;
+   await shot(page,{cobble:1,tnt:2,ender:3}[move.kind],135*power*Math.cos(move.angle),135*power*Math.sin(move.angle));
+   await page.waitForFunction(t=>MCBlockLaunch.getStatus().time>=t+6.15||MCBlockLaunch.getStatus().ended,before.time,{timeout:11000});
   }
-  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().enemiesAlive),{timeout:12000}).toBe(0);
-  await expect(page.locator('#resultFlag')).toHaveText('挑战成功');
-  await page.screenshot({path:`evidence/level-${level+1}-victory.png`});reports.push({played,...await page.evaluate(()=>MCBlockLaunch.getDiagnostics())});
+  await expect(page.locator('#resultFlag')).toHaveText('挑战成功',{timeout:12000});
+  await expect(page.locator('#resultTitle')).toContainText(level===0?'TNT':'末影珍珠');
+  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().unlocked)).toBe(level+2);
+  await page.screenshot({path:`evidence/campaign-reward-${level+1}.png`});reports.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));
+  if(level===0){await page.locator('#nextBtn').click();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([4,1,0]);}
  }
+ await page.reload();await page.waitForFunction(()=>window.MCBlockLaunch);await expect(page.locator('#level-2')).toBeEnabled();await expect(page.locator('#level-3')).toBeDisabled();
  require('node:fs').writeFileSync('evidence/browser-victories.json',JSON.stringify(reports,null,2));
 });

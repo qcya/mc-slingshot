@@ -1,33 +1,31 @@
-// Quiet elastic creak driven by the pull gesture, stopped on release/cancel/blur.
+﻿// The original Minecraft crossbow loading sample, never synthesized noise.
 export class DrawAudio{
  constructor(){this.context=null;this.active=false;this.muted=false;this.starts=0;this.stops=0;this.lastMove=0;}
+ async load(url){const response=await fetch(url);this.data=await response.arrayBuffer();return this;}
  begin(){
-  if(this.muted||this.active)return;
-  this.context??=new AudioContext();const c=this.context;c.resume().catch(()=>{});
-  const buffer=c.createBuffer(1,c.sampleRate,c.sampleRate),data=buffer.getChannelData(0);
-  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*.65;
-  const noise=c.createBufferSource();noise.buffer=buffer;noise.loop=true;
-  const filter=c.createBiquadFilter();filter.type='bandpass';filter.frequency.value=550;filter.Q.value=1.4;
-  const gain=c.createGain();gain.gain.value=0;const tone=c.createOscillator(),toneGain=c.createGain();tone.type='triangle';tone.frequency.value=90;toneGain.gain.value=.2;
-  const analyser=c.createAnalyser();analyser.fftSize=256;
-  noise.connect(filter);filter.connect(gain);tone.connect(toneGain);toneGain.connect(gain);gain.connect(analyser);analyser.connect(c.destination);
-  noise.start();tone.start();this.graph={noise,filter,gain,tone,toneGain,analyser};this.active=true;this.starts++;this.lastMove=performance.now();
+  if(this.muted||this.active)return;this.context??=new AudioContext();const c=this.context;c.resume().catch(()=>{});
+  this.active=true;this.starts++;this.lastMove=performance.now();
+  const gain=c.createGain(),analyser=c.createAnalyser();gain.gain.value=.12;analyser.fftSize=256;gain.connect(analyser);analyser.connect(c.destination);
+  const graph={gain,analyser,source:null};this.graph=graph;
+  this.ready??=c.decodeAudioData(this.data.slice(0));this.ready.then(buffer=>{
+   if(!this.active||this.graph!==graph)return;const source=c.createBufferSource();source.buffer=buffer;source.loop=true;source.connect(gain);graph.source=source;source.start();
+  }).catch(()=>{this.failed=true;this.stop();});
  }
  update(power,speed){
-  if(this.muted)return;if(!this.active)this.begin();if(!this.graph)return;
-  const c=this.context,g=this.graph;this.lastMove=performance.now();
-  g.filter.frequency.setTargetAtTime(360+power*1050,c.currentTime,.035);g.tone.frequency.setTargetAtTime(75+power*105,c.currentTime,.06);
-  g.gain.gain.setTargetAtTime((.025+.065*Math.min(1,speed/10))*Math.sqrt(Math.max(.01,power)),c.currentTime,.025);
+  if(this.muted)return;if(!this.active)this.begin();if(!this.graph)return;this.lastMove=performance.now();
+  this.graph.gain.gain.setTargetAtTime(.10+.10*Math.min(1,speed/12),this.context.currentTime,.025);
+  if(this.graph.source)this.graph.source.playbackRate.setTargetAtTime(.9+power*.18,this.context.currentTime,.06);
  }
- tick(){if(this.active&&performance.now()-this.lastMove>130)this.graph.gain.gain.setTargetAtTime(0,this.context.currentTime,.06);}
+ tick(){if(this.active&&performance.now()-this.lastMove>160)this.graph.gain.gain.setTargetAtTime(0,this.context.currentTime,.05);}
  stop(){
   if(!this.active)return;const g=this.graph,c=this.context;this.active=false;this.stops++;this.graph=null;
-  g.gain.gain.setTargetAtTime(0,c.currentTime,.012);g.noise.stop(c.currentTime+.05);g.tone.stop(c.currentTime+.05);
-  g.noise.onended=()=>{for(const node of Object.values(g))node.disconnect();};
+  g.gain.gain.setTargetAtTime(0,c.currentTime,.012);
+  if(g.source){g.source.stop(c.currentTime+.05);g.source.onended=()=>{g.source.disconnect();g.gain.disconnect();g.analyser.disconnect();};}
+  else{g.gain.disconnect();g.analyser.disconnect();}
  }
  setMuted(value){this.muted=value;if(value)this.stop();}
  diagnostics(){
   let rms=0;if(this.graph){const values=new Float32Array(256);this.graph.analyser.getFloatTimeDomainData(values);rms=Math.sqrt(values.reduce((s,v)=>s+v*v,0)/values.length);}
-  return {active:this.active,starts:this.starts,stops:this.stops,state:this.context?.state||'unused',signalRms:rms};
+  return {active:this.active,starts:this.starts,stops:this.stops,state:this.context?.state||'unused',signalRms:rms,source:'minecraft:crossbow_loading',failed:!!this.failed};
  }
 }

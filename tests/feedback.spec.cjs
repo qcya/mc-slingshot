@@ -1,42 +1,18 @@
-const {test,expect}=require('@playwright/test');
-test('滚轮循环切换九格，首尾物品框对齐且空格不发射',async({page})=>{
- await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
- await page.locator('#stage').hover();await page.mouse.wheel(0,-120);
- await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().selectedSlot)).toBe(8);
- await page.screenshot({path:'evidence/hotbar-last-slot.png'});
- const rects=await page.locator('#ballbar').evaluate(bar=>{
-  const b=bar.getBoundingClientRect();return [...bar.children].map(e=>{const r=e.getBoundingClientRect();return {w:r.width,h:r.height,left:r.left-b.left,right:r.right-b.left,limit:b.width};});
- });
- expect(Math.abs(rects[0].w-rects[0].h)).toBeLessThan(.2);expect(rects[0].left).toBeGreaterThan(0);expect(rects[8].right).toBeLessThan(rects[8].limit);
- const shots=await page.evaluate(()=>MCBlockLaunch.getStatus().shots);
- await page.keyboard.press('9');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('empty');
- expect(await page.evaluate(()=>MCBlockLaunch.getStatus().shots)).toBe(shots);
- await page.keyboard.press('1');await page.screenshot({path:'evidence/hotbar-first-slot.png'});
+﻿const {test,expect}=require('@playwright/test');const {ready,aim}=require('./browser-helpers.cjs');
+test('独立堆叠库存、方块三面图标、物品栏自动隐藏及滚轮唤回',async({page})=>{
+ await ready(page,{level:1});expect(await page.locator('#ballbar button').count()).toBe(9);expect(await page.locator('.topbar,#ammo').count()).toBe(0);
+ expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([4,1,0]);expect(await page.locator('#ballbar .stack-count').nth(0).textContent()).toBe('4');
+ expect(await page.locator('#ballbar img').nth(0).evaluate(e=>e.naturalWidth)).toBe(64);
+ await page.screenshot({path:'evidence/hotbar-first-slot.png'});
+ await expect(page.locator('#inventory')).toHaveClass(/tucked/,{timeout:5000});await page.locator('#stage').hover({position:{x:500,y:100}});await page.mouse.wheel(0,-120);
+ await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().selectedSlot)).toBe(8);await expect(page.locator('#inventory')).not.toHaveClass(/tucked/);
+ await page.screenshot({path:'evidence/hotbar-last-slot.png'});const before=await page.evaluate(()=>MCBlockLaunch.getStatus().inventory);await aim(page,-50,20);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual(before);
 });
-test('左下蓄力不反向，九格物品栏、立体行走人物与静态云实际显示',async({page})=>{
- await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);
- const initial=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());
- expect(await page.locator('#ballbar button').count()).toBe(9);expect(await page.locator('.metrics,.foot,.brand').count()).toBe(0);
- const b=await page.locator('#stage').boundingBox(),p=initial.launcher;
- await page.mouse.move(b.x+p.x*b.width/1536,b.y+p.y*b.height/864);await page.mouse.down();
- await page.mouse.move(b.x+110*b.width/1536,b.y+660*b.height/864,{steps:12});
- const aimed=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher);
- expect(aimed.x).toBeLessThan(p.x);expect(aimed.y).toBeGreaterThan(p.y);
- await page.screenshot({path:'evidence/left-below-aim.png'});await page.mouse.up();
- await page.waitForTimeout(600);await page.getByRole('button',{name:'↻ 重开',exact:true}).click();
- const cloud=()=>page.evaluate(()=>Array.from(document.querySelector('#stage').getContext('2d').getImageData(400,30,400,90).data));
- const sky=await cloud();await page.waitForTimeout(1700);
- expect(await cloud()).toEqual(sky);
- const moved=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(moved.enemies.every(e=>e.walkDistance>2)).toBe(true);
- await page.screenshot({path:'evidence/gameplay-overview.png'});
- const fs=require('node:fs');fs.writeFileSync('evidence/feedback.json',JSON.stringify({initial,moved,aimed},null,2));
- // Render the exact production cuboid skin renderer at inspection scale.
- await page.evaluate(async()=>{
-  const {MobSprites}=await import('/src/mobs.mjs'),{Assets}=await import('/src/assets.mjs');const a=await new Assets().load(),sprites=new MobSprites(a);
-  const c=document.createElement('canvas');c.id='mobInspection';c.width=720;c.height=300;const x=c.getContext('2d');x.fillStyle='#80b6eb';x.fillRect(0,0,720,300);x.imageSmoothingEnabled=false;
-  for(const [i,skin] of ['zombie','pillager'].entries())for(const [j,dir] of [-1,1].entries()){
-   const im=sprites.frame(skin,.9,dir);x.drawImage(im,25+(i*2+j)*175,28,162,180);x.fillStyle='#fff';x.font='18px sans-serif';x.fillText(`${skin} ${dir===1?'→':'←'}`,25+(i*2+j)*175,245);
-  }c.style='position:fixed;inset:0;z-index:50;width:720px;height:300px';document.body.append(c);
- });
- await page.locator('#mobInspection').screenshot({path:'evidence/mob-models.png'});
+test('ESC 冻结物理且取消蓄力，云在游戏中移动，人物继续巡逻',async({page})=>{
+ await ready(page,{level:2});await aim(page,-80,50);await page.keyboard.press('Escape');await page.mouse.up();await expect(page.locator('#pauseMenu')).toBeVisible();
+ const time=await page.evaluate(()=>MCBlockLaunch.getStatus().time);await page.waitForTimeout(250);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().time)).toBe(time);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(0);
+ await page.keyboard.press('Escape');const cloud=()=>page.evaluate(()=>Array.from(document.querySelector('#stage').getContext('2d').getImageData(390,30,400,110).data));
+ const sky=await cloud();await page.waitForTimeout(1700);expect(await cloud()).not.toEqual(sky);
+ const d=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(d.enemies.some(e=>e.walkDistance>2)).toBe(true);await page.screenshot({path:'evidence/gameplay-overview.png'});
+ require('node:fs').writeFileSync('evidence/feedback.json',JSON.stringify(d,null,2));
 });
