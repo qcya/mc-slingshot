@@ -1,7 +1,7 @@
-/* MC Block Launch v0.2 · 16x16 destructible pixels + optional local Matter.js rigid-body engine. */
+/* MC Block Launch v0.3 · 16x16 destructible pixels + optional local Matter.js rigid-body engine. */
 'use strict';
 (() => {
-const CW=1280,CH=720,S=5,GW=CW/S,GH=CH/S,GROUND=121,GRAV=700,FIXED=1/120;
+const CW=1280,CH=720,S=5,GW=CW/S,GH=CH/S,GROUND=112,BLOCK=16,GRAV=700,FIXED=1/120;
 const canvas=document.querySelector('#stage'),ctx=canvas.getContext('2d',{alpha:false});ctx.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);const UI={level:$('#levelTitle'),desc:$('#levelDesc'),ammo:$('#ammo'),targets:$('#targets'),destroyed:$('#destroyed'),bar:$('#ballbar'),result:$('#result'),resultFlag:$('#resultFlag'),resultTitle:$('#resultTitle'),resultMsg:$('#resultMsg'),next:$('#nextBtn'),hint:$('#gamehint'),sound:$('#soundToggle'),pause:$('#pause')};
 const COL={sky:'#a4d3e3',mountain:'#91b9b4'};
@@ -20,15 +20,15 @@ const MATERIAL={
   11:{name:'深板岩',hard:68,density:4.2,palette:['#4d5661','#353e48','#626974','#707880','#444c59']}
 };
 const BALLS=[
-{id:'cobble',label:'圆石',short:'石',color:'#a5a5a5',mass:4,r:15,detail:'方块重击 · 破坏石木结构',sprite:'cobblestone'},
-{id:'tnt',label:'TNT',short:'T',color:'#e46053',mass:2,r:17,detail:'爆炸破片 · 范围破坏',sprite:'tnt_side'},
+{id:'cobble',label:'圆石',short:'石',color:'#a5a5a5',mass:4,r:34,detail:'方形碰撞 · 砸出像素缺口',sprite:'cobblestone'},
+{id:'tnt',label:'TNT',short:'T',color:'#e46053',mass:2,r:33,detail:'方块炸药 · 爆炸破坏',sprite:'tnt_side'},
 {id:'ender',label:'末影珍珠',short:'末',color:'#33ae9e',mass:1.1,r:13,detail:'可穿透不超过 16 格像素的墙',sprite:'ender_pearl'},
 {id:'blackhole',label:'黑洞',short:'●',color:'#6540aa',mass:1.5,r:16,detail:'附着表面 · 持续吸入周围的方块',sprite:null}
 ];
-const SPRITE_NAMES=['cobblestone','tnt_side','ender_pearl','oak_log','oak_planks','stone_bricks','stone','dirt','grass_block_side','grass_block_top','obsidian','glass','bedrock','pillager'];
+const SPRITE_NAMES=['cobblestone','tnt_side','ender_pearl','oak_log','oak_planks','stone_bricks','stone','dirt','grass_block_side','grass_block_top','obsidian','glass','bedrock','oak_leaves','iron_ore','deepslate','pillager'];
 const sprites={};const sampledColors={};
 function loadSprites(){return Promise.all(SPRITE_NAMES.map(n=>new Promise(resolve=>{const im=new Image();im.onload=()=>{sprites[n]=im;if(im.width===16&&im.height===16){try{const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);sampledColors[n]=x.getImageData(0,0,16,16).data;}catch(e){}}resolve();};im.onerror=resolve;im.src='assets/textures/'+n+'.png';}))).then(()=>{state.dirty=true;drawGridImage();});}
-const materialSprites={1:'grass_block_side',2:'dirt',3:'stone',4:'oak_log',5:'stone_bricks',6:'glass',7:'bedrock',9:'stone',10:'oak_planks',11:'stone'};
+const materialSprites={1:'grass_block_side',2:'dirt',3:'stone',4:'oak_log',5:'stone_bricks',6:'glass',7:'bedrock',8:'oak_leaves',9:'iron_ore',10:'oak_planks',11:'deepslate'};
 const LEVELS=[
 {title:'01 / 草地小屋',desc:'拆掉两名守卫藏身的木屋',kind:'hut',shots:7,mobs:2,seed:104},
 {title:'02 / 石头哨塔',desc:'打断承重柱，挑战高处的守卫',kind:'tower',shots:7,mobs:3,seed:203},
@@ -36,7 +36,7 @@ const LEVELS=[
 {title:'04 / 掠夺者前哨站',desc:'击倒悬空平台上的全部守卫',kind:'outpost',shots:8,mobs:4,seed:414},
 {title:'05 / 像素要塞',desc:'石砖、玻璃与高塔组成的最终试验场',kind:'castle',shots:9,mobs:5,seed:522}
 ];
-const state={grid:new Uint8Array(GW*GH),hp:new Float32Array(GW*GH),dynamic:[],particles:[],projectiles:[],vortices:[],enemies:[],level:0,shots:6,selected:0,removed:0,lastShot:-100,drag:false,dragX:0,dragY:0,dragStartX:0,dragStartY:0,paused:false,ended:false,t:0,seed:0,shake:0,effects:[],dirty:true};
+const state={grid:new Uint8Array(GW*GH),hp:new Float32Array(GW*GH),dynamic:[],particles:[],projectiles:[],vortices:[],enemies:[],level:0,shots:6,selected:0,removed:0,lastShot:-100,drag:false,dragX:0,dragY:0,dragStartX:0,dragStartY:0,paused:false,ended:false,t:0,seed:0,shake:0,effects:[],dirty:true,armKick:0};
 let soundOn=true,audioCtx=null,noiseBuffer=null;
 const sounds={};for(const n of ['dirt','grass','stone','deepslate','glass','wood_like']){const a=new Audio('assets/sfx/'+n+'.ogg');a.preload='auto';sounds[n]=a;}
 function audio(type='stone',volume=.23){if(!soundOn)return;try{let sound=sounds[type]||sounds.stone;const a=sound.cloneNode();a.volume=Math.min(.65,volume);a.play().catch(()=>{});}catch(_){}}
@@ -54,16 +54,60 @@ const key=materialSprites[m];const data=sampledColors[key];if(data){let t=((y&15
 if(m===1 && y%16<3)return ['#89d46b','#72c55a','#9adc7d'][h%3];if(m===4||m===10){if(y%16===0||y%16===15)return '#7b552e';if(x%16===0)return '#93693c';if(y%16%6===0)return '#b6894d';}if(m===5&&((y%16===0)||((y%16===8)&&(x%16<1))))return '#545a63';if(m===6&&((x+y)%16===0||x%16===0||y%16===0))return '#7aafba';if(m===9&&h%13<3)return '#dfc251';return p[h%p.length];}
 const terrainCanvas=document.createElement('canvas');terrainCanvas.width=GW;terrainCanvas.height=GH;const terrainCtx=terrainCanvas.getContext('2d');
 function drawGridImage(){const im=terrainCtx.createImageData(GW,GH),d=im.data;for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){let m=material(x,y);if(!m)continue;const c=textureColor(m,x,y);let rr=parseInt(c.slice(1,3),16),gg=parseInt(c.slice(3,5),16),bb=parseInt(c.slice(5,7),16);let k=(y*GW+x)*4;d[k]=rr;d[k+1]=gg;d[k+2]=bb;d[k+3]=255;}terrainCtx.putImageData(im,0,0);state.dirty=false;}
-function addGround(seed){const rnd=rng32(seed);for(let x=0;x<GW;x++){let surf=GROUND+Math.round(1.4*Math.sin(x/21)+1.0*Math.cos(x/34));for(let y=surf;y<GH;y++){let m=y===surf?1:y<surf+7?2:y>GH-4?7:(hash(x,y,seed)%23===0?9:(y>GH-12?11:3));put(x,y,m);}}}
-function addTree(x,top=79){rectangle(x,top+10,5,GROUND-top-9,4);for(let y=top;y<top+19;y++)for(let xx=x-11;xx<x+17;xx++){let e=((xx-(x+2))/15)**2+((y-(top+8))/12)**2;if(e<1&&hash(xx,y,state.seed)%12!==0)put(xx,y,8);}}
-function anchorColumn(x,y,w,m){rectangle(x,y,w,GROUND+4-y,m);}
-function addEnemy(x,y,kind='guard'){state.enemies.push({x:x*S,y:y*S-33,vx:0,vy:0,r:14,alive:true,dying:false,life:100,type:kind,rotation:0,hits:0});}
-function stageHut(x=141,roofY=71,m=4,roof=10){hollow(x,roofY,67,47,4,m,roof,10);rectangle(x-5,roofY-4,77,5,roof);rectangle(x+25,roofY+46,17,2,10);rectangle(x+8,roofY+16,13,14,6);rectangle(x+47,roofY+16,12,14,6);anchorColumn(x,roofY+43,4,m);anchorColumn(x+63,roofY+43,4,m);addEnemy(x+20,roofY+43);addEnemy(x+51,roofY+43);}
-function stageTower(x=176,y=45,m=5){rectangle(x+8,y+8,7,GROUND-y-8,m);rectangle(x+66,y+8,7,GROUND-y-8,m);rectangle(x,y+6,82,8,4);rectangle(x+8,y+39,65,5,10);rectangle(x+8,y+69,65,4,10);rectangle(x+8,y+10,7,13,m);rectangle(x+66,y+10,7,13,m);rectangle(x+9,y+8,60,4,10);anchorColumn(x+8,GROUND-4,7,m);anchorColumn(x+66,GROUND-4,7,m);for(let a=0;a<6;a++)rectangle(x+2+a*14,y+1,8,6,m);addEnemy(x+26,y+6);addEnemy(x+53,y+38);addEnemy(x+36,y+68);}
-function stageDouble(){hollow(125,83,57,36,4,4,10,10);hollow(185,67,57,52,4,5,10,10);rectangle(174,91,20,4,10);rectangle(119,80,70,4,10);rectangle(179,63,69,5,4);rectangle(137,95,13,11,6);rectangle(204,82,16,17,6);anchorColumn(125,115,4,4);anchorColumn(178,115,4,4);anchorColumn(185,115,4,5);anchorColumn(238,115,4,5);addEnemy(157,115);addEnemy(219,115);addEnemy(214,64);}
-function stageOutpost(){rectangle(166,51,8,GROUND-51,4);rectangle(234,51,8,GROUND-51,4);rectangle(160,42,88,11,10);rectangle(169,83,65,6,10);rectangle(169,103,65,6,10);rectangle(165,62,73,4,4);for(let i=0;i<5;i++)rectangle(162+18*i,37,11,7,4);anchorColumn(166,GROUND-3,8,4);anchorColumn(234,GROUND-3,8,4);addEnemy(181,42);addEnemy(216,42);addEnemy(194,83);addEnemy(218,103);}
-function stageCastle(){rectangle(124,75,11,GROUND-75,5);rectangle(229,75,11,GROUND-75,5);rectangle(132,81,102,9,5);rectangle(132,111,102,7,5);rectangle(154,65,11,48,5);rectangle(195,65,11,48,5);rectangle(117,70,31,8,5);rectangle(217,70,31,8,5);rectangle(147,60,68,9,10);for(let x of [119,137,155,173,191,209,227])rectangle(x,55,11,8,5);for(let x of [174,181,188])rectangle(x,91,5,20,6);anchorColumn(124,GROUND-4,11,5);anchorColumn(229,GROUND-4,11,5);addEnemy(131,70);addEnemy(232,70);addEnemy(164,60);addEnemy(204,60);addEnemy(182,111);}
-function initLevel(n){state.seed=LEVELS[n].seed;state.grid.fill(0);state.hp.fill(0);state.dynamic=[];state.particles=[];state.projectiles=[];state.vortices=[];state.enemies=[];resetPhysics();state.effects=[];state.t=0;state.shake=0;state.removed=0;state.shots=LEVELS[n].shots;state.level=n;state.ended=false;state.drag=false;state.lastShot=-100;state.paused=false;state.dirty=true;state.needRebuild=false;state.lastRebuild=0;noTargetsAt=0;const l=LEVELS[n];addGround(state.seed);if(l.kind==='hut')stageHut();if(l.kind==='tower')stageTower();if(l.kind==='double')stageDouble();if(l.kind==='outpost')stageOutpost();if(l.kind==='castle')stageCastle();if(n===0)addTree(252,82);if(n===1)addTree(116,92);if(n===2)addTree(245,88);if(n===3)addTree(253,87);if(n===4)addTree(250,83);UI.result.classList.add('hidden');UI.hint.textContent='向左后方拖动发射器上的方块，松手发射';updateHUD();drawGridImage();}
+// The map is composed EXCLUSIVELY of complete, aligned 16x16 Minecraft tiles.
+// Destruction operates on their constituent 16x16 logical pixels (5 screen px each).
+function tile(x,y,m){if(x%BLOCK||y%BLOCK)throw new Error(`Tile not aligned: ${x},${y}`);rectangle(x,y,BLOCK,BLOCK,m);}
+function tileRow(x0,x1,y,m){for(let x=x0;x<=x1;x+=BLOCK)tile(x,y,m);}
+function tileColumn(x,y0,y1,m){for(let y=y0;y<=y1;y+=BLOCK)tile(x,y,m);}
+function addGround(seed){
+ // No curves or non-block stair heights. Every material begins as an intact block.
+ for(let x=0;x<GW;x+=BLOCK){
+   tile(x,GROUND,1);
+   tile(x,GROUND+BLOCK,2);
+ }
+}
+function addTree(x,top=64){
+ x=Math.floor(x/BLOCK)*BLOCK;top=Math.floor(top/BLOCK)*BLOCK;
+ tileColumn(x,top+BLOCK,GROUND-BLOCK,4);
+ for(let y=top;y<=top+BLOCK;y+=BLOCK)
+  for(let xx=x-BLOCK;xx<=x+BLOCK;xx+=BLOCK)if(xx>=0&&xx<GW)tile(xx,y,8);
+ // Leave the log visible below the canopy.
+}
+function addEnemy(x,y,kind='pillager'){state.enemies.push({x:x*S,y:y*S-33,vx:0,vy:0,r:14,alive:true,dying:false,life:100,type:kind,rotation:0,hits:0});}
+function stageHut(){
+ const x=144;tileRow(x,x+64,64,10); // five intact plank blocks form a flat roof
+ for(const a of [x,x+64]){tile(a,80,4);tile(a,96,4);}
+ tile(x,96,6);tile(x+64,96,6); // Minecraft glass windows, full tiles
+ addEnemy(x+32,GROUND);addEnemy(x+48,GROUND);
+}
+function stageTower(){
+ const x=176;tileRow(x,x+64,32,5);
+ for(const a of [x,x+64])tileColumn(a,48,96,5);
+ tileRow(x+16,x+48,80,10); // inner suspended floor
+ addEnemy(x+32,32);addEnemy(x+48,80);addEnemy(x+32,GROUND);
+}
+function stageDouble(){
+ tileRow(112,160,64,10);tileColumn(112,80,96,4);tileColumn(160,80,96,4);
+ tileRow(192,240,48,5);tileColumn(192,64,96,5);tileColumn(240,64,96,5);
+ tile(176,80,10); // single block bridge
+ tile(112,96,6);tile(240,80,6);
+ addEnemy(144,GROUND);addEnemy(224,GROUND);addEnemy(208,48);
+}
+function stageOutpost(){
+ tileRow(160,240,32,10);
+ tileColumn(160,48,96,4);tileColumn(240,48,96,4);
+ tileRow(176,224,64,10);tileRow(176,224,96,10);
+ tile(160,64,4);tile(240,64,4);
+ addEnemy(192,32);addEnemy(224,32);addEnemy(192,64);addEnemy(224,96);
+}
+function stageCastle(){
+ tileColumn(128,48,96,5);tileColumn(240,48,96,5);
+ tileRow(144,224,48,5);tileRow(144,224,96,5);
+ tile(160,80,5);tile(208,80,5);tile(192,80,6);
+ tileRow(128,160,32,5);tileRow(208,240,32,5);
+ addEnemy(144,32);addEnemy(224,32);addEnemy(176,48);addEnemy(208,48);addEnemy(176,96);
+}
+function initLevel(n){state.seed=LEVELS[n].seed;state.grid.fill(0);state.hp.fill(0);state.dynamic=[];state.particles=[];state.projectiles=[];state.vortices=[];state.enemies=[];resetPhysics();state.effects=[];state.t=0;state.shake=0;state.removed=0;state.shots=LEVELS[n].shots;state.level=n;state.ended=false;state.drag=false;state.lastShot=-100;state.armKick=0;state.paused=false;state.dirty=true;state.needRebuild=false;state.lastRebuild=0;noTargetsAt=0;const l=LEVELS[n];addGround(state.seed);if(l.kind==='hut')stageHut();if(l.kind==='tower')stageTower();if(l.kind==='double')stageDouble();if(l.kind==='outpost')stageOutpost();if(l.kind==='castle')stageCastle();if(n===0)addTree(240,64);if(n===1)addTree(112,64);if(n===2)addTree(240,64);if(n===3)addTree(240,64);if(n===4)addTree(0,64);UI.result.classList.add('hidden');UI.hint.textContent='拖动投石车上方的弹药向左拉，松手发射';updateHUD();drawGridImage();}
 function updateHUD(){const l=LEVELS[state.level];UI.level.textContent=l.title;UI.desc.textContent=l.desc;UI.ammo.textContent=state.shots;UI.targets.textContent=state.enemies.filter(e=>e.alive).length;UI.destroyed.textContent=state.removed.toLocaleString();Array.from(UI.bar.children).forEach((b,i)=>b.classList.toggle('selected',i===state.selected));UI.pause.textContent=state.paused?'▶ 继续':'Ⅱ 暂停';}
 function spawnFragments(x,y,m,count=1,force=1){if(state.particles.length>900)return;let c=textureColor(m,Math.floor(x/S),Math.floor(y/S));for(let i=0;i<count;i++){let a=Math.random()*Math.PI*2,s=(45+Math.random()*100)*force;state.particles.push({x:x+Math.random()*S,y:y+Math.random()*S,vx:Math.cos(a)*s,vy:Math.sin(a)*s-45,color:c,size:2+Math.random()*3,life:1.1+Math.random()*1.1,total:2.2});}}
 function deletePixel(x,y,impulse=1){if(!inside(x,y))return;let k=idx(x,y),m=state.grid[k];if(!m||m===7)return;state.grid[k]=0;state.hp[k]=0;state.dirty=true;state.removed++;if(Math.random()<.22)spawnFragments((x+.3)*S,(y+.3)*S,m,1,impulse);}
@@ -103,8 +147,44 @@ function explosion(x,y,r=75,power=90){state.effects.push({x,y,r,life:.35});state
 for(const b of state.dynamic){let d=Math.hypot(b.x-x,b.y-y);if(d<r+Math.max(b.w,b.h)*S/2){b.vx+=(b.x-x)/(d||1)*230;b.vy-=140;b.omega+=(b.x>x?1:-1)*.9;if(b.mb)Matter2D.Body.applyForce(b.mb,b.mb.position,{x:(b.x-x)*.00008,y:-.006});}}
 for(let i=0;i<140;i++){let a=Math.random()*Math.PI*2,s=Math.random()*280+45;state.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-80,color:['#ffcf75','#f6a85b','#86828d','#f8e4ab'][i%4],size:2+Math.random()*6,life:.3+Math.random()*1.1,total:1});}boomSound();}
 function hurtEnemy(e,energy,reason){if(!e.alive)return;if(energy<35)return;e.life-=energy;state.effects.push({x:e.x,y:e.y-15,r:13,life:.2,flash:true});if(e.life<=0){e.alive=false;e.dying=true;e.vy=-90;e.vx+=40*(Math.random()-.5);audio('glass',.3);for(let i=0;i<22;i++)spawnFragments(e.x,e.y,8,1,1.2);updateHUD();}}
-function solidNear(px,py,r){if(px-r<0||px+r>=CW||py-r<0||py+r>=CH)return {hit:true,nx:px-r<0?1:px+r>=CW?-1:0,ny:py-r<0?1:py+r>=CH?-1:0,m:3};let dx=0,dy=0,found=0,which=0;for(let i=0;i<20;i++){let a=i*Math.PI*2/20,tx=px+Math.cos(a)*r,ty=py+Math.sin(a)*r,m=cellAt(tx,ty);if(m){dx-=Math.cos(a);dy-=Math.sin(a);which=m;found++;}}if(!found&&cellAt(px,py)){dy=-1;which=cellAt(px,py);found=1;}const len=Math.hypot(dx,dy)||1;return {hit:found>0,nx:dx/len,ny:dy/len,m:which};}
-function hitBodyAt(b,px,py,r){let dx=px-b.x,dy=py-b.y;if(Math.abs(dx)>b.w*S*.75+r+20||Math.abs(dy)>b.h*S*.75+r+20)return false;const cs=Math.cos(b.rot),sn=Math.sin(b.rot);for(let a=0;a<12;a++){let theta=a*Math.PI/6,wx=px+Math.cos(theta)*r,wy=py+Math.sin(theta)*r,xx=((wx-b.x)*cs+(wy-b.y)*sn)/S+b.w/2,yy=(-(wx-b.x)*sn+(wy-b.y)*cs)/S+b.h/2,ix=Math.floor(xx),iy=Math.floor(yy);if(ix>=0&&iy>=0&&ix<b.w&&iy<b.h&&b.mask[iy*b.w+ix])return true;}return false;}
+function squareNear(px,py,half,prevX=px,prevY=py){
+ // An axis-aligned square is scanned against actual surviving material pixels.
+ // This is not a circular perimeter sample: terrain holes remain physically open.
+ if(px-half<0||px+half>=CW||py-half<0||py+half>=CH)
+  return {hit:true,nx:px-half<0?1:px+half>=CW?-1:0,ny:py-half<0?1:py+half>=CH?-1:0,m:3};
+ const x0=Math.max(0,Math.floor((px-half)/S)),x1=Math.min(GW-1,Math.floor((px+half)/S));
+ const y0=Math.max(0,Math.floor((py-half)/S)),y1=Math.min(GH-1,Math.floor((py+half)/S));
+ let best=null;
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+  let m=material(x,y);if(!m)continue;
+  const left=x*S,right=left+S,top=y*S,bottom=top+S;
+  const overlapX=Math.min(px+half,right)-Math.max(px-half,left);
+  const overlapY=Math.min(py+half,bottom)-Math.max(py-half,top);
+  if(overlapX<=0||overlapY<=0)continue;
+  let nx=0,ny=0,depth=0;
+  if(prevY+half<=top+0.01){ny=-1;depth=overlapY;}
+  else if(prevY-half>=bottom-0.01){ny=1;depth=overlapY;}
+  else if(prevX+half<=left+0.01){nx=-1;depth=overlapX;}
+  else if(prevX-half>=right-0.01){nx=1;depth=overlapX;}
+  else if(overlapX<overlapY){nx=px<(left+right)/2?-1:1;depth=overlapX;}
+  else {ny=py<(top+bottom)/2?-1:1;depth=overlapY;}
+  // Prioritize contact nearest the leading face, not an arbitrary corner.
+  const score=depth+((nx!==0&&Math.abs(px-prevX)<.01)||(ny!==0&&Math.abs(py-prevY)<.01)?2:0);
+  if(!best||score<best.score)best={hit:true,nx,ny,m,score};
+ }
+ return best||{hit:false,nx:0,ny:0,m:0};
+}
+function hitBodyAt(b,px,py,half){
+ const cs=Math.cos(b.rot),sn=Math.sin(b.rot),ex=half*(Math.abs(cs)+Math.abs(sn));
+ if(Math.abs(px-b.x)>b.w*S/2+ex||Math.abs(py-b.y)>b.h*S/2+ex)return false;
+ // Square collision proxy on the rotated pixel mask of a fallen building.
+ for(let oy=-half;oy<=half;oy+=Math.max(4,S))for(let ox=-half;ox<=half;ox+=Math.max(4,S)){
+  const wx=px+ox,wy=py+oy,dx=wx-b.x,dy=wy-b.y;
+  const ix=Math.floor((dx*cs+dy*sn)/S+b.w/2),iy=Math.floor((-dx*sn+dy*cs)/S+b.h/2);
+  if(ix>=0&&iy>=0&&ix<b.w&&iy<b.h&&b.mask[iy*b.w+ix])return true;
+ }
+ return false;
+}
 function playHitSound(m,power){if(m===6)audio('glass',.25);else if(m===4||m===10)audio('wood_like',.21);else if(m===1||m===2||m===8)audio('dirt',.20);else if(m===5||m===11)audio('deepslate',.22);else audio('stone',.2);}
 function applyImpact(p,hit,body=null){const speed=Math.hypot(p.vx,p.vy),id=p.kind.id,energy=speed*Math.sqrt(p.kind.mass);if(state.t-p.lastImpact<.04&&id!=='drill')return;
 p.lastImpact=state.t; if(id==='tnt'){explosion(p.x,p.y,87,142);p.dead=true;return;}
@@ -119,16 +199,65 @@ if(passed>0&&d-passed>=15){exit=xx;break;}}
 if(exit!==null&&passed<=limit){state.effects.push({x:p.x,y:p.y,r:30,life:.3,portal:true});p.x=exit+dir*16;p.vx*=.91;p.uses++;state.effects.push({x:p.x,y:p.y,r:35,life:.3,portal:true});audio('glass',.22);return;}
 }
 if(id==='blackhole'){p.dead=true;state.vortices.push({x:p.x,y:p.y,age:0,life:3.2,r:107});audio('deepslate',.34);return;}
-const intensity=id==='cobble'?2.45:1.0;const radius=id==='cobble'?20:15;const power=Math.min(130,Math.max(14,energy*.14*intensity));if(body){damageBody(body,p.x,p.y,radius,power,false);body.vx+=p.vx*Math.min(.16,12/body.mass);body.vy+=p.vy*Math.min(.16,12/body.mass);body.omega+=(p.x-body.x)*.003/(1+body.mass*.03);}else{damageRegion(p.x,p.y,radius,power,false);}
+const intensity=id==='cobble'?2.45:1.0;const radius=id==='cobble'?27:15;const power=Math.min(130,Math.max(14,energy*.14*intensity));if(body){damageBody(body,p.x,p.y,radius,power,false);body.vx+=p.vx*Math.min(.16,12/body.mass);body.vy+=p.vy*Math.min(.16,12/body.mass);body.omega+=(p.x-body.x)*.003/(1+body.mass*.03);}else{damageRegion(p.x,p.y,radius,power,false);}
 state.shake=Math.max(state.shake,id==='cobble'?5:2);playHitSound(hit.m,power);
-const dot=p.vx*hit.nx+p.vy*hit.ny;if(dot<0){const rest=id==='cobble'?.22:.36;p.vx-=(1+rest)*dot*hit.nx;p.vy-=(1+rest)*dot*hit.ny;}else{p.vx*=.54;p.vy=-Math.abs(p.vy)*.38;}p.vx*=.91;p.y+=hit.ny*3;p.x+=hit.nx*3;
+const dot=p.vx*hit.nx+p.vy*hit.ny;
+ if(dot<0){
+  const rest=id==='cobble'?.16:.24;
+  p.vx-=(1+rest)*dot*hit.nx;
+  p.vy-=(1+rest)*dot*hit.ny;
+ }
+ p.vx*=hit.ny<-.5?.67:.79;
+ // Cubes stop when supported, rather than jittering, rotating or sinking forever.
+ if(hit.ny<-.5&&Math.abs(p.vy)<55&&Math.abs(p.vx)<85){
+  p.resting=true;p.vx=0;p.vy=0;p.spin=0;p.rot=Math.round(p.rot/(Math.PI/2))*(Math.PI/2);
+ } else {
+  p.spin*=.75;
+  p.x+=hit.nx*1.2;p.y+=hit.ny*1.2;
+ }
+
 }
-function updateProjectiles(dt){for(const p of state.projectiles){if(p.dead)continue;p.age+=dt;if(p.age>19||p.y>CH+110||p.x>CW+110||p.x<-80){p.dead=true;continue;}p.vy+=GRAV*dt;let steps=Math.min(12,Math.max(1,Math.ceil(Math.hypot(p.vx,p.vy)*dt/3)));for(let j=0;j<steps&&!p.dead;j++){let prevX=p.x,prevY=p.y;p.x+=p.vx*dt/steps;p.y+=p.vy*dt/steps;
-for(const e of state.enemies){if(!e.alive)continue;let d=Math.hypot(p.x-e.x,p.y-(e.y-10));if(d<p.r+e.r){let energy=p.kind.mass*Math.hypot(p.vx-e.vx,p.vy-e.vy)*.27;hurtEnemy(e,energy,'弹丸');e.vx+=p.vx*.12;e.vy+=p.vy*.07;p.vx*=-.35;p.vy*=-.3;break;}}
-let collision=solidNear(p.x,p.y,p.r);let body=state.dynamic.find(b=>hitBodyAt(b,p.x,p.y,p.r));if(body&&!collision.hit)collision={hit:true,nx:(p.x-body.x)/(Math.hypot(p.x-body.x,p.y-body.y)||1),ny:(p.y-body.y)/(Math.hypot(p.x-body.x,p.y-body.y)||1),m:5};
-if(collision.hit){{p.x=prevX;p.y=prevY;}applyImpact(p,collision,body);if(p.kind.id==='tnt'||p.kind.id==='blackhole')break;}
+function updateProjectiles(dt){
+for(const p of state.projectiles){
+ if(p.dead)continue;p.age+=dt;
+ if(p.age>18||p.y>CH+110||p.x>CW+110||p.x<-80){p.dead=true;continue;}
+ if(p.resting){
+  // An excavated surface can vanish under a resting cube; then it falls again.
+  const footY=p.y+p.r+2;
+  const hasSupport=[-.7,0,.7].some(f=>cellAt(p.x+p.r*f,footY)!==0);
+  if(!hasSupport){p.resting=false;p.vy=15;}else continue;
+ }
+ p.vy+=GRAV*dt;
+ let steps=Math.min(15,Math.max(1,Math.ceil(Math.hypot(p.vx,p.vy)*dt/3)));
+ for(let j=0;j<steps&&!p.dead;j++){
+  let prevX=p.x,prevY=p.y;
+  p.x+=p.vx*dt/steps;p.y+=p.vy*dt/steps;
+  for(const e of state.enemies){
+   if(!e.alive)continue;
+   if(Math.abs(p.x-e.x)<p.r+e.r&&Math.abs(p.y-(e.y-10))<p.r+25){
+    const energy=p.kind.mass*Math.hypot(p.vx-e.vx,p.vy-e.vy)*.27;
+    hurtEnemy(e,energy,'弹药');e.vx+=p.vx*.12;e.vy+=p.vy*.07;
+    p.vx*=-.25;p.vy*=-.2;break;
+   }
+  }
+  let collision=squareNear(p.x,p.y,p.r,prevX,prevY);
+  let body=state.dynamic.find(b=>hitBodyAt(b,p.x,p.y,p.r));
+  if(body&&!collision.hit){
+   let dx=p.x-body.x,dy=p.y-body.y;
+   collision={hit:true,nx:Math.abs(dx)>Math.abs(dy)?Math.sign(dx):0,ny:Math.abs(dx)>Math.abs(dy)?0:Math.sign(dy),m:5};
+  }
+  if(collision.hit){
+   p.x=prevX;p.y=prevY;
+   applyImpact(p,collision,body);
+   if(p.kind.id==='tnt'||p.kind.id==='blackhole'||p.resting)break;
+  }else{
+   p.rot+=p.spin*dt/steps;
+   p.spin*=.999;
+  }
+ }
 }
-}state.projectiles=state.projectiles.filter(p=>!p.dead);}
+state.projectiles=state.projectiles.filter(p=>!p.dead);
+}
 function supportPixel(px,py){for(let dx=-9;dx<=9;dx+=5)if(cellAt(px+dx,py+5))return true;return false;}
 function updateEnemies(dt){for(const e of state.enemies){if(e.y>CH+80) {if(e.alive){e.alive=false;updateHUD();}continue;}if(!e.alive){e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}const supported=supportPixel(e.x,e.y+32);if(!supported){e.vy+=GRAV*dt;let lastVy=e.vy;e.x+=e.vx*dt;e.y+=e.vy*dt;if(supportPixel(e.x,e.y+32)&&lastVy>0){e.y=Math.floor((e.y+34)/S)*S-34;e.vy=0;if(lastVy>200)hurtEnemy(e,(lastVy-150)*.48,'坠落');}}else{e.vy=0;e.vx*=.8;}
 for(const b of state.dynamic){if(b.count===0)continue;let reach=(Math.max(b.w,b.h)*S/2)+20;if(Math.hypot(b.x-e.x,b.y-e.y)<reach){if(hitBodyAt(b,e.x,e.y,e.r)){let rel=Math.hypot(b.vx-e.vx,b.vy-e.vy);if(rel>65)hurtEnemy(e,(rel-55)*Math.sqrt(b.mass)*.13,'残骸');e.vx+=b.vx*.1;e.vy+=b.vy*.1;}}}}
@@ -152,18 +281,23 @@ if(v.age>.12&&Math.floor(v.age*7)!==Math.floor((v.age-dt)*7))audio('deepslate',.
 function updateParticles(dt){for(const p of state.particles){p.life-=dt;p.vy+=370*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.995;if(cellAt(p.x,p.y+3)&&p.vy>0){p.y-=Math.min(3,p.vy*dt);p.vy*=-.16;p.vx*=.65;}}state.particles=state.particles.filter(p=>p.life>0&&p.y<CH+10).slice(-900);for(const e of state.effects)e.life-=dt;state.effects=state.effects.filter(e=>e.life>0);}
 let noTargetsAt=0;
 function finishWin(won){state.ended=true;UI.result.classList.remove('hidden');UI.resultFlag.textContent=won?'任务完成':'任务失败';UI.resultTitle.textContent=won?'所有守卫已被击败':'弹药耗尽';UI.resultMsg.textContent=won?`本关击毁 ${state.removed.toLocaleString()} 个纹理像素。建筑还能继续塌一会儿。`:'调整发射角度，或者换一种弹药试试。';UI.next.textContent=state.level===LEVELS.length-1?'从头开始 ↻':'下一关 →';}
-function update(dt){if(state.paused)return;state.t+=dt;if(!state.ended)updateProjectiles(dt);updateVortices(dt);updateBodies(dt);updateEnemies(dt);updateParticles(dt);state.shake*=.88;if(state.needRebuild&&state.t-(state.lastRebuild||0)>.08){componentDetach();state.lastRebuild=state.t;}
+function update(dt){if(state.paused)return;state.t+=dt;state.armKick=Math.max(0,(state.armKick||0)-dt);if(!state.ended)updateProjectiles(dt);updateVortices(dt);updateBodies(dt);updateEnemies(dt);updateParticles(dt);state.shake*=.88;if(state.needRebuild&&state.t-(state.lastRebuild||0)>.08){componentDetach();state.lastRebuild=state.t;}
 if(!state.ended){if(state.enemies.every(e=>!e.alive)){noTargetsAt+=dt;if(noTargetsAt>2.4)finishWin(true);}else noTargetsAt=0;}
 if(state.shots===0&&state.projectiles.length===0&&state.t-state.lastShot>4&&!state.ended)finishWin(false);
 if(state.dirty&&Math.floor(state.t*30)%2===0)drawGridImage();if(Math.floor(state.t*10)%5===0)updateHUD();}
-function drawBackdrop(){let g=ctx.createLinearGradient(0,0,0,CH);g.addColorStop(0,'#b2dce8');g.addColorStop(.7,'#d7e7de');g.addColorStop(1,'#e3e5ce');ctx.fillStyle=g;ctx.fillRect(0,0,CW,CH);
-// Quiet, intentionally pixelated distant scenery.
-ctx.fillStyle='#dfeceb';for(let i=0;i<11;i++){let x=(i*203+87)%CW,y=90+(i*73)%175;ctx.fillRect(x,y,95,16);ctx.fillRect(x+20,y-13,48,14);ctx.fillRect(x+14,y+15,65,8);}
-ctx.fillStyle='#a5c6bd';ctx.beginPath();ctx.moveTo(0,540);for(let x=0;x<=CW;x+=30)ctx.lineTo(x,518+31*Math.sin(x*.012)+14*Math.cos(x*.03));ctx.lineTo(CW,CH);ctx.lineTo(0,CH);ctx.fill();ctx.fillStyle='#8cb7a5';ctx.beginPath();ctx.moveTo(0,567);for(let x=0;x<=CW;x+=24)ctx.lineTo(x,560+13*Math.sin(x*.017));ctx.lineTo(CW,CH);ctx.lineTo(0,CH);ctx.fill();}
+function drawBackdrop(){
+ ctx.fillStyle='#8fc5ef';ctx.fillRect(0,0,CW,CH);
+ // Rectangular Minecraft clouds. No smooth mountain slopes or curves.
+ ctx.fillStyle='#edf7ff';
+ for(const [x,y] of [[165,105],[495,75],[810,146],[1070,90]]){
+  ctx.fillRect(x,y,154,25);ctx.fillRect(x+31,y-20,83,20);
+ }
+ // The world background is deliberately empty; playable structures use tile sprites.
+}
 function drawObjects(){// Draw separated rigid pieces with nearest-neighbor pixel rendering and true rotations.
 for(const b of state.dynamic){if(!b.count)continue;ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.rot);ctx.imageSmoothingEnabled=false;ctx.drawImage(b.pic,-b.w*S/2,-b.h*S/2,b.w*S,b.h*S);ctx.restore();}
 for(const e of state.enemies){if(e.y>CH+50)continue;ctx.save();ctx.translate(e.x,e.y);if(!e.alive)ctx.rotate(.5);drawEnemy(e);ctx.restore();}
-for(const p of state.projectiles){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.age*2.2);drawBall(0,0,p.kind,p.r);ctx.restore();}
+for(const p of state.projectiles){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot||0);drawBall(0,0,p.kind,p.r);ctx.restore();}
 for(const p of state.particles){ctx.globalAlpha=Math.min(1,p.life/.7);ctx.fillStyle=p.color;ctx.fillRect(Math.floor(p.x),Math.floor(p.y),p.size,p.size);}ctx.globalAlpha=1;
 for(const v of state.vortices){ctx.save();let a=Math.min(1,v.life/.45);ctx.globalAlpha=a*.65;ctx.strokeStyle='#5f31c4';ctx.lineWidth=8;ctx.beginPath();ctx.arc(v.x,v.y,Math.min(v.r,15+v.age*37),state.t*1.2,state.t*1.2+Math.PI*1.65);ctx.stroke();ctx.globalAlpha=a;ctx.fillStyle='#090710';ctx.beginPath();ctx.arc(v.x,v.y,12+Math.sin(state.t*8)*3,0,Math.PI*2);ctx.fill();ctx.restore();}
 for(const e of state.effects){ctx.save();ctx.globalAlpha=Math.min(.8,e.life*2);ctx.strokeStyle=e.portal?'#70f6f3':e.flash?'#fff1c0':'#ffb76a';ctx.lineWidth=e.portal?4:3;let t=1-e.life/(e.portal?.3:e.flash?.2:.35);ctx.beginPath();ctx.arc(e.x,e.y,Math.max(1,e.r*t),0,Math.PI*2);ctx.stroke();ctx.restore();}}
@@ -173,11 +307,53 @@ rect(-3,-8,6,6,'#a4a6a6');rect(-3,-5,6,2,'#9da3a2');rect(-2,-5,1,1,'#346954');re
 // crossbow
 rect(2,0,6,1,'#402d23');rect(5,-2,1,5,'#8c6a45');rect(5,2,3,1,'#b6b6b2');ctx.globalAlpha=1;}
 function drawBall(x,y,ball,r=14){if(ball.id==='blackhole'){ctx.fillStyle='#1c1729';ctx.beginPath();ctx.arc(x,y,r+5+Math.sin(state.t*8)*2,0,6.283);ctx.fill();ctx.strokeStyle='#9465dc';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r+2,0,6.283);ctx.stroke();ctx.fillStyle='#07080b';ctx.beginPath();ctx.arc(x,y,r-3,0,6.283);ctx.fill();return;}
-const im=sprites[ball.sprite];const d=ball.id==='ender'?r*2.5:r*2.25;
-if(im){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,-d/2,-d/2,d,d);}
-else{ctx.fillStyle=ball.color;ctx.fillRect(-r,-r,2*r,2*r);ctx.fillStyle='#ffffff88';ctx.fillRect(-r,-r,2*r,3);}}
-const CANNON_X=148,CANNON_Y=453;
-function drawLauncher(){ctx.save();ctx.translate(CANNON_X,CANNON_Y);ctx.fillStyle='#684f3d';ctx.fillRect(-23,29,49,15);ctx.fillStyle='#80624c';ctx.fillRect(-11,-15,14,56);ctx.fillRect(7,-17,13,48);ctx.fillStyle='#423428';ctx.fillRect(-5,25,18,8);ctx.strokeStyle='#3c3030';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-4,-12);ctx.lineTo(5,8);ctx.lineTo(15,-15);ctx.stroke();ctx.restore();if(state.shots>0&&!state.ended){let bx=state.drag?state.dragX:CANNON_X,by=state.drag?state.dragY:CANNON_Y-13;drawBall(bx,by,BALLS[state.selected],BALLS[state.selected].r);if(state.drag){ctx.strokeStyle='#314b5baa';ctx.lineWidth=3;ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(CANNON_X,CANNON_Y-13);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([]);const vx=(CANNON_X-bx)*6.9,vy=(CANNON_Y-13-by)*6.9;ctx.fillStyle='#f8f4e2aa';for(let t=.18;t<1.6;t+=.15){let xx=CANNON_X+vx*t,yy=CANNON_Y-13+vy*t+GRAV*t*t/2;if(xx>1280||yy>720)break;ctx.fillRect(xx,yy,5,5);}}}}
+const im=sprites[ball.sprite];const d=ball.id==='ender'?r*2:r*2;
+if(im){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x-d/2,y-d/2,d,d);}
+else{ctx.fillStyle=ball.color;ctx.fillRect(x-r,y-r,2*r,2*r);ctx.fillStyle='#ffffff88';ctx.fillRect(x-r,y-r,2*r,3);}}
+const CANNON_X=195,CANNON_Y=461;
+function drawLauncher(){
+ // Functional catapult silhouette: two wheels, frame, triangular braces, axle,
+ // counterweight and a lever holding the current launchable Minecraft item.
+ const pivotX=158,pivotY=511,loadedX=CANNON_X,loadedY=CANNON_Y-13;
+ ctx.save();
+ const wooden='#86613c',dark='#3c3026',trim='#b88b53';
+ // Wheels touch the exactly flat grass-block ground.
+ for(const cx of [112,209]){
+  ctx.fillStyle=dark;ctx.fillRect(cx-20,524,40,37);
+  ctx.fillStyle='#634b30';ctx.fillRect(cx-15,529,30,26);
+  ctx.fillStyle='#b89a71';ctx.fillRect(cx-9,534,18,16);
+  ctx.fillStyle=dark;ctx.fillRect(cx-3,540,6,6);
+ }
+ ctx.fillStyle=wooden;ctx.fillRect(90,515,144,15);
+ ctx.fillStyle=trim;ctx.fillRect(97,512,129,5);
+ ctx.strokeStyle=dark;ctx.lineWidth=14;ctx.lineCap='square';
+ ctx.beginPath();ctx.moveTo(110,519);ctx.lineTo(pivotX,pivotY-9);ctx.lineTo(214,519);ctx.stroke();
+ ctx.strokeStyle=wooden;ctx.lineWidth=9;
+ ctx.beginPath();ctx.moveTo(109,519);ctx.lineTo(pivotX,pivotY-9);ctx.lineTo(210,519);ctx.stroke();
+ // The lever follows the dragged sling; after firing it swings and returns.
+ let tipX=loadedX,tipY=loadedY;
+ if(state.drag){tipX=state.dragX;tipY=state.dragY;}
+ else if(state.armKick>0){const phase=1-state.armKick/.38,ang=-.98+Math.sin(Math.max(0,phase)*Math.PI)*1.05;tipX=pivotX+66*Math.cos(ang);tipY=pivotY+66*Math.sin(ang);}
+ const dx=tipX-pivotX,dy=tipY-pivotY,L=Math.max(1,Math.hypot(dx,dy));
+ ctx.lineWidth=13;ctx.strokeStyle=dark;ctx.beginPath();ctx.moveTo(pivotX-dx*.36,pivotY-dy*.36);ctx.lineTo(tipX,tipY);ctx.stroke();
+ ctx.lineWidth=8;ctx.strokeStyle=trim;ctx.beginPath();ctx.moveTo(pivotX-dx*.36,pivotY-dy*.36);ctx.lineTo(tipX,tipY);ctx.stroke();
+ ctx.fillStyle='#514334';ctx.fillRect(pivotX-dx*.36-15,pivotY-dy*.36-12,30,25); // counterweight
+ ctx.fillStyle='#b59a72';ctx.fillRect(pivotX-9,pivotY-9,18,18);ctx.fillStyle=dark;ctx.fillRect(pivotX-4,pivotY-4,8,8);
+ // Bucket at tip rather than a Y-shaped rubber-band slingshot.
+ ctx.strokeStyle='#40342a';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(tipX-22,tipY-2);ctx.lineTo(tipX-19,tipY+14);ctx.lineTo(tipX+19,tipY+14);ctx.lineTo(tipX+22,tipY-2);ctx.stroke();
+ ctx.restore();
+ if(state.shots>0&&!state.ended){
+  if(state.armKick<=0||state.drag){
+   let bx=state.drag?state.dragX:loadedX,by=state.drag?state.dragY:loadedY;
+   drawBall(bx,by,BALLS[state.selected],BALLS[state.selected].r);
+  }
+  if(state.drag){
+   const vx=(loadedX-state.dragX)*6.9,vy=(loadedY-state.dragY)*6.9;
+   ctx.fillStyle='#fcfcf0b8';
+   for(let t=.14;t<1.75;t+=.15){let xx=loadedX+vx*t,yy=loadedY+vy*t+GRAV*t*t/2;if(xx>CW||yy>CH)break;ctx.fillRect(xx,yy,5,5);}
+  }
+ }
+}
 function drawStatus(){ctx.textBaseline='top';ctx.textAlign='left';ctx.fillStyle='#f8fbfcce';ctx.fillRect(18,16,196,32);ctx.fillStyle='#354d56';ctx.font='bold 15px system-ui';ctx.fillText(`第 ${state.level+1} 关   ·   ${state.shots} 发剩余`,30,23);ctx.fillStyle='#273e4ba3';ctx.fillRect(950,16,313,32);ctx.fillStyle='#f4fffc';ctx.font='14px system-ui';ctx.fillText('目标：摧毁全部像素守卫',966,24);if(state.paused){ctx.fillStyle='#0e203caa';ctx.fillRect(0,0,CW,CH);ctx.fillStyle='white';ctx.font='bold 56px system-ui';ctx.textAlign='center';ctx.fillText('已暂停',CW/2,CH/2);}}
 function render(){ctx.save();ctx.translate((Math.random()-.5)*state.shake,(Math.random()-.5)*state.shake);drawBackdrop();ctx.imageSmoothingEnabled=false;ctx.drawImage(terrainCanvas,0,0,CW,CH);drawObjects();drawLauncher();ctx.restore();drawStatus();}
 let previous=performance.now(),acc=0;
@@ -185,13 +361,13 @@ function loop(now){let dt=Math.min(.04,(now-previous)/1000);previous=now;acc+=dt
 function startDrag(ev){if(state.ended||state.paused||!state.shots)return;let r=canvas.getBoundingClientRect(),x=(ev.clientX-r.left)*CW/r.width,y=(ev.clientY-r.top)*CH/r.height; // Allow dragging either on the projectile or from the launcher zone.
 if(Math.hypot(x-CANNON_X,y-(CANNON_Y-13))>100)return;state.drag=true;state.dragX=CANNON_X;state.dragY=CANNON_Y-13;state.dragStartX=x;state.dragStartY=y;moveDrag(ev);canvas.setPointerCapture?.(ev.pointerId);}
 function moveDrag(ev){if(!state.drag)return;let rect=canvas.getBoundingClientRect(),x=(ev.clientX-rect.left)*CW/rect.width,y=(ev.clientY-rect.top)*CH/rect.height;let dx=x-state.dragStartX,dy=y-state.dragStartY;let mag=Math.hypot(dx,dy),cap=Math.min(110,mag);if(mag>1){state.dragX=CANNON_X+dx/mag*cap;state.dragY=CANNON_Y-13+dy/mag*cap;}else{state.dragX=CANNON_X;state.dragY=CANNON_Y-13;}}
-function endDrag(){if(!state.drag)return;state.drag=false;let dx=CANNON_X-state.dragX,dy=CANNON_Y-13-state.dragY;if(Math.hypot(dx,dy)<10)return;let vx=dx*6.9,vy=dy*6.9;if(vx<70){UI.hint.textContent='把方块向左后方拉，再松手，才能向右发射';return;}const ball=BALLS[state.selected];state.projectiles.push({x:CANNON_X,y:CANNON_Y-13,vx,vy,kind:ball,r:ball.r,age:0,dead:false,lastImpact:-100,uses:0,drillEnergy:360});state.shots--;state.lastShot=state.t;UI.hint.textContent=`已发射 ${ball.label} · 尝试切换不同弹药`;audio('wood_like',.35);updateHUD();}
+function endDrag(){if(!state.drag)return;state.drag=false;let dx=CANNON_X-state.dragX,dy=CANNON_Y-13-state.dragY;if(Math.hypot(dx,dy)<10)return;let vx=dx*6.9,vy=dy*6.9;if(vx<70){UI.hint.textContent='把方块向左后方拉，再松手，才能向右发射';return;}const ball=BALLS[state.selected];state.projectiles.push({x:CANNON_X,y:CANNON_Y-13,vx,vy,kind:ball,r:ball.r,rot:0,spin:vx/460,age:0,dead:false,resting:false,lastImpact:-100,uses:0,drillEnergy:360});state.armKick=.38;state.shots--;state.lastShot=state.t;UI.hint.textContent=`已发射 ${ball.label} · 尝试切换不同弹药`;audio('wood_like',.35);updateHUD();}
 canvas.addEventListener('pointerdown',startDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',()=>state.drag=false);canvas.addEventListener('contextmenu',ev=>ev.preventDefault());
 BALLS.forEach((ball,i)=>{let b=document.createElement('button');b.className='ball';b.innerHTML=`<span class="ball-icon" style="background:${ball.color}">${ball.short}</span><span><b>${i+1}. ${ball.label}</b><small>${ball.detail}</small></span>`;b.title=ball.detail;b.addEventListener('click',()=>{state.selected=i;updateHUD();});UI.bar.appendChild(b);});
 function next(){initLevel((state.level+1)%LEVELS.length);}function restart(){initLevel(state.level);}
 $('#restart').addEventListener('click',restart);$('#retryBtn').addEventListener('click',restart);$('#skip').addEventListener('click',next);$('#nextBtn').addEventListener('click',next);$('#pause').addEventListener('click',()=>{state.paused=!state.paused;updateHUD();});$('#soundToggle').addEventListener('click',()=>{soundOn=!soundOn;UI.sound.textContent=soundOn?'♫ 音效开':'♪ 音效关';});
 window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;if(e.key>='1'&&e.key<='4'){state.selected=Number(e.key)-1;updateHUD();}if(e.key.toLowerCase()==='r')restart();if(e.key.toLowerCase()==='n')next();if(e.code==='Space'){e.preventDefault();state.paused=!state.paused;updateHUD();}});
 // Expose non-destructive diagnostics for automated playtesting and future video capture.
-window.MCBlockLaunch={getStatus:()=>({level:state.level+1,shots:state.shots,enemiesAlive:state.enemies.filter(e=>e.alive).length,removed:state.removed,bodies:state.dynamic.length,projectiles:state.projectiles.length,blackholes:state.vortices.length,physics:Matter2D?"Matter.js":"fallback",particles:state.particles.length,paused:state.paused,ended:state.ended}),restart,next,select:i=>{if(i>=0&&i<BALLS.length){state.selected=i;updateHUD();}},testShot:(kind,vx=690,vy=-190)=>{let b=BALLS.find(x=>x.id===kind)||BALLS[0];state.projectiles.push({x:CANNON_X,y:CANNON_Y-13,vx,vy,kind:b,r:b.r,age:0,dead:false,lastImpact:-100,uses:0,drillEnergy:360});state.lastShot=state.t;},testBlast:(x,y)=>explosion(x,y,85,140),setLevel:n=>initLevel(Math.max(0,Math.min(LEVELS.length-1,n)))};
+window.MCBlockLaunch={getStatus:()=>({level:state.level+1,shots:state.shots,enemiesAlive:state.enemies.filter(e=>e.alive).length,removed:state.removed,bodies:state.dynamic.length,projectiles:state.projectiles.length,restingBlocks:state.projectiles.filter(p=>p.resting).length,blackholes:state.vortices.length,physics:Matter2D?"Matter.js":"fallback",particles:state.particles.length,paused:state.paused,ended:state.ended}),restart,next,select:i=>{if(i>=0&&i<BALLS.length){state.selected=i;updateHUD();}},testShot:(kind,vx=690,vy=-190)=>{let b=BALLS.find(x=>x.id===kind)||BALLS[0];state.projectiles.push({x:CANNON_X,y:CANNON_Y-13,vx,vy,kind:b,r:b.r,rot:0,spin:vx/460,age:0,dead:false,resting:false,lastImpact:-100,uses:0,drillEnergy:360});state.lastShot=state.t;},testBlast:(x,y)=>explosion(x,y,85,140),setLevel:n=>initLevel(Math.max(0,Math.min(LEVELS.length-1,n)))};
 initLevel(0);loadSprites();requestAnimationFrame(loop);
 })();
