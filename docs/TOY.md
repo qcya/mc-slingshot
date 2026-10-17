@@ -20,6 +20,8 @@ Toy 版直接使用官方 `getRankList`、`getMyRank`、`submitScore`，不请�
 
 按官方技能，必须先向用户展示可检查的预览，收到明确“提交审核”确认后，才用同参数重跑 CLI 并加 `--yes`。发布分享地址需带 `index.html`。
 
+用户实测最新预览的原生榜单返回 `[ToySDK] toy id not available on host`。同期 `toy mylist --json` 返回作品总数 0，临时预览没有宿主作品 ID。CLI 未提供单独领取 ID/创建草稿的命令；首次 `create --yes` 会返回作品 `id` 和审核状态。下一步需用户明确确认首次创建与提交审核，再用分配的 ID 继续验证平台榜单；当前不能宣称原生排行榜线上已通过。
+
 ## 0.11.4 历史预检（以下平台接口缺口已按上述方案补齐）
 
 2026-10-17，按用户提供的命令安装并阅读官方 `bilibili/toy` 的 `toy` 技能及内容检查表。当前游戏名为 **MC打弹弓 / MC Slingshot**，建议 slug 为 `mc-slingshot`。
