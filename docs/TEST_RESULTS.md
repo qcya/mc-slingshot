@@ -39,3 +39,7 @@
 0.7 阶段的独立只读审查复核了新规则及关键实现，未发现 Critical / Important 问题，并独立通过 41 项核心测试。Windows Playwright trace 曾发生 EBUSY，当前关闭 trace，保留截图和 JSON。便捷启动器在前一阶段已使用独立端口实际启动验收；本版打包后另做解压文件和服务响应检查。
 
 当前玩法边界见 README。人物没有主动攻击和复杂寻路；建筑不坍塌是用户最新指定的规则。
+
+## 0.7.2 startup fix
+
+42/42 Node tests passed, including an occupied port held by an unrelated HTTP server: the game selects a different port and the other server remains intact. The 3 Edge boot tests passed. Windows START_GAME.bat was actually launched with 8766 occupied; it started on a free port and opened the browser. Python fallback also passed the same occupied-port check (including Windows error 10013). A real browser loaded the new address in Matter.js mode without script errors; see `evidence/startup-recovered.png`. Gameplay was unchanged; the 13 gameplay/browser scenarios above were run on 0.7.1.

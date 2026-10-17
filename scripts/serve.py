@@ -3,6 +3,7 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 import argparse
 import webbrowser
+import errno
 
 root = Path(__file__).resolve().parent.parent
 
@@ -28,7 +29,11 @@ if __name__ == '__main__':
     try:
         server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     except OSError as error:
-        raise SystemExit(f'Port unavailable: {error}. Close the previous server window.')
+        # Windows may report an exclusive existing listener as WSAEACCES.
+        if args.port == 0 or error.errno not in (errno.EADDRINUSE, errno.EACCES, 10048, 10013):
+            raise SystemExit(f'Server could not start: {error}')
+        print(f'Port {args.port} is busy; choosing a free local port.', flush=True)
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     url = f'http://127.0.0.1:{server.server_port}'
     print(f'MC Block Launch: {url}', flush=True)
     if args.open:
