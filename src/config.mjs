@@ -16,7 +16,9 @@ export const MATERIALS={
   13:{name:'深色橡木板',sprite:'dark_oak_planks',hard:24,density:1.2,sound:'wood'},
   14:{name:'云杉原木',sprite:'spruce_log',hard:28,density:1.5,sound:'wood'},
   15:{name:'云杉木板',sprite:'spruce_planks',hard:23,density:1.2,sound:'wood'},
-  16:{name:'圆石',sprite:'cobblestone',hard:45,density:3,sound:'stone'}
+  16:{name:'圆石',sprite:'cobblestone',hard:45,density:3,sound:'stone'},
+  17:{name:'木门上半',sprite:'oak_door_top',hard:18,density:.8,sound:'wood'},
+  18:{name:'木门下半',sprite:'oak_door_bottom',hard:18,density:.8,sound:'wood'}
 };
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:32,mass:4,detail:'实心方块 · 冲量撞击'},

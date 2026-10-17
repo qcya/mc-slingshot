@@ -8,19 +8,21 @@
 <body>
 <div class="page">
   <header class="top">
-    <div class="brand"><span class="brandmark">▦</span><div><strong>MC方块弹射</strong><small>MC BLOCK LAUNCH · ALPHA 0.4</small></div></div>
+    <div class="brand"><span class="brandmark">▦</span><div><strong>MC方块弹射</strong><small>MC BLOCK LAUNCH · ALPHA 0.5</small></div></div>
     <div class="headline">原版 16 × 16 方块纹理 <span>·</span> 独立破坏 <span>·</span> 结构倒塌</div>
     <div class="actions"><button id="soundToggle" title="切换音效">♫ 音效开</button><button id="restart">↻ 重开</button></div>
   </header>
   <main class="main">
-    <div class="levelbar"><div><span class="tiny">当前任务</span><strong id="levelTitle">01 / 草地小屋</strong><span id="levelDesc" class="leveldesc">摧毁建筑，击败全部守卫</span></div><div class="metrics"><div>剩余弹药 <b id="ammo">5</b></div><div>守卫 <b id="targets">2</b></div><div>击毁像素 <b id="destroyed">0</b></div></div></div>
-    <div class="stagebox"><canvas id="stage" width="1280" height="720" aria-label="像素攻城二维物理游戏"></canvas><div class="gamehint" id="gamehint">拖动投石车上的弹药向左拉，松手发射</div><div class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">过关</span><h2 id="resultTitle">建筑清除</h2><p id="resultMsg">漂亮的一击。</p><div class="result-buttons"><button id="retryBtn">重试</button><button class="primary" id="nextBtn">下一关 →</button></div></div></div></div>
-    <div class="controls"><div class="ballbar" id="ballbar"></div><div class="controlright"><button id="skip" title="进入下一关">切换关卡 →</button><button id="pause">Ⅱ 暂停</button></div></div>
-    <p class="foot">操作：拖动弹药并松开发射 · 1–4 选择弹药 · R 重开 · N 下一关 · 空格暂停。<span>地形逐像素破坏 · 独立残骸使用 Matter.js 刚体运动</span></p>
+    <div class="levelbar"><div><strong id="levelTitle">正在加载关卡</strong><span id="levelDesc" class="leveldesc">击败建筑里的全部敌对生物</span></div><div class="metrics"><div>剩余弹药 <b id="ammo">—</b></div><div>敌人 <b id="targets">—</b></div><div>击毁像素 <b id="destroyed">0</b></div></div></div>
+    <div class="stagebox"><canvas id="stage" width="1536" height="864" aria-label="像素攻城二维物理游戏"></canvas><div id="loadState" role="status">正在加载原版纹理与物理引擎…</div><div class="gamehint" id="gamehint">拖动投石臂上的弹药，向左下蓄力，松手发射</div><div class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">过关</span><h2 id="resultTitle">挑战成功</h2><p id="resultMsg"></p><div class="result-buttons"><button id="retryBtn">重试</button><button class="primary" id="nextBtn">下一关 →</button></div></div></div></div>
+    <div class="controls"><div class="ballbar" id="ballbar"></div><div class="controlright"><select id="levelSelect" aria-label="选择关卡"></select><button id="skip" title="进入下一关">切换关卡 →</button><button id="pause">Ⅱ 暂停</button></div></div>
+    <p class="foot">拖拽蓄力并松手 · 1–4 选弹药 · R 重开 · N 下一关 · 空格暂停<span>攻击支撑、爆破墙壁，击败全部敌人</span></p>
   </main>
-  <footer>MC Block Launch · 可玩原型 · 物理攻城 · 首批四种弹药</footer>
 </div>
 <script src="vendor/matter.min.js"></script>
-<script src="game.js"></script>
+<script>
+window.addEventListener('error',function(e){var p=document.querySelector('#loadState');if(p&&!p.hidden){p.classList.add('error');p.textContent='加载失败，请双击 START_GAME.bat 重新启动。'+(e.message||'必要脚本无法加载');}});
+</script>
+<script type="module" src="game.js"></script>
 </body>
 </html>

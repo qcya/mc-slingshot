@@ -8,6 +8,7 @@ export class SiegeWorld {
     if(!Matter?.Engine)throw new Error('Matter.js 物理引擎未加载，请重新启动游戏。');
     this.M=Matter;this.grid=grid;this.s=pixelSize;
     this.width=grid.width*pixelSize;this.height=grid.height*pixelSize;
+    this.groundRow=grid.height;for(let y=0;y<grid.height;y++)if(grid.get(0,y)){this.groundRow=y;break;}
     this.engine=Matter.Engine.create({enableSleeping:true,positionIterations:8,velocityIterations:8,gravity:{x:0,y:1,scale:.001}});
     this.staticTiles=new Map();this.projectiles=[];this.debris=[];this.enemies=[];
     this.vortices=[];this.events=[];this.contacts=[];this.cooldowns=new Map();
@@ -20,7 +21,11 @@ export class SiegeWorld {
     entity.id=++this.serial;entity.body=body;body.plugin.entity=entity;
     this.M.Composite.add(this.engine.world,body);return entity;
   }
-  remove(entity){if(!entity||entity.dead)return;entity.dead=true;this.M.Composite.remove(this.engine.world,entity.body);}
+  wakeBounds(bounds){for(const e of this.allMoving()){
+    const b=e.body.bounds;
+    if(b.max.x>=bounds.min.x-4&&b.min.x<=bounds.max.x+4&&b.max.y>=bounds.min.y-4&&b.min.y<=bounds.max.y+4)this.M.Sleeping.set(e.body,false);
+  }}
+  remove(entity){if(!entity||entity.dead)return;entity.dead=true;this.wakeBounds(entity.body.bounds);this.M.Composite.remove(this.engine.world,entity.body);}
   spawnProjectile(kind,x,y,vx,vy){
     const ammo=AMMO.find(a=>a.id===kind);if(!ammo)throw new Error(`Unknown ammunition: ${kind}`);
     const options={friction:.85,frictionStatic:1.2,frictionAir:.0015,restitution:kind==='cobble'?.14:.07,slop:.025,sleepThreshold:75};
@@ -37,12 +42,16 @@ export class SiegeWorld {
   }
   synchronize(detach=true){
     if(!this.grid.dirty.size)return;
-    if(detach)this.detachUnsupported();
     const cols=Math.ceil(this.grid.width/16);
+    if(detach){
+      const cuts=new Set();for(const id of this.grid.dirty){const y=Math.floor(id/cols)*16;if(y>0&&y<=this.groundRow)cuts.add(y);if(y+16<=this.groundRow)cuts.add(y+16);}
+      this.detachUnsupported();this.releaseUnbalanced([...cuts].sort((a,b)=>b-a));
+    }
     for(const id of this.grid.dirty){
       const old=this.staticTiles.get(id);if(old)this.M.Composite.remove(this.engine.world,old);
       this.staticTiles.delete(id);
       const tx=id%cols*16,ty=Math.floor(id/cols)*16,w=Math.min(16,this.grid.width-tx),h=Math.min(16,this.grid.height-ty);
+      this.wakeBounds({min:{x:tx*this.s,y:ty*this.s},max:{x:(tx+w)*this.s,y:(ty+h)*this.s}});
       const mask=new Uint8Array(w*h);
       for(let y=0;y<h;y++)for(let x=0;x<w;x++)mask[y*w+x]=this.grid.get(tx+x,ty+y);
       const rects=meshPixels(mask,w,h);if(!rects.length)continue;
@@ -51,6 +60,26 @@ export class SiegeWorld {
       body.plugin.terrain=true;this.staticTiles.set(id,body);this.M.Composite.add(this.engine.world,body);
     }
     this.grid.dirty.clear();
+  }
+  releaseUnbalanced(cuts){
+    const {width:w,cells}=this.grid;
+    for(const cut of cuts){
+      for(const indices of components(cells.subarray(0,w*cut),w,cut)){
+        let min=Infinity,max=-Infinity,weighted=0,total=0;
+        for(const k of indices){
+          const x=k%w,y=Math.floor(k/w),weight=MATERIALS[cells[k]].density;
+          weighted+=(x+.5)*weight;total+=weight;
+          if(y===cut-1&&this.grid.get(x,cut)){min=Math.min(min,x);max=Math.max(max,x+1);}
+        }
+        if(min===Infinity||indices.length<64)continue;
+        const center=weighted/total;
+        if(center>=min-2&&center<=max+2)continue;
+        const piece=cropPixels(cells,w,indices);
+        for(const k of indices)this.grid.set(k%w,Math.floor(k/w),0);
+        // No scripted spin: the surviving contact applies the torque in Matter.
+        this.addDebris(piece.mask,piece.w,piece.h,{x:piece.x*this.s,y:piece.y*this.s},{x:piece.x,y:piece.y});
+      }
+    }
   }
   detachUnsupported(){
     const {width:w,height:h,cells}=this.grid,seen=new Uint8Array(cells.length),queue=[];
@@ -95,7 +124,10 @@ export class SiegeWorld {
   damageDisk(x,y,radius,power,options={}){
     let n=this.grid.damageDisk(x/this.s,y/this.s,radius/this.s,power,options);
     this.flushGridPixels();
-    for(const e of [...this.debris])if(!e.dead)n+=this.damageDebris(e,x,y,radius,power,options);
+    for(const e of [...this.debris])if(!e.dead){
+      const remaining=(options.budget??Infinity)-n;if(remaining<=0)break;
+      n+=this.damageDebris(e,x,y,radius,power,{...options,budget:remaining});
+    }
     this.stats.removed+=n;return n;
   }
   damageDebris(e,x,y,radius,power,{budget=Infinity}={}){

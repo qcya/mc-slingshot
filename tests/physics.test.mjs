@@ -19,16 +19,15 @@ test('旋转的方块弹药落在真实 Matter 地面后停稳，不下沉', () 
   assert.equal(p.body.isSleeping,true);
 });
 
-test('两根承重柱必须都断开，屋顶才变成可运动残骸', () => {
+test('承重只剩一侧且重心越界时，屋顶自然翻倒', () => {
   const grid=new PixelGrid(240,160);grid.fill(0,128,240,32,7);
   grid.fill(96,80,16,48,4);grid.fill(144,80,16,48,4);grid.fill(96,64,64,16,10);
   const w=new SiegeWorld(Matter,{grid,pixelSize:2});
   grid.fill(96,112,16,16,0);w.synchronize();
-  assert.equal(w.debris.length,0);
-  grid.fill(144,112,16,16,0);w.synchronize();
   assert.equal(w.debris.length,1);
   const piece=w.debris[0],before=piece.body.position.y;step(w,.25);
-  assert.ok(piece.body.position.y>before+10);
+  assert.ok(piece.body.position.y>before+2);
+  assert.ok(Math.abs(piece.body.angle)>.01);
   assert.equal(grid.get(110,70),0);
 });
 
@@ -75,4 +74,26 @@ test('完整物理引擎中珍珠穿薄墙，厚墙阻挡', () => {
 test('怪物从高处坠落会受有限数值伤害，轻碎屑碰撞不秒杀', () => {
   const w=fixture(),e=w.addEnemy(100,95);step(w,1.5);
   assert.ok(Number.isFinite(e.hp));assert.equal(e.alive,false);
+});
+
+test('实际刚体碰撞中沉重石块能压死怪物，轻小碎片不会', () => {
+  for(const [size,lethal] of [[16,true],[3,false]]){
+    const w=fixture(),e=w.addEnemy(100,256);
+    w.addDebris(new Uint8Array(size*size).fill(3),size,size,{x:100-size,y:20},{x:0,y:0},0,{x:0,y:5});step(w,1.5);
+    assert.equal(e.alive,!lethal,`debris size ${size}`);
+  }
+});
+
+test('吞噬预算对地形和所有残骸合计生效', () => {
+  const w=fixture();w.grid.fill(60,80,48,48,5);w.synchronize();
+  w.addDebris(new Uint8Array(256).fill(10),16,16,{x:220,y:190});
+  assert.equal(w.damageDisk(210,208,50,500,{budget:10}),10);
+});
+
+test('静止弹药脚下的泥土被挖掉后重新下落', () => {
+  const grid=new PixelGrid(240,160);grid.fill(0,128,240,16,2);grid.fill(0,144,240,16,7);
+  const w=new SiegeWorld(Matter,{grid,pixelSize:2}),p=w.spawnProjectile('cobble',100,240,0,0);step(w,3);
+  assert.equal(p.body.isSleeping,true);const y=p.body.position.y;
+  grid.fill(40,128,32,16,0);w.synchronize();step(w,.5);
+  assert.ok(p.body.position.y>y+20);
 });

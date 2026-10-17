@@ -1,12 +1,18 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-echo Starting Pixel Siege locally on http://127.0.0.1:8765
-start "" "http://127.0.0.1:8765"
+title MC Block Launch
+echo MC方块弹射 - 请保留此窗口，关闭窗口会停止服务。
+where node >nul 2>nul
+if %errorlevel%==0 (
+  node scripts\serve.cjs --open
+  goto end
+)
 where py >nul 2>nul
 if %errorlevel%==0 (
-  py -3 -m http.server 8765 --bind 127.0.0.1
+  py -3 scripts\serve.py --open
 ) else (
-  python -m http.server 8765 --bind 127.0.0.1
+  python scripts\serve.py --open
 )
+:end
 pause
