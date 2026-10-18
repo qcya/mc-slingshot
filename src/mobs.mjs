@@ -43,7 +43,9 @@ export function mobGeometry(skin,phase,direction,pose={}){
  }
  box('leftLeg',0,-12,-2,4,12,4,0,ill?22:16,-swing,-12);
  box('rightLeg',-4,-12,-2,4,12,4,0,ill?22:16,swing,-12);
- box('body',-4,-24,-3,8,12,6,16,ill?20:16);
+ // Zombies use the 4-deep humanoid torso; the illager torso is 6 deep.
+ // Reusing the illager depth shifts zombie UVs into the transparent waist rows.
+ box('body',-4,-24,ill?-3:-2,8,12,ill?6:4,16,ill?20:16);
  // Pillager independent-arm UV is at (40,46), not the crossed-arm texture.
  box('leftArm',4,-24,-2,4,12,4,40,ill?46:16,swing*.75,-24);
  box('rightArm',-8,-24,-2,4,12,4,40,ill?46:16,-swing*.75-(pose.gesture||0)*1.5,-24);

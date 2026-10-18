@@ -19,7 +19,7 @@ test('两颗 TNT 相互炸飞，消耗各自库存且没有黑洞物品',async({
  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([6,1,0,1]);
  await page.waitForFunction(()=>MCBlockLaunch.getStatus().explosions===1,null,{timeout:6000});
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies[0]?.speed||0)).toBeGreaterThan(200);
- expect(await page.locator('#ballbar img').count()).toBe(3);await page.screenshot({path:'evidence/tnt-interaction.png'});
+ expect(await page.locator('#ballbar img').count()).toBe(9);await page.screenshot({path:'evidence/tnt-interaction.png'});
  require('node:fs').writeFileSync('evidence/tnt-interaction.json',JSON.stringify(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()),null,2));
 });
 test('用户 PNG、阁楼梯子与怪物停顿抬手实际显示',async({page})=>{

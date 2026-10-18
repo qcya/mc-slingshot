@@ -24,7 +24,8 @@ export function finishLevel(progress,level){
  return {unlocked:Math.max(Math.min(CAMPAIGN_LENGTH,progress.unlocked),Math.min(CAMPAIGN_LENGTH,level+2)),completed:[...new Set([...progress.completed,level])].sort((a,b)=>a-b)};
 }
 export function inventoryFor(level){return [...LOADOUTS[level]];}
-export function loadoutSlots(level){const kinds=LOADOUTS[level].flatMap((count,index)=>count>0?[index]:[]);return Array.from({length:3},(_,i)=>kinds[i]??null);}
+// Permanent Minecraft-style positions; unlocks depend on campaign progress, not this level's supply.
+export function hotbarSlots(progress){return Array.from({length:9},(_,i)=>i<4&&i<progress.unlocked?i:null);}
 export function totalAmmo(inventory){return inventory.reduce((n,count)=>n+count,0);}
 export function spendAmmo(inventory,slot){if(!Number.isInteger(slot)||!(inventory[slot]>0))return false;inventory[slot]--;return true;}
 export function rewardFor(level){return level===0?'TNT':level===1?'末影珍珠':level===2?'烈焰弹':null;}

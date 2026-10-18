@@ -9,9 +9,9 @@ test('touch loadout disclosure closes on the second tap',async({browser})=>{
  const context=await browser.newContext({viewport:{width:844,height:390},isMobile:true,hasTouch:true});const page=await context.newPage();await ready(page,{level:7});await page.locator('#touchPause').tap();await page.locator('#levelMenuBtn').tap();
  await page.locator('[data-loadout-level="7"]').tap();await expect(page.locator('#loadout-7')).toBeVisible();await page.locator('[data-loadout-level="7"]').tap();await expect(page.locator('#loadout-7')).toBeHidden();await context.close();
 });
-test('loadout information is a hover or tap disclosure and the hotbar has three real slots',async({page})=>{
- await ready(page,{level:7});await expect(page.locator('#ballbar button')).toHaveCount(3);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('tnt');
- await page.keyboard.press('2');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('ender');await page.keyboard.press('3');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('fire');
+test('loadout information is click-only and the hotbar uses nine permanent slots',async({page})=>{
+ await ready(page,{level:7});await expect(page.locator('#ballbar button')).toHaveCount(9);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('tnt');
+ await page.keyboard.press('3');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('ender');await page.keyboard.press('4');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().selected)).toBe('fire');
  await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();await page.locator('[data-loadout-level="7"]').click();await expect(page.locator('#loadout-7')).toBeVisible();await expect(page.locator('#loadout-7')).toContainText('烈焰弹');
  await page.screenshot({path:'evidence/personal-best-loadout.png'});
 });

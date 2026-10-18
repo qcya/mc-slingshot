@@ -1,15 +1,17 @@
 ﻿const {expect}=require('@playwright/test');
 let profileSequence=0;
+async function enterStart(page){if(await page.locator('#startScreen').isVisible())await page.locator('#startScreen').click();}
+async function levelCard(page,level){const target=Math.floor(level/6);for(let tries=0;tries<10;tries++){const current=Number((await page.locator('#pageStatus').textContent()).split('/')[0])-1;if(current===target)return page.locator('#level-'+level);await page.locator(current<target?'#nextPage':'#prevPage').click();}throw Error('Unable to reach level page');}
 async function ready(page,{level=0,unlocked=10}={}){
  if(unlocked>1)await page.addInitScript(n=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:n,completed:[]})),unlocked);
- await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill(`T${Date.now().toString(36)}_${++profileSequence}`);await page.locator('#saveProfile').click();}await page.locator('#level-'+level).click();
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await enterStart(page);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill(`T${Date.now().toString(36)}_${++profileSequence}`);await page.locator('#saveProfile').click();}await(await levelCard(page,level)).click();
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().screen)).toBe('play');
 }
 async function chooseLevel(page,level){
  if(await page.evaluate(()=>MCBlockLaunch.getStatus().screen)==='play')await page.keyboard.press('Escape');
  if(await page.locator('#levelMenuBtn').isVisible())await page.locator('#levelMenuBtn').click();
  else if(await page.locator('#resultLevels').isVisible())await page.locator('#resultLevels').click();
- await page.locator('#level-'+level).click();
+ await(await levelCard(page,level)).click();
 }
 async function restart(page){
  const screen=await page.evaluate(()=>MCBlockLaunch.getStatus().screen);
@@ -26,4 +28,4 @@ async function shotPlan(page,move){
  if(!move.input)return shot(page,slot,135*(move.pull??1)*Math.cos(move.angle),135*(move.pull??1)*Math.sin(move.angle));
  await selectAmmo(page,slot);const home=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher);await aim(page,move.input.x-home.x,move.input.y-home.y);const launch=await page.evaluate(()=>({...MCBlockLaunch.getStatus().launcher,time:MCBlockLaunch.getStatus().time}));await page.mouse.up();return launch;
 }
-module.exports={ready,chooseLevel,restart,aim,shot,shotPlan,selectAmmo};
+module.exports={ready,chooseLevel,restart,aim,shot,shotPlan,selectAmmo,enterStart,levelCard};

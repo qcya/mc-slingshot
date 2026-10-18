@@ -7,8 +7,9 @@
  <div class="gamehint faded" id="gamehint"></div>
  <nav class="touch-controls" aria-label="触屏操作"><button id="touchPause">暂停菜单</button></nav>
  <div class="inventory" id="inventory"><div id="ballbar" class="ballbar" aria-label="物品栏"></div></div>
+ <section id="startScreen" class="start-screen hidden" aria-label="开始游戏" role="button" tabindex="0"><div class="start-title"><h1>拉满的石</h1><p>四种弹药 · 十关挑战</p></div><p class="start-prompt">点击任意位置开始游戏</p></section>
  <section id="levelMenu" class="menu-screen hidden" aria-label="选关">
-  <div class="campaign-panel"><h1>拉满的石</h1><p class="menu-subtitle">主世界 · 选择关卡</p><div id="levelCards" class="level-grid"></div><div class="menu-actions"><button id="profileBtn">设置昵称</button><button id="leaderboardBtn">排行榜</button><button id="fullscreenBtn">全屏</button></div><p class="menu-help" id="menuHelp">拖动发射 · 右键取消 · 滚轮换物品 · ESC 菜单</p><small id="cloudState" hidden role="status"></small></div>
+  <div class="campaign-panel"><h1>选择关卡</h1><p class="menu-subtitle">主世界</p><div id="levelCards" class="level-grid"></div><div class="page-controls"><button id="prevPage" aria-label="上一页">←</button><span id="pageStatus">1 / 2</span><button id="nextPage" aria-label="下一页">→</button></div><div class="menu-actions"><button id="homeBtn">主界面</button><button id="profileBtn">设置昵称</button><button id="leaderboardBtn">排行榜</button><button id="fullscreenBtn">全屏</button></div><p class="menu-help" id="menuHelp">拖动发射 · 右键取消 · 滚轮换物品 · ESC 菜单</p><small id="cloudState" hidden role="status"></small></div>
  </section>
  <section id="pauseMenu" class="menu-screen hidden" aria-label="暂停菜单"><div class="pause-panel"><h2>游戏暂停</h2>
   <button id="resume">继续游戏</button><button id="restart" aria-label="↻ 重开">重新挑战</button><button id="levelMenuBtn">选择关卡</button><button id="soundToggle">音效：开</button><button id="musicToggle">音乐：开</button>
