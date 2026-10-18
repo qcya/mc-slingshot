@@ -1,16 +1,16 @@
-﻿# MC打弹弓 / MC Slingshot
+﻿# 拉满的石 / Stone at Full Draw
 
 弹弓发射 Minecraft 方块与物品，逐像素破坏固定建筑，清除怪物。**Alpha 0.12.0：主世界十关、唯一昵称、计时排行榜、原版音乐与 Toy 云存档适配。**
 
-![主世界场景](evidence/level-6-initial.png)
+![拉满的石](docs/publishing/laman-de-shi/toy-cover.jpg)
 
 ## 开始游玩
 
-在线试玩：[MC打弹弓](https://qcya.fun:8443/mc-block-launch/)。电脑使用鼠标，安卓手机建议横屏。开局设置昵称，不需要密码；关卡进度保存在当前浏览器，排行榜由服务器共享保存。项目仓库：[qcya/mc-slingshot](https://github.com/qcya/mc-slingshot)。改名保留已有试玩地址、存档键和服务数据目录。
+在线试玩：[拉满的石](https://qcya.fun:8443/mc-block-launch/)。电脑使用鼠标，安卓手机建议横屏。开局设置昵称，不需要密码；关卡进度保存在当前浏览器，排行榜由服务器共享保存。项目仓库：[qcya/stone-at-full-draw](https://github.com/qcya/stone-at-full-draw)。改名保留已有试玩地址、存档键和服务数据目录。
 
 家中同一局域网使用 [192.168.1.4:8770](http://192.168.1.4:8770/)，避免 NAT 回环；内外网使用同一服务端排行榜。浏览器身份和本机关卡进度按访问地址分别保存。
 
-Windows 玩家可下载[0.11.0 历史试玩包](https://github.com/qcya/mc-slingshot/releases/tag/v0.11.0)，完整解压后双击 START_GAME.bat，保留启动窗口。包内自带已校验的 Node.js，不用安装开发工具。不要只提取启动器，也不要直接打开 HTML。离线包使用本机排行榜；与朋友比较成绩请使用上面的在线地址。本轮不生成新的下载包。
+Windows 玩家可下载[0.11.0 历史试玩包](https://github.com/qcya/stone-at-full-draw/releases/tag/v0.11.0)，完整解压后双击 START_GAME.bat，保留启动窗口。包内自带已校验的 Node.js，不用安装开发工具。不要只提取启动器，也不要直接打开 HTML。离线包使用本机排行榜；与朋友比较成绩请使用上面的在线地址。本轮不生成新的下载包。
 
 源码包含素材和 Matter.js，需要 Node.js 20+ 或 Python 3。双击 START_GAME.bat，或运行 npm start。端口占用自动换端口；复制启动窗口显示的实际地址。Python 静态模式仍可离线玩，排行榜需要 Node 服务。离线通关成绩暂存本机，恢复同一站点的服务后重试上传。
 

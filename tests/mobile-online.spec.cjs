@@ -54,7 +54,7 @@ test('overlapping board refreshes cannot append duplicate rows or replace newer 
 
 test('an occupied nickname stays in the form with a clear message',async({page})=>{
  const occupied=`Taken${Date.now().toString(36)}`;expect((await page.request.post('/api/profile',{data:{nickname:occupied}})).ok()).toBe(true);
- await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await expect(page).toHaveTitle('MC打弹弓 · MC Slingshot');await expect(page.locator('#levelMenu h1')).toHaveText('MC打弹弓');await page.locator('#nickname').fill(occupied);await page.locator('#saveProfile').click();
+ await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await expect(page).toHaveTitle('拉满的石 · Stone at Full Draw');await expect(page.locator('#levelMenu h1')).toHaveText('拉满的石');await page.locator('#nickname').fill(occupied);await page.locator('#saveProfile').click();
  await expect(page.locator('#profileMenu')).toBeVisible();await expect(page.locator('#profileStatus')).toHaveText('用户名已占用');await expect(page.locator('#saveProfile')).toBeEnabled();
  expect(await page.evaluate(()=>localStorage.getItem('mc-block-launch.profile.v1'))).toBeNull();
  await page.locator('#nickname').fill(`${occupied}a`);await page.locator('#saveProfile').click();await expect(page.locator('#levelMenu')).toBeVisible();

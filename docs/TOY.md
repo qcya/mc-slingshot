@@ -1,5 +1,11 @@
 # B 站 Toy 适配
 
+## 当前名称与手动发布 — 2026-10-18
+
+游戏现名《拉满的石 / Stone at Full Draw》，仓库为 `qcya/stone-at-full-draw`。用户已删除旧 Toy，并决定自行重新发布；下文旧作品 ID、发布状态与预览链接仅作历史记录，不再作为当前在线作品的依据。
+
+先运行 `npm run build:toy`，上传生成目录内容的 ZIP，包根必须是 `index.html`。只打包前端文件，不上传源码仓库、Node 服务、玩家数据或凭据。新封面见 `docs/publishing/laman-de-shi/toy-cover.jpg`，图标见同目录 `toy-icon.png`。新 Toy 的地址由用户发布时决定；未自动更改旧云存档键。
+
 ## 发布状态 — 2026-10-18
 
 用户明确回复“提交审核”后，使用已试玩的 `dist/toy-CL3lM2` 包与相同名称、slug、封面、图标等参数执行首次创建提交。平台返回作品 ID **45029104285696**、状态 **auditing（审核中）**；随后 `toy mylist --json` 核对账号下已有该作品且仍在审核中。

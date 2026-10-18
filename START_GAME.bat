@@ -2,10 +2,10 @@
 chcp 65001 >nul
 setlocal
 cd /d "%~dp0"
-title MC Slingshot
+title Stone at Full Draw
 set "MC_LAUNCH_OPEN=--open"
 if /i "%~1"=="--no-open" set "MC_LAUNCH_OPEN="
-echo MC Slingshot - Starting game. Keep this window open.
+echo Stone at Full Draw - Starting game. Keep this window open.
 if exist "%~dp0runtime\node.exe" goto bundled
 where node >nul 2>nul
 if errorlevel 1 goto trypy

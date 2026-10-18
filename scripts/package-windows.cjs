@@ -15,7 +15,7 @@ function packageWindows(output,node=process.execPath){
   // Always emit a CMD-compatible launcher, including when building from a Git ZIP.
   const bat=path.join(stage,'START_GAME.bat');fs.writeFileSync(bat,fs.readFileSync(bat,'utf8').replace(/\r?\n/g,'\r\n'),'ascii');
   fs.mkdirSync(path.join(stage,'runtime'));fs.copyFileSync(node,path.join(stage,'runtime/node.exe'));
-  fs.writeFileSync(path.join(stage,'开始游戏.txt'),`MC打弹弓 ${version} · Windows 10/11 64位免安装试玩包\r\n\r\n1. 完整解压整个文件夹，不要直接在压缩包里运行。\r\n2. 双击 START_GAME.bat，浏览器会自动打开游戏。\r\n3. 保留启动窗口；关闭窗口会停止游戏服务。\r\n\r\n无需安装 Node.js、Python 或 npm，无需联网，无需管理员权限。\r\n不要直接打开 index.html，也不要把本机的 127.0.0.1 地址发给别人。\r\n若浏览器没有自动打开，复制启动窗口中实际显示的完整 http://127.0.0.1:端口 地址。\r\n发给朋友请发整个试玩 ZIP，不要只发启动器或网页。\r\n\r\n滚轮/数字键换物品，拖动发射，右键取消，ESC 菜单。\r\n项目：https://github.com/qcya/mc-slingshot\r\n`,'utf8');
+  fs.writeFileSync(path.join(stage,'开始游戏.txt'),`拉满的石 ${version} · Windows 10/11 64位免安装试玩包\r\n\r\n1. 完整解压整个文件夹，不要直接在压缩包里运行。\r\n2. 双击 START_GAME.bat，浏览器会自动打开游戏。\r\n3. 保留启动窗口；关闭窗口会停止游戏服务。\r\n\r\n无需安装 Node.js、Python 或 npm，无需联网，无需管理员权限。\r\n不要直接打开 index.html，也不要把本机的 127.0.0.1 地址发给别人。\r\n若浏览器没有自动打开，复制启动窗口中实际显示的完整 http://127.0.0.1:端口 地址。\r\n发给朋友请发整个试玩 ZIP，不要只发启动器或网页。\r\n\r\n滚轮/数字键换物品，拖动发射，右键取消，ESC 菜单。\r\n项目：https://github.com/qcya/stone-at-full-draw\r\n`,'utf8');
   const manifest={gameVersion:version,runtime,files:{}};
   function scan(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())scan(file);else manifest.files[path.relative(stage,file).split(path.sep).join('/')]=hash(file);}}scan(stage);
   fs.writeFileSync(path.join(stage,'package-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
