@@ -30,7 +30,7 @@ for(const skin of ['zombie','pillager','warden'])test(`${skin}: fire contact sch
 
 test('second charge applies independently while the first charge and its burning wood remain active',()=>{
  const w=fixture(),e=w.addEnemy(300,400,'warden');M.Body.setStatic(e.body,true);
- const p=fireContact(w,e);w.rear.grid.tile(6,6,10);w.ignite(6*48+24,6*48+24,20,`ammo:${p.id}`);
+ const p=fireContact(w,e);w.grid.tile(6,6,10);assert.ok(w.ignite(6*48+24,6*48+24,20,`ammo:${p.id}`));
  const second=fireContact(w,e);assert.notEqual(p.id,second.id);
  assert.equal(e.hp,300,'neither collision deals contact damage');advance(w,400);
  assert.equal(e.hp,0);assert.equal(e.alive,false);

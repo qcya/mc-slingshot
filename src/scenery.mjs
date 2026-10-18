@@ -30,24 +30,15 @@ export function driftingClouds(ctx,time){
 
 export function rearPixel(assets,m,x,y,world,visual){
   const p=assets.pixel(m,x,y);
-  if(m===23){const alpha=assets.colors.ladder[((y&15)*16+(x&15))*4+3];if(!alpha)return rearPixel(assets,10,x,y,world,visual);}
-  if(m>=19)return [p[0]*.91,p[1]*.91,p[2]*.91,p[3]];
-  if(y>=224)return [p[0]*.48,p[1]*.48,p[2]*.48,p[3]];
-  const average=assets.averages[MATERIALS[m].sprite],gable=visual?.gables.has((y>>4)*32+(x>>4));
-  const room=visual?.rooms.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h);
-  let light=gable?.49:.73;
-  if(room){
-    if(room.y+room.h-y<4)light*=.79;
-    const opening=world.grid.get(room.x-8,y);
-    if(opening===0||opening===6)light+=Math.max(0,1-(x-room.x)/45)*.13;
-  }
-  for(let d=1;d<=9;d++)if(world.grid.get(x,y-d)){light*=.68+.32*d/10;break;}
-  return [0,1,2].map(c=>(average[c]*.65+p[c]*.35)*light).concat(p[3]);
+  const average=assets.averages[MATERIALS[m].sprite];
+  // An even, subdued wall has no windows or bright furniture to suggest
+  // interactive openings. Foreground destruction does not relight the wall.
+  return [0,1,2].map(c=>(average[c]*.35+p[c]*.65)*.42).concat(p[3]);
 }
 
 export function foregroundPixel(assets,m,x,y,grid,visual){
   const p=assets.pixel(m,x,y);if(y>=224||m===6)return p;
-  let shade=visual?.roofTiles.has((y>>4)*32+(x>>4))?.68:1;
+  let shade=1;
   if(!grid.get(x,y-1))shade*=1.12;
   if(!grid.get(x+1,y))shade*=.86;
   if(!grid.get(x,y+1))shade*=.76;

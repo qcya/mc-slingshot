@@ -7,7 +7,7 @@ const M=createRequire(import.meta.url)('../vendor/matter.min.js');
 const candidates=[];
 // The desktop CDP pointer stores client coordinates as float32; the canvas starts at y=118.
 const inputShot=input=>{const pointer={x:Math.fround(input.x),y:Math.fround(input.y+118)-118};return {input:{...input},pointer,...pullSling(pointer)};};
-for(const kind of ['cobble','tnt','ender','fire'].filter(id=>AMMO.some(a=>a.id===id)))for(const power of [1,.875,.75,.625])for(const angle of [.12,.20,.28,.36,.40,.44,.48,.52,.56,.60,.64,.68,.72,.76,.80,.84,.88,.92,.96,1,1.06]){
+for(const kind of ['cobble','tnt','ender','fire'].filter(id=>AMMO.some(a=>a.id===id)))for(const power of [1,.875,.75,.625])for(const angle of [.03,.05,.08,.10,.12,.20,.28,.36,.40,.44,.48,.52,.56,.60,.64,.68,.72,.76,.80,.84,.88,.92,.96,1,1.06]){
  const ideal=pullSling({x:SLING_HOME.x-135*power*Math.cos(angle),y:SLING_HOME.y+135*power*Math.sin(angle)}),shot=inputShot(ideal.origin);candidates.push({kind,...shot,angle,pull:power,wait:kind==='fire'?10:6});
 }
 function setup(level){const s=buildLevel(level),w=new SiegeWorld(M,{grid:s.grid,rear:s.rear});for(const e of s.enemies)w.addEnemy(e.x,e.feet,e.skin,e);w.playability={shots:s.shots,launch:null,quiet:0,winWait:0,outcome:null};return w;}

@@ -12,15 +12,16 @@ function impact(w,projectile,enemy){
  w.processContact({bodyA:projectile.body,bodyB:enemy.body,collision:{normal:{x:1,y:0},supports:[{x:enemy.body.position.x,y:enemy.body.position.y}]}});
 }
 
-test('fire consumes connected front and rear wood over time and includes each cardinal neighbor',()=>{
+test('fire consumes connected foreground wood and leaves decorative rear wood intact',()=>{
  const w=world();
  for(const [tx,ty,m] of [[5,5,4],[4,5,19],[6,5,21],[5,4,17],[5,6,18]])w.grid.tile(tx,ty,m);
  w.rear.grid.tile(6,6,23);w.rear.grid.tile(5,7,15);
+ const rear=w.rear.grid.cells.slice(),rearHp=w.rear.grid.hp.slice();
  const original=w.grid.count();assert.equal(typeof w.ignite,'function');
  assert.ok(w.ignite(5*48+24,5*48+24));assert.equal(w.grid.count(),original);
- assert.ok(w.fires.length>=7);assert.ok(w.active());
+ assert.equal(w.fires.length,5);assert.ok(w.active());
  step(w,1.1);assert.ok(w.grid.count()<original&&w.grid.count()>0,'wood visibly burns before disappearing');
- step(w,5);assert.equal(w.grid.count(),0);assert.equal(w.rear.grid.count(),0);assert.equal(w.fires.length,0);
+ step(w,5);assert.equal(w.grid.count(),0);assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,rearHp);assert.equal(w.fires.length,0);
  assert.ok(w.events.some(e=>e.type==='fire'&&e.sound==='fire_burn'));
  assert.equal(w.debris.length,0,'burning never detaches fixed buildings');
 });
@@ -68,11 +69,23 @@ test('Warden survives the knockback and landing from its first TNT blast',()=>{
  assert.equal(e.alive,true);assert.equal(e.hp,150,'landing must not count as another weapon hit');
 });
 
-test('a fire charge ignites rear wood on its swept path without damaging foreground soil',()=>{
- const w=world();w.rear.grid.tile(5,5,23);w.grid.tile(5,6,2);
+test('a fire charge passes through rear wood without being consumed or creating flames',()=>{
+ const w=world();w.engine.gravity.y=0;w.rear.grid.tile(5,5,23);w.grid.tile(5,6,2);
+ const rear=w.rear.grid.cells.slice(),rearHp=w.rear.grid.hp.slice();
  const dirt=w.grid.cells.slice(),hp=w.grid.hp.slice(),p=w.spawnProjectile('fire',195,260,360,0);
- step(w,.3);assert.ok(p.dead);assert.ok(w.fires.length>0);step(w,4);
- assert.equal(w.rear.grid.count(),0);assert.deepEqual(w.grid.cells,dirt);assert.deepEqual(w.grid.hp,hp);
+ step(w,.35);assert.ok(!p.dead);assert.ok(p.body.position.x>302,'the entire charge clears the rear wall');
+ assert.equal(w.fires.length,0);assert.ok(!w.events.some(e=>e.type==='fire'));step(w,4);
+ assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,rearHp);
+ assert.deepEqual(w.grid.cells,dirt);assert.deepEqual(w.grid.hp,hp);
+});
+
+test('rear wood alone cannot ignite or create a burn hazard for an overlapping enemy',()=>{
+ const w=world();w.engine.gravity.y=0;w.rear.grid.tile(5,5,10);
+ const rear=w.rear.grid.cells.slice(),hp=w.rear.grid.hp.slice(),enemy=w.addEnemy(264,300,'zombie');M.Body.setStatic(enemy.body,true);
+ assert.equal(w.ignite(264,264,20,'rear-only'),false);step(w,4);
+ assert.equal(enemy.hp,100);assert.equal(enemy.burnTicks.length,0);assert.equal(w.fires.length,0);
+ assert.ok(!w.events.some(e=>e.type==='fire'||e.type==='hurt'));
+ assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,hp);
 });
 
 test('fire impacts near a wood boundary guarantee the seed and all available cardinal wood',()=>{

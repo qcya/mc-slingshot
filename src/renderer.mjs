@@ -17,7 +17,7 @@ export class Renderer {
   reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.arcKey='';this.backgroundReady=false;this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
   drawRear(world){
     const g=world.rear.grid;
-    const revision=`${g.version}:${world.grid.version}`;
+    const revision=g.version;
     if(revision!==this.rearVersion){
       const c=this.rearCanvas.getContext('2d'),im=c.createImageData(g.width,g.height);
       for(let y=0;y<g.height;y++)for(let x=0;x<g.width;x++){

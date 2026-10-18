@@ -17,9 +17,9 @@ export function buildTitleScene(){
       grid.fill(x*16,ty*16+8,16,8,15);
       if(up!==null)grid.fill(x*16+(up?8:0),ty*16,8,8,15);
       visual.roofTiles.add(ty*32+x);
+      if(step){grid.tile(x,ty+1,15);visual.roofTiles.add((ty+1)*32+x);}
       if(step)rear.grid.fill(x*16,(ty+1)*16,16,(9-ty)*16,10);
     }
   }
-  rear.grid.tile(25,8,6);
   scene.enemies=[];scene.titleScene=true;return scene;
 }

@@ -3,7 +3,7 @@ import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDama
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
-import {igniteWood,igniteImpact,rearWoodContact,advanceFire,burnEnemy} from './fire.mjs';
+import {igniteWood,igniteImpact,advanceFire,burnEnemy} from './fire.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -41,7 +41,6 @@ export class SiegeWorld {
     this.M.Body.setMass(body,ammo.mass);
     this.M.Body.setVelocity(body,{x:vx/60,y:vy/60});
     const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0},body);
-    if(kind==='fire')p.lastFirePosition={x,y};
     if(kind==='tnt')this.events.push({type:'fuse',x,y});
     this.projectiles.push(p);return p;
   }
@@ -113,7 +112,6 @@ export class SiegeWorld {
   emitPixel(x,y,m,force=1){this.events.push({type:'pixel',x,y,m,force});}
   flushGridPixels(){for(const p of this.grid.recent)if((p.x*7+p.y*11+this.stats.removed)%5===0)this.emitPixel((p.x+.5)*this.s,(p.y+.5)*this.s,p.m);this.grid.recent.length=0;}
   damageDisk(x,y,radius,power,options={}){
-    if(options.background)this.damageRear(x,y,radius,power,options.backgroundBudget??Infinity);
     let n=this.grid.damageDisk(x/this.s,y/this.s,radius/this.s,power,options);
     this.flushGridPixels();
     for(const e of [...this.debris])if(!e.dead){
@@ -121,16 +119,6 @@ export class SiegeWorld {
       n+=this.damageDebris(e,x,y,radius,power,{...options,budget:remaining});
     }
     this.stats.removed+=n;return n;
-  }
-  damageRear(x,y,radius,power,budget=Infinity){
-    let n=this.rear.grid.damageDisk(x/this.s,y/this.s,radius/this.s,power,{budget});this.rear.grid.recent.length=0;
-    for(const e of this.debris){if(e.dead||n>=budget)continue;
-      const p=this.localPoint(e,x,y),r=radius/this.s;
-      e.backPixels=e.backPixels.filter(v=>{
-        const d=Math.hypot(v.x+.5-p.x,v.y+.5-p.y);if(v.m===7||d>r||n>=budget)return true;
-        v.hp-=power*(.45+.55*(1-d/r));if(v.hp>0)return true;n++;e.backRevision++;return false;
-      });
-    }this.stats.backgroundRemoved+=n;return n;
   }
   damageDebris(e,x,y,radius,power,{budget=Infinity,onlyMaterial=0}={}){
     const center=this.localPoint(e,x,y),r=radius/this.s;let n=0;
@@ -173,7 +161,7 @@ export class SiegeWorld {
   }
   blast(x,y,radius=98,power=160){
     this.stats.explosions++;this.events.push({type:'explosion',x,y,radius});
-    this.damageDisk(x,y,radius,power,{jagged:true,seed:this.stats.explosions,background:true});this.synchronize();
+    this.damageDisk(x,y,radius,power,{jagged:true,seed:this.stats.explosions});this.synchronize();
     for(const e of this.allMoving()){
       const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy),reach=radius+50;if(d>reach)continue;
       const speed=clamp(1600*(1-d/reach)/e.body.mass,0,650),ux=d>1?dx/d:(e.id%2?1:-1),uy=d>1?dy/d:0;
@@ -267,16 +255,6 @@ export class SiegeWorld {
     for(const pair of this.contacts)this.processContact(pair);
     for(const p of this.projectiles){
       if(p.dead)continue;p.age+=dt;p.fuse-=dt;
-      if(p.ammo.id==='fire'){
-        // Rear walls intentionally have no Matter body. Sweep the projectile's
-        // path so a fire charge can still touch and ignite those wooden pixels.
-        const from=p.lastFirePosition||p.body.position,to=p.body.position,length=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(length/this.s));
-        for(let k=0;k<=steps;k++){
-          const hit=rearWoodContact(this,from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2);
-          if(hit){this.ignite(hit.x,hit.y,this.s,`ammo:${p.id}`);this.remove(p);break;}
-        }
-        p.lastFirePosition={...to};
-      }
       if(p.ammo.id==='tnt'&&p.fuse<=0){const pos={...p.body.position};this.remove(p);this.blast(pos.x,pos.y);}
     }
     for(const e of this.allMoving()){

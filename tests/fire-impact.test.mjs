@@ -49,8 +49,9 @@ for(const skin of ['zombie','warden'])test(`${skin} entering a lingering mineral
 
 test('a nonwood foreground contact cannot ignite a rear wood cluster through the struck wall',()=>{
  const w=fixture();w.grid.tile(6,5,6);w.rear.grid.fill(6*16,4*16,4*16,3*16,10);
+ const rear=w.rear.grid.cells.slice(),hp=w.rear.grid.hp.slice();
  shoot(w,220,264,420,0);advance(w,4);
- assert.equal(w.rear.grid.get(8*16+8,5*16+8),10,'rear wood beyond the local plus survives');
+ assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,hp);
  assert.equal(w.grid.get(6*16+8,5*16+8),6);
 });
 
@@ -58,8 +59,9 @@ test('stone debris contact also leaves a local flame instead of igniting a rear 
  const w=fixture(),mask=new Uint8Array(16*16).fill(3);
  const debris=w.addDebris(mask,16,16,{x:288,y:240});M.Body.setStatic(debris.body,true);
  w.rear.grid.fill(6*16,5*16,4*16,16,10);
+ const rear=w.rear.grid.cells.slice(),hp=w.rear.grid.hp.slice();
  shoot(w,220,264,420,0);advance(w,4);
- assert.equal(w.rear.grid.get(8*16+8,5*16+8),10,'rear wood beyond the local footprint survives');
+ assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,hp);
  assert.ok(debris.mask.every(m=>m===3));
 });
 

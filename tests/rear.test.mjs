@@ -6,11 +6,16 @@ function setup(){
  const rear=new RearLayer(240,160);rear.room(7,5,2,2,10,112,{x0:96,y0:64,x1:160,y1:128});
  return new SiegeWorld(M,{grid,rear,pixelSize:2});
 }
-test('普通撞击只伤前景，爆炸同时破坏可见后景',()=>{
- const w=setup(),before=w.rear.grid.count();
- w.damageDisk(242,210,18,500);assert.equal(w.rear.grid.count(),before);
- w.blast(242,210,22,500);assert.ok(w.rear.grid.count()<before);
+for(const [name,damage] of [
+ ['ordinary damage with the legacy background option',w=>w.damageDisk(242,210,18,500,{background:true})],
+ ['a weak blast',w=>w.blast(242,210,22,1)],
+ ['TNT',w=>{const tnt=w.spawnProjectile('tnt',242,210,0,0);tnt.fuse=1/120;w.step(1/120);assert.equal(tnt.dead,true);assert.equal(w.stats.explosions,1);}]
+])test(`${name} leaves decorative rear cells and durability unchanged`,()=>{
+ const w=setup(),cells=w.rear.grid.cells.slice(),hp=w.rear.grid.hp.slice();damage(w);
+ assert.deepEqual(w.rear.grid.cells,cells);assert.deepEqual(w.rear.grid.hp,hp);
+ assert.equal(w.stats.backgroundRemoved,0);
 });
+
 test('楼板被移除时后墙仍留在原位置，不产生可运动房屋残骸',()=>{
  const w=setup(),before=w.rear.grid.count();w.grid.fill(96,112,64,16,0);w.synchronize();
  assert.equal(w.debris.length,0);assert.equal(w.rear.grid.count(),before);

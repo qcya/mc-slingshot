@@ -39,7 +39,8 @@ test('十个手工关卡使用完整方块和真实楼梯，装饰不参与承�
 test('后续关卡包含完整方块台阶、凹地和有真实入口的地窖',()=>{
  const hill=buildLevel(1).grid;assert.equal(hill.get(13*16,12*16),1);assert.equal(hill.get(13*16,13*16),2);
  const s=buildLevel(2);assert.ok(s.enemies.some(e=>e.feet===16*48));
- for(let x=14;x<=28;x++)for(let y=14;y<=15;y++){assert.equal(s.grid.get(x*16,y*16),0);assert.ok(s.rear.grid.get(x*16,y*16));}
+ for(let x=14;x<=28;x++)for(let y=14;y<=15;y++){assert.ok([0,19,20,21].includes(s.grid.get(x*16,y*16)));assert.ok(s.rear.grid.get(x*16,y*16));}
+ for(let x=14;x<19;x++)for(let y=14;y<=15;y++)assert.equal(s.grid.get(x*16,y*16),0,'the cellar entrance remains clear');
  assert.equal(s.grid.get(23*16,16*16),3);assert.equal(s.grid.get(23*16,13*16),16);
  const dip=buildLevel(3).grid;assert.equal(dip.get(14*16,14*16),0);assert.equal(dip.get(14*16,16*16),1);
 });

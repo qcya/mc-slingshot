@@ -1,10 +1,11 @@
 const {test,expect}=require('@playwright/test');const {ready,shot,restart,chooseLevel}=require('./browser-helpers.cjs');
-test('真实发射烈焰弹显示原版火焰并烧掉前后木墙，音效能播放',async({page})=>{
+test('?????????????????????????????????',async({page})=>{
  await ready(page,{level:3});await shot(page,4,135*Math.cos(.24),135*Math.sin(.24));
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().burning),{timeout:6000}).toBeGreaterThan(0);
  await page.locator('#stage').screenshot({path:'evidence/fire-burning.png'});
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getDiagnostics().sound.played.fire_launch||0)).toBeGreaterThan(0);
- await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().backgroundRemoved)).toBeGreaterThan(0);
+ await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().removed)).toBeGreaterThan(0);
+ expect(await page.evaluate(()=>MCBlockLaunch.getStatus().backgroundRemoved)).toBe(0);
  const d=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(d.removed).toBeGreaterThan(0);expect(d.explosions).toBe(0);expect(d.sound.failed).toBe(0);
  require('node:fs').writeFileSync('evidence/fire-browser.json',JSON.stringify(d,null,2));
 });

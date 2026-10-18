@@ -5,11 +5,8 @@ export const isCombustible=m=>[4,10,12,13,14,15,17,18,19,21,22,23].includes(m);
 
 function woodPixels(world,tx,ty){
  const pixels=[];
- for(const layer of ['front','rear']){
-  const grid=layer==='front'?world.grid:world.rear.grid;
-  for(let y=ty*BLOCK;y<(ty+1)*BLOCK;y++)for(let x=tx*BLOCK;x<(tx+1)*BLOCK;x++){
-   const m=grid.get(x,y);if(isCombustible(m))pixels.push({layer,x,y,m});
-  }
+ for(let y=ty*BLOCK;y<(ty+1)*BLOCK;y++)for(let x=tx*BLOCK;x<(tx+1)*BLOCK;x++){
+  const m=world.grid.get(x,y);if(isCombustible(m))pixels.push({x,y,m});
  }
  return pixels;
 }
@@ -31,26 +28,13 @@ function addFire(world,tx,ty,pixels,sourceId,seedX,seedY,depth=0){
 export function igniteImpact(world,x,y,normal,sourceId){
  const tileSize=BLOCK*world.s,dx=Math.abs(normal.x)>=Math.abs(normal.y)?Math.sign(normal.x):0,dy=dx?0:Math.sign(normal.y);
  const hitX=x-dx*world.s/2,hitY=y-dy*world.s/2;
- const material=world.sample(hitX,hitY)||world.rear.grid.get(hitX/world.s,hitY/world.s);
+ const material=world.sample(hitX,hitY);
  if(isCombustible(material)&&igniteWood(world,hitX,hitY,world.s,sourceId))return true;
  const tx=Math.floor(hitX/tileSize)+dx,ty=Math.floor(hitY/tileSize)+dy;
  let added=false;
  for(const [ox,oy] of [[0,0],[-1,0],[1,0],[0,-1],[0,1]])added=addFire(world,tx+ox,ty+oy,woodPixels(world,tx+ox,ty+oy),sourceId,tx,ty)||added;
  if(added)world.events.push({type:'fire',x,y,sound:'fire_burn'});
  return true;
-}
-
-// Rear walls have no rigid body. Require an actual charge-disc overlap with an
-// exposed rear pixel instead of seeking nearby wood through foreground walls.
-export function rearWoodContact(world,x,y,radius){
- let nearest=null,distance=Infinity;
- for(let py=Math.max(0,Math.floor((y-radius)/world.s));py<=Math.min(world.grid.height-1,Math.floor((y+radius)/world.s));py++)
-  for(let px=Math.max(0,Math.floor((x-radius)/world.s));px<=Math.min(world.grid.width-1,Math.floor((x+radius)/world.s));px++){
-   const wx=(px+.5)*world.s,wy=(py+.5)*world.s,d=Math.hypot(wx-x,wy-y);
-   if(!isCombustible(world.rear.grid.get(px,py))||world.sample(wx,wy))continue;
-   if(d<=radius&&d<distance){nearest={x:wx,y:wy};distance=d;}
-  }
- return nearest;
 }
 
 // Public renderer contract: world.fires contains world-space tile rectangles
@@ -99,9 +83,8 @@ export function advanceFire(world){
   }
   const progress=Math.min(1,(world.time-fire.startedAt)/2.8),target=Math.floor(progress*fire.pixels.length);
   while(fire.burned<target){
-   const p=fire.pixels[fire.burned++],grid=p.layer==='front'?world.grid:world.rear.grid,m=grid.get(p.x,p.y);
-   if(!isCombustible(m))continue;grid.set(p.x,p.y,0);
-   if(p.layer==='front')world.stats.removed++;else world.stats.backgroundRemoved++;
+   const p=fire.pixels[fire.burned++],m=world.grid.get(p.x,p.y);
+   if(!isCombustible(m))continue;world.grid.set(p.x,p.y,0);world.stats.removed++;
    if(fire.burned%23===0)world.emitPixel((p.x+.5)*world.s,(p.y+.5)*world.s,m,.35);
   }
   if(world.time>=fire.nextSoundAt){

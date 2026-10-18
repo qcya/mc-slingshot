@@ -23,7 +23,7 @@ export function buildLevel(number){
   const column=(x,y0,y1,m)=>{for(let y=y0;y<=y1;y++)grid.tile(x,y,m);};
   const tile=(x,y,m)=>grid.tile(x,y,m);
   const enemy=(x,y,skin='pillager',options={})=>enemies.push({x:x*TILE,feet:y*TILE,skin,height:skin==='warden'?132:92,...options});
-  const roof=(x0,x1,y,m=10)=>{
+  const roof=(x0,x1,y,m=15)=>{
     // Real stair masks: one lower half plus one upper quarter. Rendering
     // and collision use the same material and the same shape.
     const base=(y+1)*16;
@@ -33,6 +33,9 @@ export function buildLevel(number){
         visual.roofTiles.add(ty*32+tx);
         grid.fill(tx*16,ty*16+8,16,8,m);
         if(ascending!==null)grid.fill(tx*16+(ascending?8:0),ty*16,8,8,m);
+        // A whole block beneath each inner stair joins the slope into a
+        // continuous roof instead of eleven separate corner-touching pieces.
+        if(step>0){grid.tile(tx,ty+1,m);visual.roofTiles.add((ty+1)*32+tx);}
         if(step>0)rear.grid.fill(tx*16,(ty+1)*16,16,base-(ty+1)*16,level===3?13:10);
       }
     }
@@ -47,7 +50,7 @@ export function buildLevel(number){
     // Descending entrance, with a two-block-high cellar below the house.
     surface(12,15);surface(13,16);
     for(let x=14;x<=28;x++)for(let y=14;y<=15;y++)tile(x,y,0);
-    room(19,14,10,2,5);rear.grid.tile(21,15,20);rear.grid.tile(27,15,21);
+    room(19,14,10,2,5);
   }
   if(level===3)for(const [x,y] of [[12,15],[13,15],[14,16],[15,16],[16,15],[17,15]])surface(x,y);
   if(level===4)for(const [x,y] of [[10,13],[11,12],[12,12],[13,12],[14,13]])surface(x,y);
@@ -118,15 +121,12 @@ export function buildLevel(number){
     // A continuous log-supported loading shelter opens toward the low guard.
     row(25,30,9,15);column(25,10,13,14);column(30,10,13,14);
     room(19,9,4,4,15);room(26,10,4,4,10);
-    // Stacked cut logs distinguish the loading yard from the dwelling.
-    rear.room(26,12,2,2,14);
     enemy(20,13,'zombie');enemy(22.5,13);enemy(26,9);enemy(29,14,'zombie');enemy(27.5,9);
   }else if(level===6){
     // A fixed timber bridge crosses the deep ravine; breaking it creates a hole.
     row(18,29,9,15);column(18,10,16,14);column(29,10,14,14);
     column(22,6,8,4);column(27,6,8,4);roof(21,28,5,15);tile(22,7,6);tile(27,7,6);
-    // The bridge rests on timber abutments and a visible rear crossbeam.
-    rear.room(19,10,10,1,14);
+    // The solid bridge deck rests on the two timber abutments.
     row(19,25,16,16);row(28,30,13,16);column(19,12,15,16);tile(19,14,6);tile(19,15,6);
     room(23,6,4,3,15);room(19,12,7,4,3);
     enemy(23.5,9);enemy(26,9);enemy(20.5,16,'zombie');enemy(24.5,16,'zombie');enemy(28.5,13,'pillager',{stationary:true});
@@ -159,18 +159,45 @@ export function buildLevel(number){
     // The open intake is guarded by a pillager; the zombie stays under the canopy.
     enemy(19.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16);enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
   }
-  // Furniture lives in the destructible rear layer, outside the firing plane.
+  // Appliances are solid foreground blocks. Relocate a planned prop within
+  // its room if it would overlap a spawn; omit it if there is no safe floor.
   const furniture=[[[21,12,19],[22,12,20],[26,12,21]],[[24,12,20],[27,8,21]],[[20,12,19],[21,12,20],[28,12,21],[20,9,21],[27,9,19]],[[23,9,21],[26,9,19]],[[20,12,20],[29,12,21],[23,12,19],[26,12,20]],[[19,12,19],[22,12,20],[28,11,21]],[[23,8,21],[20,15,20]],[[23,12,19],[26,12,20],[28,15,9]],[[19,15,9],[29,15,9]],[[20,11,21],[25,11,19],[28,15,20]]][level];
-  for(const [x,y,m] of furniture)rear.grid.tile(x,y,m);
-  // Full glass blocks share a row; door textures are never window trim.
-  const windows=[[[22,11],[26,11]],[[25,7],[26,7],[25,11],[26,11]],
-    [[21,8],[22,8],[26,8],[27,8],[23,11],[24,11]],
-    [[24,8],[25,8]],[[20,8],[29,8]],[[20,11],[21,11]],
-    [[24,7],[25,7]],[[24,11],[26,11]],[],[]][level];
-  for(const [x,y] of windows)rear.grid.tile(x,y,6);
-  const atticLights={0:[24,7],2:[24,4],5:[20,6],6:[24,3]};
-  if(atticLights[level]){const [x,y]=atticLights[level];rear.grid.tile(x,y,6);}
+  if(level===2)furniture.push([21,15,20],[27,15,21]);
+  for(const prop of furniture)placeFurniture(grid,enemies,visual.rooms,...prop);
   // Background objects never enter the destructible/support grid.
   const trees=[{x:31,base:14,height:5,kind:'cherry'}];
   return {...LEVELS[level],shots:LOADOUTS[level].reduce((a,b)=>a+b,0),number:level,grid,rear,enemies,trees,visual};
+}
+
+function placeFurniture(grid,enemies,rooms,x,y,material){
+  const room=rooms.find(r=>(x+.5)*16>=r.x&&(x+.5)*16<r.x+r.w&&(y+.5)*16>=r.y&&(y+.5)*16<r.y+r.h);
+  if(!room)return;
+  const options=[];
+  for(let ty=room.y/16;ty<(room.y+room.h)/16;ty++)for(let tx=room.x/16;tx<(room.x+room.w)/16;tx++){
+    let clear=true;
+    for(let py=0;py<16&&clear;py++)for(let px=0;px<16;px++)if(grid.get(tx*16+px,ty*16+py)){clear=false;break;}
+    if(!clear)continue;
+    if(enemies.some(e=>{
+      const half=e.skin==='warden'?29:16;
+      return (tx+1)*TILE>e.x-half&&tx*TILE<e.x+half&&(ty+1)*TILE>e.feet-e.height&&ty*TILE<e.feet;
+    }))continue;
+    // A prop must not turn an existing patrol into a one-block shuffle.
+    if(enemies.some(e=>!e.stationary&&patrolWidth(grid,e,tx,ty)<80&&patrolWidth(grid,e,tx,ty)<patrolWidth(grid,e)))continue;
+    if(!Array.from({length:16},(_,i)=>grid.get(tx*16+i,(ty+1)*16)).every(m=>m&&![19,20,21].includes(m)))continue;
+    options.push({x:tx,y:ty,d:Math.abs(tx-x)+Math.abs(ty-y)*2});
+  }
+  options.sort((a,b)=>a.d-b.d||a.y-b.y||a.x-b.x);
+  if(options.length)grid.tile(options[0].x,options[0].y,material);
+}
+
+function patrolWidth(grid,enemy,propX=-1,propY=-1){
+  const top=Math.ceil((enemy.feet-enemy.height)/3),bottom=Math.floor((enemy.feet-1)/3);
+  const blocked=x=>{
+    for(let y=top;y<=bottom;y++)if(grid.get(x,y)||(x>=propX*16&&x<(propX+1)*16&&y>=propY*16&&y<(propY+1)*16))return true;
+    return false;
+  };
+  let left=Math.floor(enemy.x/3),right=left;
+  while(left>=0&&!blocked(left))left--;
+  while(right<grid.width&&!blocked(right))right++;
+  return (right-left-1)*3;
 }
