@@ -41,10 +41,16 @@ coordinates. Dimensions and UV offsets follow Mojang's
 top-left world-space coordinates; `size` is one world-space block. Draw only
 when `world.time >= startedAt`. Internal `pixels`, `burned`, and `nextSoundAt`
 fields drive consumption and do not need renderer handling. Burn duration is
-2.8 seconds, with a 0.13-second spread delay per cardinal step. Every record
-belongs to a cardinally connected wood block whose tile-center distance is
-at most two blocks from its seed: the center plus two blocks in each direction,
-at most five blocks across. Only foreground wood participates in this graph;
+2.8 seconds, with a 0.13-second delay for each immediate cardinal neighbor.
+Wood ignition includes only the struck block plus its four immediate cardinal
+neighbors that actually contain combustible foreground pixels (at most five
+blocks total). It does not spread to distance-two blocks or empty cells.
+Nonwood wall and ceiling impacts create no fire. Ground-top impacts instead
+create up to three horizontally adjacent supported surface flames, with
+`surfaceY` storing the exact support height (`null` for wood combustion).
+Each surface cell requires solid support below and exposed air above; losing
+that support expires the flame. Surface flames and wood burns have separate
+records even when they share tile coordinates. Only foreground wood burns;
 the rear layer is a dark, noncolliding wall: it cannot ignite independently,
 but disappears with erased foreground pixels and can be damaged directly by TNT.
 Each record also has a `sourceIds` set: all tiles ignited by one charge share

@@ -26,12 +26,12 @@ test('fire consumes connected foreground wood and leaves nonoverlapping rear woo
  assert.equal(w.debris.length,0,'burning never detaches fixed buildings');
 });
 
-test('fire stays within a five-block diameter, cannot cross nonwood gaps, and preserves mineral HP',()=>{
+test('fire stays in its five-cell footprint, cannot cross nonwood gaps, and preserves mineral HP',()=>{
  const w=world();w.grid.fill(2*16,5*16,9*16,16,10);w.grid.tile(5,4,20);w.grid.tile(4,4,2);w.grid.tile(6,4,3);w.grid.tile(5,3,4);
  w.rear.grid.tile(5,4,5);const stoneHp=w.grid.hp[4*16*w.grid.width+6*16];
  assert.equal(typeof w.ignite,'function');w.ignite(5*48+24,5*48+24);step(w,6);
- for(const tx of [3,4,5,6,7])assert.equal(w.grid.get(tx*16+8,5*16+8),0,`connected tile ${tx}`);
- for(const tx of [2,8,9])assert.equal(w.grid.get(tx*16+8,5*16+8),10,'three or more blocks from seed stays intact');
+ for(const tx of [4,5,6])assert.equal(w.grid.get(tx*16+8,5*16+8),0,`adjacent tile ${tx}`);
+ for(const tx of [2,3,7,8,9])assert.equal(w.grid.get(tx*16+8,5*16+8),10,'nonadjacent wood stays intact');
  assert.equal(w.grid.get(5*16+8,3*16+8),4,'furnace blocks disconnected wood');
  for(const [tx,m] of [[4,2],[5,20],[6,3]])assert.equal(w.grid.get(tx*16+8,4*16+8),m);
  assert.equal(w.grid.hp[4*16*w.grid.width+6*16],stoneHp);assert.equal(w.rear.grid.get(5*16+8,4*16+8),5);
@@ -88,10 +88,11 @@ test('rear wood alone cannot ignite or create a burn hazard for an overlapping e
  assert.deepEqual(w.rear.grid.cells,rear);assert.deepEqual(w.rear.grid.hp,hp);
 });
 
-test('fire impacts near a wood boundary guarantee the seed and all available cardinal wood',()=>{
+test('fire near a wood boundary uses the actual struck cell as its five-cell center',()=>{
  const w=world();for(const [x,y] of [[5,5],[4,5],[6,5],[5,4],[5,6]])w.grid.tile(x,y,10);
  assert.ok(w.ignite(5*48-1,5*48+24));step(w,5);
- assert.equal(w.grid.count(),0);
+ for(const [x,y]of [[4,5],[5,5]])assert.equal(w.grid.get(x*16+8,y*16+8),0);
+ for(const [x,y]of [[6,5],[5,4],[5,6]])assert.equal(w.grid.get(x*16+8,y*16+8),10);
 });
 
 test('a Warden falling outside the arena counts as defeated',()=>{
