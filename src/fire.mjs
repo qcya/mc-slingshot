@@ -14,6 +14,45 @@ function woodPixels(world,tx,ty){
  return pixels;
 }
 
+function addFire(world,tx,ty,pixels,sourceId,seedX,seedY,depth=0){
+ const existing=world.fires.find(f=>f.tx===tx&&f.ty===ty);
+ if(existing){existing.sourceIds.add(sourceId);return false;}
+ const tileSize=BLOCK*world.s,startedAt=world.time+depth*.13;
+ // A deterministic shuffled removal order reveals individual burning pixels.
+ pixels.sort((a,b)=>((a.x*73+a.y*151)%257)-((b.x*73+b.y*151)%257));
+ world.fires.push({id:++world.fireSerial,sourceIds:new Set([sourceId]),tx,ty,x:tx*tileSize,y:ty*tileSize,size:tileSize,
+  startedAt,endsAt:startedAt+2.8,seedX,seedY,pixels,burned:0,nextSoundAt:startedAt+.6});
+ return true;
+}
+
+// The impact normal points out of the struck surface toward the projectile.
+// Only a direct wooden hit spreads; flames on other surfaces touch this plus
+// footprint alone, including any local wooden floor under its empty center.
+export function igniteImpact(world,x,y,normal,sourceId){
+ const tileSize=BLOCK*world.s,dx=Math.abs(normal.x)>=Math.abs(normal.y)?Math.sign(normal.x):0,dy=dx?0:Math.sign(normal.y);
+ const hitX=x-dx*world.s/2,hitY=y-dy*world.s/2;
+ const material=world.sample(hitX,hitY)||world.rear.grid.get(hitX/world.s,hitY/world.s);
+ if(isCombustible(material)&&igniteWood(world,hitX,hitY,world.s,sourceId))return true;
+ const tx=Math.floor(hitX/tileSize)+dx,ty=Math.floor(hitY/tileSize)+dy;
+ let added=false;
+ for(const [ox,oy] of [[0,0],[-1,0],[1,0],[0,-1],[0,1]])added=addFire(world,tx+ox,ty+oy,woodPixels(world,tx+ox,ty+oy),sourceId,tx,ty)||added;
+ if(added)world.events.push({type:'fire',x,y,sound:'fire_burn'});
+ return true;
+}
+
+// Rear walls have no rigid body. Require an actual charge-disc overlap with an
+// exposed rear pixel instead of seeking nearby wood through foreground walls.
+export function rearWoodContact(world,x,y,radius){
+ let nearest=null,distance=Infinity;
+ for(let py=Math.max(0,Math.floor((y-radius)/world.s));py<=Math.min(world.grid.height-1,Math.floor((y+radius)/world.s));py++)
+  for(let px=Math.max(0,Math.floor((x-radius)/world.s));px<=Math.min(world.grid.width-1,Math.floor((x+radius)/world.s));px++){
+   const wx=(px+.5)*world.s,wy=(py+.5)*world.s,d=Math.hypot(wx-x,wy-y);
+   if(!isCombustible(world.rear.grid.get(px,py))||world.sample(wx,wy))continue;
+   if(d<=radius&&d<distance){nearest={x:wx,y:wy};distance=d;}
+  }
+ return nearest;
+}
+
 // Public renderer contract: world.fires contains world-space tile rectangles
 // {id,tx,ty,x,y,size,startedAt,endsAt,seedX,seedY}. Delayed records become visible
 // at startedAt. sourceIds deduplicate one charge across the whole wood cluster.
@@ -33,15 +72,7 @@ export function igniteWood(world,x,y,reach=world.s*2,sourceId){
   const {tx,ty,depth}=queue[i],key=`${tx}:${ty}`;
   if(seen.has(key)||Math.hypot(tx-seed.tx,ty-seed.ty)>2)continue;seen.add(key);
   const pixels=woodPixels(world,tx,ty);if(!pixels.length)continue;
-  const existing=world.fires.find(f=>f.tx===tx&&f.ty===ty);
-  if(existing)existing.sourceIds.add(sourceId);
-  else{
-   const startedAt=world.time+depth*.13;
-   // A deterministic shuffled removal order reveals individual burning pixels.
-   pixels.sort((a,b)=>((a.x*73+a.y*151)%257)-((b.x*73+b.y*151)%257));
-   world.fires.push({id:++world.fireSerial,sourceIds:new Set([sourceId]),tx,ty,x:tx*tileSize,y:ty*tileSize,size:tileSize,
-    startedAt,endsAt:startedAt+2.8,seedX:seed.tx,seedY:seed.ty,pixels,burned:0,nextSoundAt:startedAt+.6});added++;
-  }
+  if(addFire(world,tx,ty,pixels,sourceId,seed.tx,seed.ty,depth))added++;
   touched++;
   for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])queue.push({tx:tx+dx,ty:ty+dy,depth:depth+1});
  }

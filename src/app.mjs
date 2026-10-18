@@ -58,7 +58,7 @@ function hud(){
  state.shots=totalAmmo(state.inventory);
  for(const [i,b] of [...$('#ballbar').children].entries()){
   const kind=hotbarSlots(progress)[i],count=kind===null?0:state.inventory[kind]||0;b.dataset.ammoIndex=kind===null?'':String(kind);b.classList.toggle('selected',i===state.selected);b.classList.toggle('empty',kind===null);b.classList.toggle('depleted',kind!==null&&!count);b.setAttribute('aria-pressed',String(i===state.selected));
-  b.querySelector('.stack-count').textContent=kind!==null&&(count===0||count>1)?String(count):'';b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);if(kind!==null)b.querySelector('img').src=iconUrl(kind);
+  b.querySelector('.stack-count').textContent=kind!==null?String(count):'';b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);if(kind!==null)b.querySelector('img').src=iconUrl(kind);
  }
 }
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}

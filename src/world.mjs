@@ -3,7 +3,7 @@ import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDama
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
-import {igniteWood,advanceFire,burnEnemy} from './fire.mjs';
+import {igniteWood,igniteImpact,rearWoodContact,advanceFire,burnEnemy} from './fire.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -41,6 +41,7 @@ export class SiegeWorld {
     this.M.Body.setMass(body,ammo.mass);
     this.M.Body.setVelocity(body,{x:vx/60,y:vy/60});
     const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0},body);
+    if(kind==='fire')p.lastFirePosition={x,y};
     if(kind==='tnt')this.events.push({type:'fuse',x,y});
     this.projectiles.push(p);return p;
   }
@@ -219,8 +220,13 @@ export class SiegeWorld {
     if(ammo){
       const kind=ammo.ammo.id;
       if(kind==='fire'){
-        const sourceId=`ammo:${ammo.id}`;if(other?.type==='enemy')burnEnemy(this,other,sourceId);
-        this.ignite(point.x,point.y,ammo.ammo.size/2+this.s*2,sourceId);this.remove(ammo);return;
+        const sourceId=`ammo:${ammo.id}`;
+        if(other?.type==='enemy')burnEnemy(this,other,sourceId);
+        else{
+          const sign=(ammo.body.position.x-point.x)*n.x+(ammo.body.position.y-point.y)*n.y>=0?1:-1;
+          igniteImpact(this,point.x,point.y,{x:n.x*sign,y:n.y*sign},sourceId);
+        }
+        this.remove(ammo);return;
       }
       if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
@@ -265,8 +271,9 @@ export class SiegeWorld {
         // Rear walls intentionally have no Matter body. Sweep the projectile's
         // path so a fire charge can still touch and ignite those wooden pixels.
         const from=p.lastFirePosition||p.body.position,to=p.body.position,length=Math.hypot(to.x-from.x,to.y-from.y),steps=Math.max(1,Math.ceil(length/this.s));
-        for(let k=0;k<=steps;k++)if(this.ignite(from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2,`ammo:${p.id}`)){
-          this.remove(p);break;
+        for(let k=0;k<=steps;k++){
+          const hit=rearWoodContact(this,from.x+(to.x-from.x)*k/steps,from.y+(to.y-from.y)*k/steps,p.ammo.size/2);
+          if(hit){this.ignite(hit.x,hit.y,this.s,`ammo:${p.id}`);this.remove(p);break;}
         }
         p.lastFirePosition={...to};
       }

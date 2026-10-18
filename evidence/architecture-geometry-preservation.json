@@ -1,0 +1,62 @@
+[
+  {
+    "level": 1,
+    "foreground": "b23f3e9f750013914e0a34088d58947e6223cf9a5f7b11c9638d6594b4a3de20",
+    "rear": "4b72d3de530e9b229cb1d5e528a10030130d8e6c89457eb3c51021ee7287d821",
+    "enemies": 1
+  },
+  {
+    "level": 2,
+    "foreground": "02df4b13402452d70e292336fb9c3b87323ebcebe73a252ae1e5596a355dd623",
+    "rear": "a48fd86f358193ff06eb07c2078886de9ccba1146865ba62498b8ffc4d30fd0e",
+    "enemies": 3
+  },
+  {
+    "level": 3,
+    "foreground": "f53532b81d7db7283f3faa3dab9019649d0ad50d895eaff9a126d5a35dc2c7b7",
+    "rear": "1b36a6e0de5b6b1044c20f35502359ed4fc637fc60ebd6bbb5e4e35253290caa",
+    "enemies": 4
+  },
+  {
+    "level": 4,
+    "foreground": "55e70dd9fd906e21c774dfddd065f667bf3a8d3f83edfa160dd134cab8322f71",
+    "rear": "e671b3a922e4ee1572e98ed2b8719d256878715b43b6a751f0ec05392abb53f9",
+    "enemies": 4
+  },
+  {
+    "level": 5,
+    "foreground": "af850140e7d5ff7a5f1c9346389e52e135d9f787604b38ebe6a23a6c252619dc",
+    "rear": "3dd56afde67b4f8d5a6283c74d7789bd13642c9ba20decbee2664f02b5e5acb8",
+    "enemies": 5
+  },
+  {
+    "level": 6,
+    "foreground": "68e7c7e4509d15263036b7a040e8bd4d4d05a71ebd619c281b714f14777300b1",
+    "rear": "fa806e2e0dacc6b209c433b28942d4d03a76393d8b1d0f230fdd2fd2f2903142",
+    "enemies": 5
+  },
+  {
+    "level": 7,
+    "foreground": "f82d87f1bc057dbd71088e05e8df95dff41b9b869c5710c782390048b198ffbf",
+    "rear": "580c8b4a80c26c6357f0391f6c3cc8ddd45b29bf40532c475779d75cf9bf3a9d",
+    "enemies": 5
+  },
+  {
+    "level": 8,
+    "foreground": "14d577f25010a5d6d26ec74fb08ab6cbeb1a7bc2baefe71f236e651a894dbb25",
+    "rear": "7af2a956ffdf9b67fdcde3925120741402b265626b696581d18f35bb2e94e82e",
+    "enemies": 6
+  },
+  {
+    "level": 9,
+    "foreground": "f63d8129c31275e059d16fb5d785b2c6ece2a8b4af8fff4225457f686bed73f3",
+    "rear": "2a06962b2c303ab628d47ebffbea3a0a278857e939d96a66218f09eefefa3f50",
+    "enemies": 5
+  },
+  {
+    "level": 10,
+    "foreground": "97dba26058575513744215b324de86790b07eda2b32b94c949e9ce93e678f0d1",
+    "rear": "b3c8e6a9dc51d9154ad555373ea212b570a5e1b8c404c6c5a65e58a9f84c1eb4",
+    "enemies": 8
+  }
+]

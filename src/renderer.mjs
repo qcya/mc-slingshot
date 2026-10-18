@@ -4,6 +4,7 @@ import {MobSprites} from './mobs.mjs';
 import {tntFlash,DEATH_POOF} from './animation.mjs';
 import {SLING_HOME,SLING_FRAME,pouchRotation} from './sling.mjs';
 import {skyAndLandscape,driftingClouds,rearPixel,foregroundPixel,contactShadows} from './scenery.mjs';
+import {isCombustible} from './fire.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -21,7 +22,7 @@ export class Renderer {
     if(revision!==this.rearVersion){
       const c=this.rearCanvas.getContext('2d'),im=c.createImageData(g.width,g.height);
       for(let y=0;y<g.height;y++)for(let x=0;x<g.width;x++){
-        const m=g.get(x,y);if(!m)continue;const k=(y*g.width+x)*4;
+        const base=g.get(x,y);if(!base)continue;const paint=this.scene.visual?.rearPaint?.get(x,y)??base,m=isCombustible(base)===isCombustible(paint)?paint:base;if(!m)continue;const k=(y*g.width+x)*4;
         im.data.set(rearPixel(this.assets,m,x,y,world,this.scene.visual),k);
       }c.putImageData(im,0,0);this.rearVersion=revision;
     }
@@ -45,7 +46,7 @@ export class Renderer {
     if(this.version===grid.version)return;
     const image=this.tctx.createImageData(grid.width,grid.height),d=image.data;
     for(let y=0;y<grid.height;y++)for(let x=0;x<grid.width;x++){
-      const m=grid.get(x,y);if(!m)continue;const k=(y*grid.width+x)*4,p=foregroundPixel(this.assets,m,x,y,grid,this.scene.visual);
+      const m=grid.get(x,y);if(!m)continue;const k=(y*grid.width+x)*4,face=this.scene.visual?.facings?.get(y*grid.width+x),p=face?this.assets.pixel(face.m,x,y).map((v,i)=>i<3?v*face.light:v):foregroundPixel(this.assets,m,x,y,grid,this.scene.visual);
       d[k]=p[0];d[k+1]=p[1];d[k+2]=p[2];d[k+3]=p[3];
     }
     this.tctx.putImageData(image,0,0);this.version=grid.version;
