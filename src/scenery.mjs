@@ -23,7 +23,7 @@ export function skyAndLandscape(ctx,assets){
 }
 export function driftingClouds(ctx,time){
  for(const [start,y,w,speed] of [[-20,96,180,5],[400,66,270,3],[950,120,156,6],[1310,55,210,4]]){
-  const x=Math.round((((start+time*speed+250)%(WIDTH+500))-250)/3)*3;
+  const x=(start+time*speed+250)%(WIDTH+500)-250;
   ctx.fillStyle='#e4edf7';ctx.fillRect(x,y+18,w,12);ctx.fillStyle='#fff';ctx.fillRect(x,y,w,21);ctx.fillRect(x+30,y-12,w-63,18);
  }
 }

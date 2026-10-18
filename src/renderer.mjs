@@ -149,10 +149,10 @@ export class Renderer {
       c.fillStyle='#ffffffbb';for(const {x,y} of this.arc)c.fillRect(Math.round(x/3)*3,Math.round(y/3)*3,6,6);
     }
   }
-  draw(world,launcher,paused=false){
+  draw(world,launcher,paused=false,visualTime=world.time){
     const c=this.ctx;c.imageSmoothingEnabled=false;
     if(!this.backgroundReady){this.ctx=this.background.getContext('2d',{alpha:false});this.ctx.imageSmoothingEnabled=false;this.backdrop(0);this.ctx=c;this.backgroundReady=true;}
-    c.drawImage(this.background,0,0);driftingClouds(c,world.time);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
+    c.drawImage(this.background,0,0);driftingClouds(c,visualTime);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
     contactShadows(c,world,SLING_HOME);
     for(const e of world.debris){if(e.dead)continue;c.save();c.translate(e.body.position.x,e.body.position.y);c.rotate(e.body.angle);c.drawImage(this.cachePiece(e),e.offset.x,e.offset.y,e.w*PIXEL,e.h*PIXEL);c.restore();}
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
