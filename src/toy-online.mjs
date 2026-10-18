@@ -1,4 +1,5 @@
 import {timeBundle,parseTimeBundle} from './timing.mjs';
+import {mergeHistoricalRows} from './restored-records.mjs';
 // The official SDK accepts signed 24-bit integer scores and keeps the maximum.
 // Centiseconds cover all ten allowed one-hour stage times without saturation.
 const SCORE_BASE=10000000;
@@ -35,9 +36,7 @@ export function createToyOnlineClient({sdk=globalThis.toy,getUser=()=>null,getTi
    const reply=await call('getRankList',{board:1,period:'all',limit:100}),list=rows(reply);
    if(!list)throw Error(`Toy 榜单返回格式无法识别（${Object.keys(reply||{}).slice(0,4).join(',')}）`);
    const entries=list.map((row,index)=>{const u=row.user||row.userInfo||row.userProfile||row.player||row,score=Number(row.score);return {id:`toy:${u.toyOpenId||u.openId||u.mid||u.id||row.toyOpenId||index}`,nickname:String(u.nickname||u.uname||u.name||row.nickname||`玩家${index+1}`),totalTimeMs:decodeTime(score),completed:10};}).filter(e=>Number.isSafeInteger(e.totalTimeMs)&&e.totalTimeMs>=1000&&e.totalTimeMs<=36000000);
-   // This is the user-requested illustrative row, not a submitted platform score.
-   if(!entries.some(e=>e.nickname==='星海_Astra'))entries.push({id:'sample-astra',nickname:'星海_Astra',totalTimeMs:397000,completed:10,demo:true});
-   entries.sort((a,b)=>a.totalTimeMs-b.totalTimeMs||a.id.localeCompare(b.id));rankCache={entries:entries.slice(0,100).map((e,i)=>({...e,rank:i+1}))};cachedAt=now();return rankCache;
+   rankCache={entries:mergeHistoricalRows(entries)};cachedAt=now();return rankCache;
   },
  };
 }

@@ -1,6 +1,18 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createToyStorage,TOY_CLOUD_KEY} from '../src/toy-storage.mjs';
 import {SAVE_KEY} from '../src/campaign.mjs';import {TIME_SAVE_KEY} from '../src/timing.mjs';
+test('the approved owner recovery restores yesterday but never another Toy account',async()=>{
+ const owner=fixture();owner.sdk.getUserProfile=async()=>({toyOpenId:'new-owner',nickname:'青春沿岸'});await owner.initialize();
+ const times=JSON.parse(owner.getItem(TIME_SAVE_KEY));assert.equal(times.reduce((n,t)=>n+t,0),435135);
+ assert.deepEqual(JSON.parse(owner.getItem(SAVE_KEY)),{unlocked:10,completed:[0,1,2,3,4,5,6,7,8,9]});
+ await owner.flush();assert.equal(JSON.parse(owner.calls.find(c=>c[0]==='set')[1][TOY_CLOUD_KEY]).values[TIME_SAVE_KEY],JSON.stringify(times));
+ const other=fixture();other.sdk.getUserProfile=async()=>({toyOpenId:'other-player',nickname:'其他玩家'});await other.initialize();assert.equal(other.getItem(TIME_SAVE_KEY),null);
+});
+test('owner recovery keeps faster cloud records and does not write after a cloud read failure',async()=>{
+ const faster=fixture();faster.sdk.getUserProfile=async()=>({toyOpenId:'new-owner',nickname:'青春沿岸'});
+ faster.sdk.getCloudStorage=async()=>({[TOY_CLOUD_KEY]:JSON.stringify({version:1,values:{[TIME_SAVE_KEY]:JSON.stringify([1000])}})});await faster.initialize();assert.equal(JSON.parse(faster.getItem(TIME_SAVE_KEY))[0],1000);
+ const offline=fixture();offline.sdk.getUserProfile=async()=>({toyOpenId:'new-owner',nickname:'青春沿岸'});offline.sdk.getCloudStorage=async()=>{throw Error('offline');};await offline.initialize();await offline.flush();assert.equal(offline.calls.filter(c=>c[0]==='set').length,0);
+});
 const PROFILE='mc-block-launch.profile.v1';
 function fixture(extra={}){const map=new Map(),calls=[],storage={getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,String(v))};const sdk={getUserProfile:async()=>({toyOpenId:'account-A'}),getCloudStorage:async keys=>{calls.push(['get',keys]);return {};},setCloudStorage:async values=>calls.push(['set',values])};return {...createToyStorage({enabled:true,storage,sdk,autoFlush:false,...extra}),map,calls,sdk};}
 

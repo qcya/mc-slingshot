@@ -1,5 +1,6 @@
 import {SAVE_KEY,readProgress} from './campaign.mjs';
 import {TIME_SAVE_KEY,normalizeTimes,recordBestTime} from './timing.mjs';
+import {RESTORED_PLAYER,RESTORED_TIMES} from './restored-records.mjs';
 export const TOY_CLOUD_KEY='mcslingshot_save_v1';
 const PROFILE_KEY='mc-block-launch.profile.v1',KEYS=[SAVE_KEY,TIME_SAVE_KEY,PROFILE_KEY];
 function parse(raw){try{return JSON.parse(raw);}catch{return null;}}
@@ -34,6 +35,13 @@ export function createToyStorage({enabled=false,sdk=globalThis.toy,storage=globa
     if(key===SAVE_KEY){const local=readProgress(read(key)),other=readProgress(remote);write(key,JSON.stringify({unlocked:Math.max(local.unlocked,other.unlocked),completed:[...new Set([...local.completed,...other.completed])].sort((a,b)=>a-b)}));}
     else if(key===TIME_SAVE_KEY){let times=normalizeTimes(parse(read(key)));normalizeTimes(parse(remote)).forEach((value,stage)=>{if(value!==null)times=recordBestTime(times,stage,value);});write(key,JSON.stringify(times));}
     else{const p=parse(remote),local=parse(read(key));if(!validProfile(p))throw Error('Invalid Toy profile');if(!validProfile(local)||local.id!==p.id||!local.dirty)write(key,JSON.stringify(p));}
+   }
+   // The owner explicitly approved restoring this named player's verified run
+   // after deleting the old Toy. Keep it within the current SDK account prefix.
+   // Never give the illustrative Astra row progress or submit it as a real user.
+   if(user.nickname===RESTORED_PLAYER){
+    let times=normalizeTimes(parse(read(TIME_SAVE_KEY)));RESTORED_TIMES.forEach((value,stage)=>{times=recordBestTime(times,stage,value);});
+    write(TIME_SAVE_KEY,JSON.stringify(times));write(SAVE_KEY,JSON.stringify({unlocked:10,completed:RESTORED_TIMES.map((_,stage)=>stage)}));
    }
    ready=true;lastError='';dirty=JSON.stringify(snapshot())!==JSON.stringify(cloud);notify();if(dirty)schedule();
   }catch(error){lastError=error.message||'Toy service unavailable';notify();}
