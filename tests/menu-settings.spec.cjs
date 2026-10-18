@@ -1,4 +1,20 @@
 const{test,expect}=require('@playwright/test');const{ready}=require('./browser-helpers.cjs');
+test('recorded times, full level titles and item buttons fit one centered line at every menu size',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('mc-block-launch.best-times.v1',JSON.stringify([4058,14625,30875,17217,49450,39417,44967,59542,39258,133667])));await ready(page);await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();
+ for(const size of [{width:1536,height:1100},{width:1000,height:700},{width:670,height:520},{width:568,height:320},{width:390,height:844},{width:320,height:568}]){
+  await page.setViewportSize(size);
+  for(let n=0;n<2;n++){
+   for(const row of await page.locator('.level-card-wrap').all()){
+    const boxes=await Promise.all(['.level-number','strong','.personal-best','.loadout-info'].map(s=>row.locator(s).boundingBox()));
+    const centers=boxes.map(b=>b.y+b.height/2);expect(Math.max(...centers)-Math.min(...centers)).toBeLessThan(2);
+    for(let i=1;i<boxes.length;i++)expect(boxes[i].x).toBeGreaterThanOrEqual(boxes[i-1].x+boxes[i-1].width);
+    expect(await row.locator('strong').evaluate(e=>e.scrollWidth<=e.clientWidth&&e.clientHeight>=parseFloat(getComputedStyle(e).fontSize))).toBe(true);
+   }
+   if(n===0)await page.locator('#nextPage').click();else await page.locator('#prevPage').click();
+  }
+  if(size.width===670)await page.screenshot({path:'evidence/one-line-level-menu.png'});if(size.width===320)await page.screenshot({path:'evidence/one-line-level-menu-phone.png'});
+ }
+});
 test('five vertical world buttons per page in landscape and portrait',async({page})=>{
  await ready(page);await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();
  for(const size of [{width:1000,height:700},{width:390,height:844}]){await page.setViewportSize(size);await expect(page.locator('#levelCards .level-card')).toHaveCount(5);const cards=await page.locator('.level-card').all(),boxes=await Promise.all(cards.map(c=>c.boundingBox()));for(let i=1;i<5;i++){expect(Math.abs(boxes[i].x-boxes[0].x)).toBeLessThan(1);expect(boxes[i].y).toBeGreaterThan(boxes[i-1].y+boxes[i-1].height);}expect(boxes[0].width/boxes[0].height).toBeGreaterThan(5);await page.locator('#nextPage').click();await expect(page.locator('#level-9')).toBeVisible();await expect(page.locator('#level-0')).toHaveCount(0);await page.locator('#prevPage').click();await expect(page.locator('#level-0')).toBeVisible();}
