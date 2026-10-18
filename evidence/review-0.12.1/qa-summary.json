@@ -1,0 +1,182 @@
+{
+  "version": "0.12.1",
+  "unitTests": {
+    "passed": 213,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 51,
+    "failed": 0
+  },
+  "liveChecks": [
+    {
+      "mobile": false,
+      "url": "http://192.168.1.4:8770/",
+      "physics": "Matter.js",
+      "screen": "play",
+      "previewPoints": 5,
+      "cancelledWithoutFiring": true,
+      "serverWrites": 0,
+      "music": {
+        "track": "C418 — Sweden",
+        "enabled": true,
+        "playing": true,
+        "loop": true,
+        "volume": 0.18,
+        "time": 0.215659,
+        "duration": 185.72576,
+        "lastError": ""
+      },
+      "errors": [],
+      "failed": []
+    },
+    {
+      "mobile": true,
+      "url": "http://192.168.1.4:8770/",
+      "physics": "Matter.js",
+      "screen": "play",
+      "previewPoints": 5,
+      "cancelledWithoutFiring": true,
+      "serverWrites": 0,
+      "music": {
+        "track": "C418 — Sweden",
+        "enabled": true,
+        "playing": true,
+        "loop": true,
+        "volume": 0.18,
+        "time": 0.20862,
+        "duration": 185.72576,
+        "lastError": ""
+      },
+      "errors": [],
+      "failed": []
+    }
+  ],
+  "stages": [
+    {
+      "level": 1,
+      "time": 2.391666666666661,
+      "remainingAmmo": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 2,
+      "time": 20.091666666666168,
+      "remainingAmmo": [
+        2,
+        0,
+        0,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 3,
+      "time": 38.00833333333182,
+      "remainingAmmo": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 4,
+      "time": 15.649999999999752,
+      "remainingAmmo": [
+        5,
+        1,
+        0,
+        1
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 5,
+      "time": 23.258333333332654,
+      "remainingAmmo": [
+        5,
+        0,
+        1,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 6,
+      "time": 25.816666666665842,
+      "remainingAmmo": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 7,
+      "time": 20.091666666666168,
+      "remainingAmmo": [
+        6,
+        0,
+        1,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 8,
+      "time": 43.10833333333153,
+      "remainingAmmo": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 9,
+      "time": 26.091666666665827,
+      "remainingAmmo": [
+        5,
+        0,
+        1,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    },
+    {
+      "level": 10,
+      "time": 32.341666666665475,
+      "remainingAmmo": [
+        6,
+        0,
+        1,
+        0
+      ],
+      "enemiesAlive": 0,
+      "screen": "result"
+    }
+  ],
+  "limits": [
+    "Android is browser emulation, not a physical phone",
+    "HTTPS checked from LAN with domain/SNI; external mobile data not tested",
+    "Toy was built and tested locally but not uploaded or submitted"
+  ]
+}

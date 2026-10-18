@@ -24,3 +24,15 @@ test('all scene materials are real blocks, without a separate cosmetic material 
     assert.equal(s.visual.rearPaint,undefined);
   }
 });
+
+test('cottage and title roofs have a low pitch while retaining connected half-block steps',()=>{
+  for(const [scene,left,right,top,bottom] of [[buildLevel(0),19,29,7,10],[buildTitleScene(),21,29,7.5,10]]){
+    const g=scene.grid;
+    let minY=Infinity;
+    for(let y=0;y<bottom*16;y++)for(let x=left*16;x<(right+1)*16;x++)if(g.get(x,y)===15)minY=Math.min(minY,y);
+    assert.equal(minY,top*16,'gable height must stay proportional to the three-block wall');
+    // The roof still bears on the original wall columns at the same eave height.
+    for(const x of [left+1,right-1])for(let px=0;px<16;px++)assert.equal(g.get(x*16+px,bottom*16-1),15);
+    assert.equal(g.get((left+2)*16+4,9*16+4),0,'do not retain the old full block beneath every inner stair');
+  }
+});

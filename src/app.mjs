@@ -24,14 +24,28 @@ function pendingResults(){const raw=readLocal(PENDING_KEY,[]);return Array.isArr
 function queueBestTimes(){const bundle=timeBundle(bestTimes);if(bundle)saveLocal(PENDING_KEY,[bundle]);}
 async function restoreTimes(){
  if(!profile?.token)return;const revision=profileRevision;
- try{const reply=await online.profile(profile.token);if(revision!==profileRevision)return;if(!profile.dirty&&reply.profile?.id===profile.id&&typeof reply.profile.nickname==='string'){profile={...profile,nickname:reply.profile.nickname};saveLocal(PROFILE_KEY,profile);profileLabel();}const bundle=parseTimeBundle(reply);if(!bundle)return;for(const s of bundle.stages)bestTimes=recordBestTime(bestTimes,s.stage,s.timeMs);saveLocal(TIME_SAVE_KEY,bestTimes);queueBestTimes();if(state.screen==='levels')renderCards();}catch{/* Offline play keeps local records. */}
+ try{if(profileMutation)await profileMutation.catch(()=>{});if(revision!==profileRevision)return;const reply=await online.profile(profile.token);if(revision!==profileRevision)return;if(!profile.dirty&&reply.profile?.id===profile.id&&typeof reply.profile.nickname==='string'){profile={...profile,nickname:reply.profile.nickname};saveLocal(PROFILE_KEY,profile);profileLabel();}const bundle=parseTimeBundle(reply);if(!bundle)return;for(const s of bundle.stages)bestTimes=recordBestTime(bestTimes,s.stage,s.timeMs);saveLocal(TIME_SAVE_KEY,bestTimes);queueBestTimes();if(state.screen==='levels')renderCards();}catch{/* Offline play keeps local records. */}
 }
 function profileLabel(){$('#profileBtn').textContent=profile?.nickname?`玩家：${profile.nickname}`:'设置昵称';}
+let profileCreation=null,profileMutation=null;
+function serializeProfileMutation(change){
+ const previous=profileMutation,operation=(async()=>{if(previous)await previous.catch(()=>{});return change();})();profileMutation=operation;
+ const clear=()=>{if(profileMutation===operation)profileMutation=null;};void operation.then(clear,clear);return operation;
+}
+function updateProfileInOrder(token,nickname){return serializeProfileMutation(()=>online.updateProfile(token,nickname));}
+async function createProfileOnce(nickname){
+ const pending=profileCreation;
+ if(pending){try{return await pending.promise;}catch(error){if(error.status!==409||pending.nickname===nickname)throw error;return createProfileOnce(nickname);}}
+ // A completed creation owns a nickname and its only token, even if the menu changed.
+ const creation={nickname};profileCreation=creation;
+ creation.promise=serializeProfileMutation(async()=>{const reply=await online.createProfile(nickname);profile={...reply.profile,token:reply.token};saveLocal(PROFILE_KEY,profile);profileLabel();return reply;}).finally(()=>{if(profileCreation===creation)profileCreation=null;});
+ return creation.promise;
+}
 async function syncResults(){
  if(syncing||!profile?.nickname||state.screen==='profile')return;syncing=true;const revision=profileRevision;
  try{
-  if(profile.token&&profile.dirty){try{const reply=await online.updateProfile(profile.token,profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:profile.token};}catch(error){if(revision!==profileRevision)return;if(error.status!==401)throw error;profile.token=null;}}
-  if(!profile.token){const reply=await online.createProfile(profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:reply.token};}saveLocal(PROFILE_KEY,profile);profileLabel();await restoreTimes();if(revision!==profileRevision)return;
+  if(profile.token&&profile.dirty){try{const reply=await updateProfileInOrder(profile.token,profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:profile.token};}catch(error){if(revision!==profileRevision)return;if(error.status!==401)throw error;profile.token=null;}}
+  if(!profile.token){await createProfileOnce(profile.nickname);if(revision!==profileRevision)return;}saveLocal(PROFILE_KEY,profile);profileLabel();await restoreTimes();if(revision!==profileRevision)return;
   while(pendingResults().length){const score=pendingResults()[0];if(revision!==profileRevision)return;try{await online.submitResult(profile.token,score);}catch(error){if(revision!==profileRevision)return;if(error.status===401){profile.token=null;saveLocal(PROFILE_KEY,profile);}throw error;}if(revision!==profileRevision)return;const rest=pendingResults().filter(s=>JSON.stringify(s)!==JSON.stringify(score));saveLocal(PENDING_KEY,rest);}
  }catch(error){if(error.status===409&&revision===profileRevision){showProfile();$('#profileStatus').textContent='用户名已占用';}else console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
 }
@@ -39,7 +53,11 @@ function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?
 async function saveProfile(event){
  event.preventDefault();if($('#saveProfile').disabled)return;const platformName=nativeOnline&&appStorage.user()?.nickname,nickname=platformName||$('#nickname').value.normalize('NFKC').trim().replace(/ +/g,' ');if(!platformName&&(!nickname||[...nickname].length>16||! /^[\p{L}\p{N}\p{M}_ -]+$/u.test(nickname)||!/[\p{L}\p{N}]/u.test(nickname))){$('#profileStatus').textContent='请输入 1—16 个字母、汉字或数字，可含空格、下划线和短横线。';return;}
  const revision=++profileRevision,returnTo=profileReturn;$('#saveProfile').disabled=true;let nextProfile;
- try{const reply=profile?.token?await online.updateProfile(profile.token,nickname):await online.createProfile(nickname);nextProfile={...reply.profile,token:reply.token||profile?.token};}
+ try{
+  let reply;if(profile?.token)reply=await updateProfileInOrder(profile.token,nickname);
+  else{reply=await createProfileOnce(nickname);if(revision!==profileRevision)return;if(reply.profile.nickname!==nickname)reply=await updateProfileInOrder(reply.token,nickname);}
+  nextProfile={...reply.profile,token:reply.token||profile?.token};
+ }
  catch(error){if(revision!==profileRevision)return;if([400,403,409].includes(error.status)){$('#profileStatus').textContent=error.status===409?'用户名已占用':error.status===403?'这是测试记录，不能修改昵称':'这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
  if(revision!==profileRevision)return;profile=nextProfile;$('#saveProfile').disabled=false;saveLocal(PROFILE_KEY,profile);profileLabel();if(state.screen==='profile')menus(returnTo);void syncResults();
 }
@@ -64,6 +82,7 @@ function hud(){
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}
 function menus(screen){
  state.screen=screen;state.paused=screen!=='play';
+ if(state.paused)assets?.pauseAll();else assets?.resumeAll();
  for(const [id,name] of [['startScreen','home'],['levelMenu','levels'],['pauseMenu','pause'],['settingsMenu','settings'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
  $('#gameRoot').classList.toggle('menu-open',screen!=='play');
 }
@@ -83,7 +102,7 @@ function renderCards(){
 }
 function cancelDrag(){drawAudio?.stop();state.drag=false;if(state.pointerId!==undefined&&canvas.hasPointerCapture(state.pointerId))canvas.releasePointerCapture(state.pointerId);state.angle=0;state.power=0;state.vx=state.vy=0;if(!state.launch)state.pouch={...SLING_HOME};}
 function loadLevel(n,preview=false){
- if(!canEnter(progress,n))return false;cancelDrag();
+ if(!canEnter(progress,n))return false;cancelDrag();assets?.stopAll();
  if(world){window.Matter.Events.off(world.engine);window.Matter.Composite.clear(world.engine.world,false);window.Matter.Engine.clear(world.engine);}
  scene=preview?buildTitleScene():buildLevel(n);world=new SiegeWorld(window.Matter,{grid:scene.grid,rear:scene.rear});for(const e of scene.enemies)world.addEnemy(e.x,e.feet,e.skin,e);
  Object.assign(state,{level:n,inventory:inventoryFor(n),selected:inventoryFor(n).findIndex(count=>count>0),ended:false,drag:false,angle:0,pouch:{...SLING_HOME},launch:null,quiet:0,winWait:0,power:0,launched:0});
@@ -128,7 +147,10 @@ function moveDrag(e){
  state.pouch=shot.origin;state.vx=shot.vx;state.vy=shot.vy;state.power=shot.power;if(assets.soundOn)drawAudio.update(shot.power,distance);
 }
 function endDrag(e){
- if(!state.drag||e.pointerId!==state.pointerId)return;state.drag=false;drawAudio.stop();const kind=state.selected;
+ if(!state.drag||e.pointerId!==state.pointerId)return;
+ // A click is not a shot. Keep even very small deliberate pulls available.
+ if(!state.vx&&!state.vy){cancelDrag();return;}
+ state.drag=false;drawAudio.stop();const kind=state.selected;
  if(!spendAmmo(state.inventory,kind))return;world.spawnProjectile(AMMO[kind].id,state.pouch.x,state.pouch.y,state.vx,state.vy);
  state.launch={age:0,kind,dx:state.pouch.x-SLING_HOME.x,dy:state.pouch.y-SLING_HOME.y,released:true};state.launched++;
  assets.play(AMMO[kind].id==='fire'?'fire_launch':'bow',.2);hud();revealInventory(1600);$('#gamehint').classList.add('faded');

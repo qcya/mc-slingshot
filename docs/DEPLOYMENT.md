@@ -35,6 +35,8 @@ handle_path /mc-block-launch/* {
 
 ## 当前服务器
 
+- 2026-10-18：0.12.1 供服务器试玩，未同步提交 Toy。发布前验证端口归属，弹弓服务保持 8770，`mc-deep-mine.service` 使用 8771；更新只替换弹弓的发布链接并重启弹弓服务。
+- 本次发布前在 `/srv/mc-block-launch/backups/` 保存只对服务器管理员可读的排行榜备份；发布前后数据文件哈希一致。具体发布目录和公开文件哈希见 `evidence/deployment.json`。回滚可将 current 指回其中记录的 previousRelease，再重启 `mc-block-launch.service`。
 - 地址：https://qcya.fun:8443/mc-block-launch/ 。家庭宽带无 NAT 回环，局域网校验需指定服务器 LAN 地址并保留域名 SNI；外网由用户实际测试。
 - 服务：mc-block-launch.service，DynamicUser，256 MB 内存上限，只读应用目录。
 - 代码：/srv/mc-block-launch/current 符号链接指向 releases 中带版本与时间戳的发布目录，具体路径及文件哈希见 evidence/deployment.json。

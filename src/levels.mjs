@@ -23,23 +23,7 @@ export function buildLevel(number){
   const column=(x,y0,y1,m)=>{for(let y=y0;y<=y1;y++)grid.tile(x,y,m);};
   const tile=(x,y,m)=>grid.tile(x,y,m);
   const enemy=(x,y,skin='pillager',options={})=>enemies.push({x:x*TILE,feet:y*TILE,skin,height:skin==='warden'?132:92,...options});
-  const roof=(x0,x1,y,m=15)=>{
-    // Real stair masks: one lower half plus one upper quarter. Rendering
-    // and collision use the same material and the same shape.
-    const base=(y+1)*16;
-    for(let step=0;x0+step<=x1-step;step++){
-      const left=x0+step,right=x1-step,ty=y-step;
-      for(const [tx,ascending] of left===right?[[left,null]]:[[left,true],[right,false]]){
-        visual.roofTiles.add(ty*32+tx);
-        grid.fill(tx*16,ty*16+8,16,8,m);
-        if(ascending!==null)grid.fill(tx*16+(ascending?8:0),ty*16,8,8,m);
-        // A whole block beneath each inner stair joins the slope into a
-        // continuous roof instead of eleven separate corner-touching pieces.
-        if(step>0){grid.tile(tx,ty+1,m);visual.roofTiles.add((ty+1)*32+tx);}
-        if(step>0)rear.grid.fill(tx*16,(ty+1)*16,16,base-(ty+1)*16,level===3?13:10);
-      }
-    }
-  };
+  const roof=(x0,x1,y,m=15)=>buildPitchedRoof(grid,rear,visual,x0,x1,y,m,level===3?13:10);
   for(let x=0;x<32;x++){tile(x,14,1);tile(x,15,2);tile(x,16,3);tile(x,17,7);rear.grid.tile(x,14,2);rear.grid.tile(x,15,2);rear.grid.tile(x,16,3);rear.grid.tile(x,17,7);}
   // Entire 16x16 blocks form the playable terrain, including every step.
   const surface=(x,top)=>{
@@ -167,6 +151,26 @@ export function buildLevel(number){
   // Background objects never enter the destructible/support grid.
   const trees=[{x:31,base:14,height:5,kind:'cherry'}];
   return {...LEVELS[level],shots:LOADOUTS[level].reduce((a,b)=>a+b,0),number:level,grid,rear,enemies,trees,visual};
+}
+
+// A shallow roof rises half a block per column. All pieces occupy the same
+// half-block quadrant grid used for collision; neighboring stairs share an edge.
+export function buildPitchedRoof(grid,rear,visual,x0,x1,y,material=15,backing=10){
+  const base=(y+1)*16;
+  for(let step=0;x0+step<=x1-step;step++){
+    const left=x0+step,right=x1-step,top=y*16-step*8;
+    for(const [tx,ascending] of left===right?[[left,null]]:[[left,true],[right,false]]){
+      grid.fill(tx*16,top+8,16,8,material);
+      if(ascending!==null)grid.fill(tx*16+(ascending?8:0),top,8,8,material);
+      for(let ty=Math.floor(top/16);ty<=Math.floor((top+15)/16);ty++)visual.roofTiles.add(ty*32+tx);
+      if(step)rear.grid.fill(tx*16,top+16,16,base-top-16,backing);
+    }
+  }
+  // Half-block bearings meet the existing wall tops without thickening the slope.
+  for(const tx of [x0+1,x1-1]){
+    grid.fill(tx*16,base-8,16,8,material);
+    visual.roofTiles.add(y*32+tx);
+  }
 }
 
 function placeFurniture(grid,rear,enemies,rooms,x,y,material){

@@ -99,3 +99,12 @@ test('a Warden falling outside the arena counts as defeated',()=>{
  const w=world(),e=w.addEnemy(200,w.height+400,'warden');step(w,.02);
  assert.equal(e.alive,false);assert.ok(e.dead);assert.equal(w.snapshot().enemiesAlive,0);
 });
+
+for(const kind of ['cobble','tnt','ender','fire'])for(const fireFirst of [false,true])test(`fire is consumed on ${kind} contact with fire spawned ${fireFirst?'first':'last'}`,()=>{
+ const w=world();w.engine.gravity.y=0;let fire,other;
+ const spawnFire=()=>w.spawnProjectile('fire',200,200,300,0),spawnOther=()=>w.spawnProjectile(kind,260,200,0,0);
+ if(fireFirst){fire=spawnFire();other=spawnOther();}else{other=spawnOther();fire=spawnFire();}
+ step(w,.4);
+ assert.equal(fire.dead,true);assert.equal(!!other.dead,kind==='fire');assert.equal(w.fires.length,0);
+ if(kind==='tnt')assert.ok(other.fuse>3.5&&other.fuse<3.7,'contact preserves the original fuse');
+});

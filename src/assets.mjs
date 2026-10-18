@@ -10,10 +10,19 @@ function tint(im,color){
   x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);return c;
 }
 export class Assets {
-  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.soundVolume=1;this.activeSounds=new Map();this.playing=0;this.audioStats={played:{},failed:0,lastError:null};try{const saved=JSON.parse(localStorage.getItem('mc-block-launch.audio.v1'));if(typeof saved?.enabled==='boolean')this.soundOn=saved.enabled;if(Number.isFinite(saved?.volume))this.soundVolume=Math.max(0,Math.min(1,saved.volume));}catch{}}
-  saveAudio(){try{localStorage.setItem('mc-block-launch.audio.v1',JSON.stringify({enabled:this.soundOn,volume:this.soundVolume}));}catch{}for(const[a,base]of this.activeSounds)a.volume=this.soundOn?base*this.soundVolume:0;}
+  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.soundVolume=1;this.soundsPaused=false;this.activeSounds=new Map();this.playing=0;this.audioStats={played:{},failed:0,lastError:null};try{const saved=JSON.parse(localStorage.getItem('mc-block-launch.audio.v1'));if(typeof saved?.enabled==='boolean')this.soundOn=saved.enabled;if(Number.isFinite(saved?.volume))this.soundVolume=Math.max(0,Math.min(1,saved.volume));}catch{}}
+  saveAudio(){try{localStorage.setItem('mc-block-launch.audio.v1',JSON.stringify({enabled:this.soundOn,volume:this.soundVolume}));}catch{}for(const[a,clip]of this.activeSounds)a.volume=this.soundOn?clip.base*this.soundVolume:0;}
   setSoundEnabled(enabled){this.soundOn=!!enabled;this.saveAudio();}
   setSoundVolume(volume){if(!Number.isFinite(volume))return;this.soundVolume=Math.max(0,Math.min(1,volume));this.saveAudio();}
+  pauseAll(){
+    if(this.soundsPaused)return;this.soundsPaused=true;
+    for(const[a,clip]of this.activeSounds){clip.version++;a.pause();}
+  }
+  resumeAll(){
+    if(!this.soundsPaused)return;this.soundsPaused=false;
+    for(const clip of this.activeSounds.values())clip.start();
+  }
+  stopAll(){for(const[a,clip]of this.activeSounds){clip.finish();a.pause();}}
   async load(){
     await Promise.all(NAMES.map(async name=>{
       const im=await image(`assets/textures/${name}.png`);
@@ -40,11 +49,25 @@ export class Assets {
     return this;
   }
   play(name,volume=.3){
-    if(!this.soundOn||this.playing>=8||!this.sounds[name])return;
-    const a=this.sounds[name].cloneNode(),base=Math.min(.8,volume);a.volume=base*this.soundVolume;this.activeSounds.set(a,base);this.playing++;
-    let done=false;const finish=()=>{if(!done){done=true;this.playing--;this.activeSounds.delete(a);}};
-    a.addEventListener('ended',finish,{once:true});a.addEventListener('error',finish,{once:true});
-    a.play().then(()=>{this.audioStats.played[name]=(this.audioStats.played[name]||0)+1;}).catch(error=>{this.audioStats.failed++;this.audioStats.lastError=error.message;finish();});
+    if(this.soundsPaused||!this.soundOn||this.playing>=8||!this.sounds[name])return;
+    const a=this.sounds[name].cloneNode(),clip={base:Math.min(.8,volume),done:false,started:false,version:0};
+    a.volume=clip.base*this.soundVolume;this.activeSounds.set(a,clip);this.playing++;
+    const finish=clip.finish=()=>{
+      if(clip.done)return;clip.done=true;this.playing--;this.activeSounds.delete(a);
+      a.removeEventListener('ended',finish);a.removeEventListener('error',finish);
+    };
+    // Pausing invalidates pending play callbacks; resuming owns a new attempt.
+    clip.start=()=>{
+      const version=++clip.version;
+      a.play().then(()=>{
+        if(clip.done||this.soundsPaused){a.pause();return;}if(version!==clip.version)return;
+        if(!clip.started){clip.started=true;this.audioStats.played[name]=(this.audioStats.played[name]||0)+1;}
+      }).catch(error=>{
+        if(clip.done||version!==clip.version)return;
+        this.audioStats.failed++;this.audioStats.lastError=error.message;finish();
+      });
+    };
+    a.addEventListener('ended',finish,{once:true});a.addEventListener('error',finish,{once:true});clip.start();
   }
   pixel(m,x,y){const data=this.colors[MATERIALS[m].sprite],k=((y&15)*16+(x&15))*4;return [data[k],data[k+1],data[k+2],m===6?Math.max(28,data[k+3]):data[k+3]];}
 }

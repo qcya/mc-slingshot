@@ -1,4 +1,4 @@
-import {buildLevel} from './levels.mjs';
+import {buildLevel,buildPitchedRoof} from './levels.mjs';
 
 // A small oak cottage, built from whole blocks and real half-block stairs.
 export function buildTitleScene(){
@@ -11,15 +11,6 @@ export function buildTitleScene(){
   }
   for(const x of [23,27])grid.tile(x,11,6);
   grid.tile(25,11,17);grid.tile(25,12,18);
-  for(let step=0;step<=4;step++){
-    const left=21+step,right=29-step,ty=9-step;
-    for(const [x,up] of left===right?[[left,null]]:[[left,true],[right,false]]){
-      grid.fill(x*16,ty*16+8,16,8,15);
-      if(up!==null)grid.fill(x*16+(up?8:0),ty*16,8,8,15);
-      visual.roofTiles.add(ty*32+x);
-      if(step){grid.tile(x,ty+1,15);visual.roofTiles.add((ty+1)*32+x);}
-      if(step)rear.grid.fill(x*16,(ty+1)*16,16,(9-ty)*16,10);
-    }
-  }
+  buildPitchedRoof(grid,rear,visual,21,29,9);
   scene.enemies=[];scene.titleScene=true;return scene;
 }

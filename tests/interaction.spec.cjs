@@ -15,7 +15,7 @@ test('小力度和反向发射实际扣除当前圆石，重开恢复库存',asy
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies[0]?.x??9999)).toBeLessThan(x-5);
 });
 test('两颗 TNT 相互炸飞，消耗各自库存且没有黑洞物品',async({page})=>{
- await ready(page,{level:3});await page.keyboard.press('2');await aim(page,0,0);await page.mouse.up();await page.waitForTimeout(1050);await aim(page,0,0);await page.mouse.up();
+ await ready(page,{level:3});await page.keyboard.press('2');await aim(page,-2,0);await page.mouse.up();await page.waitForTimeout(1050);await aim(page,-2,0);await page.mouse.up();
  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([6,1,0,1]);
  await page.waitForFunction(()=>MCBlockLaunch.getStatus().explosions===1,null,{timeout:6000});
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies[0]?.speed||0)).toBeGreaterThan(200);

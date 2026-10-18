@@ -220,7 +220,8 @@ export class SiegeWorld {
     };
     if(ea?.type==='enemy')this.hurt(ea,contactDamage(ea,eb,b.mass,a.mass));
     if(eb?.type==='enemy')this.hurt(eb,contactDamage(eb,ea,a.mass,b.mass));
-    const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
+    // A fire charge must resolve its impact even when it hits an older projectile.
+    const ammo=ea?.ammo?.id==='fire'?ea:eb?.ammo?.id==='fire'?eb:ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
     const other=ammo===ea?eb:ea,otherBody=ammo===ea?b:a;
     if(ammo){
       const kind=ammo.ammo.id;
@@ -231,7 +232,7 @@ export class SiegeWorld {
           const sign=(ammo.body.position.x-point.x)*n.x+(ammo.body.position.y-point.y)*n.y>=0?1:-1;
           igniteImpact(this,point.x,point.y,{x:n.x*sign,y:n.y*sign},sourceId);
         }
-        this.remove(ammo);return;
+        this.remove(ammo);if(other?.ammo?.id==='fire')this.remove(other);return;
       }
       if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;

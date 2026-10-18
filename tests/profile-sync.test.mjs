@@ -45,3 +45,53 @@ test('a read-only sample rename cannot be saved as a dirty offline change',async
 test('restoring the same identity refreshes a server-renamed nickname',async()=>{
  const {context:c,node}=fixture();c.profile.nickname='1';c.online.profile=async()=>({profile:{id:'id',nickname:'星海'},...bundle(39700)});c.online.submitResult=async()=>{};await c.syncResults();assert.equal(c.profile.nickname,'星海');assert.equal(node('#profileBtn').textContent,'玩家：星海');
 });
+
+test('opening the nickname window during reconnect preserves the newly created identity',async()=>{
+ const {context:c,node,storage}=fixture();c.profile={nickname:'OfflinePlayer',dirty:true};let release;
+ c.online.createProfile=()=>new Promise(resolve=>release=resolve);
+ const sync=c.syncResults();c.showProfile();node('#nickname').value='StillEditing';
+ release({profile:{id:'created-id',nickname:'OfflinePlayer'},token:'created-token'});await sync;
+ assert.equal(c.profile.token,'created-token');assert.equal(JSON.parse(storage.get('profile')).token,'created-token');
+ assert.equal(c.state.screen,'profile');assert.equal(node('#nickname').value,'StillEditing');
+});
+
+for(const nickname of ['OfflinePlayer','RenamedPlayer'])test(`saving ${nickname} during reconnect uses the identity already being created`,async()=>{
+ const {context:c,node,storage}=fixture();c.profile={nickname:'OfflinePlayer',dirty:true};let release,creates=0;
+ c.online.createProfile=()=>{creates++;if(creates>1)throw Object.assign(Error('taken'),{status:409});return new Promise(resolve=>release=resolve);};
+ c.online.updateProfile=async(token,name)=>{assert.equal(token,'created-token');return {profile:{id:'created-id',nickname:name}};};
+ const sync=c.syncResults();c.showProfile();node('#nickname').value=nickname;const save=c.saveProfile({preventDefault(){}});
+ release({profile:{id:'created-id',nickname:'OfflinePlayer'},token:'created-token'});await Promise.all([sync,save]);
+ assert.equal(c.profile.token,'created-token');assert.equal(c.profile.nickname,nickname);assert.equal(creates,1);
+ assert.equal(JSON.parse(storage.get('profile')).nickname,nickname);assert.equal(c.state.screen,'levels');
+});
+
+test('a conflict for the old reconnect nickname does not reject a newly requested free name',async()=>{
+ const {context:c,node,storage}=fixture();c.profile={nickname:'Taken',dirty:true};let rejectOld;const names=[];
+ c.online.createProfile=name=>{names.push(name);return name==='Taken'?new Promise((resolve,reject)=>rejectOld=reject):Promise.resolve({profile:{id:'created-id',nickname:name},token:'created-token'});};
+ const sync=c.syncResults();c.showProfile();node('#nickname').value='FreeName';const save=c.saveProfile({preventDefault(){}});
+ rejectOld(Object.assign(Error('taken'),{status:409}));await Promise.all([sync,save]);
+ assert.deepEqual(names,['Taken','FreeName']);assert.equal(c.profile.nickname,'FreeName');assert.equal(c.profile.token,'created-token');
+ assert.equal(JSON.parse(storage.get('profile')).nickname,'FreeName');assert.equal(c.state.screen,'levels');
+});
+
+for(const firstAction of ['save','reconnect'])test(`a newer nickname save waits for an earlier ${firstAction} mutation and remains authoritative`,{timeout:2000},async()=>{
+ const {context:c,node,storage}=fixture();let serverName='Original',secondStarted;const requests=[];
+ const secondRequest=new Promise(resolve=>secondStarted=resolve);
+ c.online.updateProfile=(token,name)=>new Promise(resolve=>{requests.push({name,finish(){serverName=name;resolve({profile:{id:'id',nickname:name}});}});if(name==='Second')secondStarted();});
+ c.online.profile=async()=>({profile:{id:'id',nickname:serverName},stages:[]});
+ let first;if(firstAction==='reconnect'){c.profile.nickname='First';c.profile.dirty=true;first=c.syncResults();}
+ else{c.state.screen='profile';node('#nickname').value='First';first=c.saveProfile({preventDefault(){}});}
+ c.menus('levels');c.showProfile();node('#nickname').value='Second';const second=c.saveProfile({preventDefault(){}});
+ assert.deepEqual(requests.map(r=>r.name),['First'],'only one profile mutation may be in flight');
+ requests[0].finish();await secondRequest;requests[1].finish();await Promise.all([first,second]);await c.restoreTimes();
+ assert.equal(serverName,'Second');assert.equal(c.profile.nickname,'Second');assert.equal(JSON.parse(storage.get('profile')).nickname,'Second');
+});
+
+test('restoring a profile during a pending rename cannot overwrite the successful new name',{timeout:2000},async()=>{
+ const {context:c,node,storage}=fixture();let serverName='Original',finishRename,finishRead,readStarted;const readRequest=new Promise(resolve=>readStarted=resolve);
+ c.online.updateProfile=(token,name)=>new Promise(resolve=>finishRename=()=>{serverName=name;resolve({profile:{id:'id',nickname:name}});});
+ c.online.profile=()=>{const nickname=serverName;if(finishRead)return Promise.resolve({profile:{id:'id',nickname},stages:[]});return new Promise(resolve=>{finishRead=()=>resolve({profile:{id:'id',nickname},stages:[]});readStarted();});};
+ c.state.screen='profile';node('#nickname').value='Second';const save=c.saveProfile({preventDefault(){}}),restore=c.restoreTimes();
+ finishRename();await save;await readRequest;finishRead();await restore;
+ assert.equal(c.profile.nickname,'Second');assert.equal(JSON.parse(storage.get('profile')).nickname,'Second');
+});
