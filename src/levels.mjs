@@ -102,8 +102,8 @@ export function buildLevel(number){
   }else if(level===3){
     column(22,6,13,12);column(27,6,13,12);row(20,29,10,13);
     roof(20,29,5,13);tile(21,9,12);tile(28,9,12);
-    // Corner piers carry the watch deck and enclose the open ground-floor bay.
-    rear.room(22,11,1,3,12);rear.room(27,11,1,3,12);
+    // The open bay has only solid foreground supports. When burned away,
+    // they reveal distant scenery; the fixed watch deck stays suspended.
     for(const x of [22,27]){tile(x,8,6);tile(x,9,6);}
     enemy(23.7,10);enemy(26.2,10);enemy(29.4,10,'pillager',{stationary:true});enemy(24.5,14,'zombie');
     room(23,6,4,4,13,10,[22,5,28,11]);
@@ -134,8 +134,8 @@ export function buildLevel(number){
     // Open quarry ledges, a wooden machine room, and a low mine gallery.
     row(18,21,10,5);column(18,11,13,5);column(21,11,13,5);
     row(25,30,7,16);column(25,8,8,16);column(29,8,15,3);column(30,8,13,5);
-    // A dressed quarry face carries the upper working ledge down to the mine.
-    rear.room(29,8,1,8,3);
+    // The quarry pier is already in the foreground; do not duplicate it
+    // as a permanent background column behind the exposed face.
     row(22,28,13,15);column(22,10,12,14);column(28,10,12,14);row(22,28,9,15);tile(22,11,6);
     row(18,29,16,3);column(18,14,15,5);tile(18,14,6);tile(18,15,6);
     room(23,10,5,3,15);
