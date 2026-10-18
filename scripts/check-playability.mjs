@@ -32,7 +32,7 @@ function robustFinish(level,plan){
  }))),...candidates]:candidates;
  const remaining=inventoryFor(level),slots={cobble:0,tnt:1,ender:2,fire:3};for(const p of history)remaining[slots[p.kind]]--;
  const replay=(extra,scenario)=>{const w=setup(level);advance(w,scenario.initial);for(const p of [...history,...extra]){advance(w,scenario.delay);simulate(w,p);}return w;};
- const evaluate=extra=>{const outcomes=scenarios.map(s=>{const w=replay(extra,s),hp=w.enemies.reduce((n,e)=>n+(e.alive?Math.max(0,e.hp):0),0),alive=w.enemies.filter(e=>e.alive).length;dispose(w);return {hp,alive};});return {outcomes,won:outcomes.every(o=>!o.alive),score:-Math.max(...outcomes.map(o=>o.hp))*10000-outcomes.reduce((n,o)=>n+o.hp,0)};};
+ const evaluate=extra=>{const outcomes=scenarios.map(s=>{const w=replay(extra,s),hp=w.enemies.reduce((n,e)=>n+(e.alive?Math.max(0,e.hp):0),0),alive=w.enemies.filter(e=>e.alive).length,removed=w.stats.removed;dispose(w);return {hp,alive,removed};});return {outcomes,won:outcomes.every(o=>!o.alive),score:-Math.max(...outcomes.map(o=>o.hp))*10000-outcomes.reduce((n,o)=>n+o.hp,0)+outcomes.reduce((n,o)=>n+o.removed,0)*.0001};};
  for(let shot=history.length;shot<buildLevel(level).shots;shot++){
   const baseline=evaluate([]);if(baseline.won)break;let best=null;
   for(const candidate of localCandidates.filter(c=>remaining[slots[c.kind]]&&(c.refinement||process.argv.includes('--dense')||([1,.875,.75].includes(c.pull)&&[.12,.20,.28,.36,.44,.52,.64,.76,.88,1,1.06].includes(c.angle))))){

@@ -10,16 +10,16 @@ test('原版弩上弦声实际输出，反向和低角度均五点，右键取�
  }
 });
 test('小力度和反向发射实际扣除当前圆石，重开恢复库存',async({page})=>{
- await ready(page);await aim(page,-2,0);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([2,0,0,0]);
+ await ready(page);await aim(page,-2,0);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([4,0,0,0]);
  await restart(page);await aim(page,60,10);const x=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher.x);await page.mouse.up();
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies[0]?.x??9999)).toBeLessThan(x-5);
 });
 test('两颗 TNT 相互炸飞，消耗各自库存且没有黑洞物品',async({page})=>{
- await ready(page,{level:2});await page.keyboard.press('2');await aim(page,0,0);await page.mouse.up();await page.waitForTimeout(1050);await aim(page,0,0);await page.mouse.up();
- expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([2,0,1,0]);
+ await ready(page,{level:3});await page.keyboard.press('2');await aim(page,0,0);await page.mouse.up();await page.waitForTimeout(1050);await aim(page,0,0);await page.mouse.up();
+ expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([6,1,0,1]);
  await page.waitForFunction(()=>MCBlockLaunch.getStatus().explosions===1,null,{timeout:6000});
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies[0]?.speed||0)).toBeGreaterThan(200);
- expect(await page.locator('#ballbar img').count()).toBe(4);await page.screenshot({path:'evidence/tnt-interaction.png'});
+ expect(await page.locator('#ballbar img').count()).toBe(3);await page.screenshot({path:'evidence/tnt-interaction.png'});
  require('node:fs').writeFileSync('evidence/tnt-interaction.json',JSON.stringify(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()),null,2));
 });
 test('用户 PNG、阁楼梯子与怪物停顿抬手实际显示',async({page})=>{

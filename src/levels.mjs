@@ -8,7 +8,7 @@ export const LEVELS=[
   {title:'03 / 双层村庄建筑',desc:'注意入口下方的地窖与守卫'},
   {title:'04 / 掠夺者前哨站',desc:'穿过木墙，攻击高架平台上的守卫'},
   {title:'05 / 小型堡垒',desc:'爆破打开射界，利用爆炸推动其他弹药'},
-  {title:'06 / 山坡伐木场',desc:'越过土坡，在屋顶与木屋之间分配烈焰和爆破'},
+  {title:'06 / 山坡伐木场',desc:'越过土坡，在屋顶与木屋之间分配圆石和爆破'},
   {title:'07 / 峡谷吊桥',desc:'高低两路守军，桥板仍会固定在原位'},
   {title:'08 / 采石场工坊',desc:'穿过石窗，清理台地、工坊和地下矿道'},
   {title:'09 / 幽深洞窟',desc:'监守者需要反复重击；先打开洞口再集中火力'},
@@ -86,7 +86,7 @@ export function buildLevel(number){
     tile(23,7,6);tile(23,11,6);tile(28,6,6);
     // An oak pier divides the lower room behind its fragile entry window.
     column(24,10,12,4);
-    enemy(25.5,4);enemy(26,9,'zombie');enemy(25.5,13);
+    enemy(25.5,4);enemy(26,9);enemy(25.5,13,'zombie');
     room(24,5,4,4,5,9,[23,4,29,10]);room(24,10,4,3,5,13,[23,9,29,14]);
   }else if(level===2){
     row(19,29,13,16);column(19,7,12,4);column(29,7,12,4);
@@ -155,7 +155,8 @@ export function buildLevel(number){
     // separate blast areas instead of making success depend on a patrol phase.
     column(30,13,15,11);for(const x of [20,24,25,29])column(x,14,15,11);
     room(19,7,3,5,5);room(23,8,4,4,13);room(28,7,2,5,5);
-    enemy(19.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16,'zombie');enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
+    // The open intake is guarded by a pillager; the zombie stays under the canopy.
+    enemy(19.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16);enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
   }
   // Furniture lives in the destructible rear layer, outside the firing plane.
   const furniture=[[[21,12,19],[22,12,20],[26,12,21]],[[24,12,20],[27,8,21]],[[20,12,19],[21,12,20],[28,12,21],[20,9,21],[27,9,19]],[[23,9,21],[26,9,19]],[[20,12,20],[29,12,21],[23,12,19],[26,12,20]],[[19,12,19],[22,12,20],[28,11,21]],[[23,8,21],[20,15,20]],[[23,12,19],[26,12,20],[28,15,9]],[[19,15,9],[29,15,9]],[[20,11,21],[25,11,19],[28,15,20]]][level];

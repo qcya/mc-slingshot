@@ -2,8 +2,8 @@
 export const CAMPAIGN_LENGTH=10;
 // Slots: cobblestone, TNT, ender pearl, fire charge. Clear stages 1–3 to unlock each.
 export const LOADOUTS=[
- [3,0,0,0], [3,1,0,0], [2,2,1,0], [2,2,1,1], [3,3,1,1],
- [2,2,1,1], [2,3,1,1], [2,4,1,1], [3,3,2,1], [4,6,2,1]
+ [5,0,0,0], [5,1,0,0], [5,1,1,0], [6,3,0,1], [6,3,1,0],
+ [5,2,1,0], [6,3,2,0], [0,4,2,1], [6,3,2,0], [7,4,2,0]
 ];
 export function readProgress(raw){
  try{
@@ -24,6 +24,7 @@ export function finishLevel(progress,level){
  return {unlocked:Math.max(Math.min(CAMPAIGN_LENGTH,progress.unlocked),Math.min(CAMPAIGN_LENGTH,level+2)),completed:[...new Set([...progress.completed,level])].sort((a,b)=>a-b)};
 }
 export function inventoryFor(level){return [...LOADOUTS[level]];}
+export function loadoutSlots(level){const kinds=LOADOUTS[level].flatMap((count,index)=>count>0?[index]:[]);return Array.from({length:3},(_,i)=>kinds[i]??null);}
 export function totalAmmo(inventory){return inventory.reduce((n,count)=>n+count,0);}
 export function spendAmmo(inventory,slot){if(!Number.isInteger(slot)||!(inventory[slot]>0))return false;inventory[slot]--;return true;}
 export function rewardFor(level){return level===0?'TNT':level===1?'末影珍珠':level===2?'烈焰弹':null;}

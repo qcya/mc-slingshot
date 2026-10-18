@@ -2,7 +2,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#151515">
 <title>拉满的石 · Stone at Full Draw</title><link rel="icon" type="image/png" href="assets/sprites/game-icon.png"><link rel="stylesheet" href="style.css"></head><body>
 <main class="viewport" id="gameRoot">
- <canvas id="stage" width="1536" height="864" aria-label="像素攻城二维物理游戏"></canvas>
+ <canvas id="stage" width="1536" height="864" aria-label="像素攻城二维物理游戏"></canvas><p id="fullscreenStatus" class="fullscreen-feedback" role="status" hidden></p>
  <div id="loadState" role="status">正在加载原版纹理与物理引擎…</div>
  <div class="gamehint faded" id="gamehint"></div>
  <nav class="touch-controls" aria-label="触屏操作"><button id="touchPause">暂停菜单</button></nav>
@@ -16,7 +16,7 @@
  <section id="profileMenu" class="menu-screen hidden" aria-label="玩家昵称"><form class="dialog-panel" id="profileForm"><h2>你叫什么名字？</h2><p>设置昵称后开始挑战，十关全通后记录排行榜成绩。</p><label for="nickname">玩家昵称</label><input id="nickname" name="nickname" maxlength="16" minlength="1" autocomplete="nickname" required><p id="profileStatus" class="online-status" role="status"></p><button id="saveProfile" type="submit">开始冒险</button><button id="profileBack" type="button">返回</button></form></section>
  <section id="leaderboardMenu" class="menu-screen hidden" aria-label="排行榜"><div class="dialog-panel leaderboard-panel"><h2>主世界排行榜</h2><p>所有玩家可查看 · 全通后上榜 · 最多 100 人</p><p id="leaderboardStatus" class="online-status" role="status"></p><div class="ranking-scroll" id="rankingTable"><table><thead><tr><th>名次</th><th>玩家</th><th>总用时</th></tr></thead><tbody id="rankingRows"></tbody></table></div><button id="leaderboardRefresh">刷新</button><button id="leaderboardBack">返回选关</button></div></section>
  <section class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">挑战成功</span><h2 id="resultTitle"></h2><img id="rewardIcon" class="reward-icon hidden" alt=""><p id="resultMsg"></p>
- <div class="result-buttons"><button id="retryBtn">重新挑战</button><button id="nextBtn">下一关</button><button id="resultLevels">选关</button></div></div></section>
+ <p id="resultTiming" hidden></p><div class="result-buttons"><button id="retryBtn">重新挑战</button><button id="nextBtn">下一关</button><button id="resultLevels">选关</button></div></div></section>
 </main><script src="vendor/matter.min.js"></script>
 <aside class="rotate-hint" id="rotateHint">横过手机，视野更开阔 <button id="rotateFullscreen">全屏游玩</button></aside>
 <script>window.addEventListener('error',function(e){var p=document.querySelector('#loadState');if(p&&!p.hidden){p.classList.add('error');p.textContent='加载失败，请刷新页面重试。'+(e.message||(e.target&&e.target.src)||'必要脚本无法加载');}},true);</script>

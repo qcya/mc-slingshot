@@ -17,7 +17,7 @@ test('新存档锁关，实际圆石通关解锁TNT，第二关解锁珍珠并�
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1')).filter(Number.isInteger).length)).toBe(level+1);
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.pending.v2')||'[]'))).toEqual([]);
   await page.screenshot({path:`evidence/campaign-reward-${level+1}.png`});reports.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));
-  if(level===0){await page.locator('#nextBtn').click();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([3,1,0,0]);}
+  if(level===0){await page.locator('#nextBtn').click();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([5,1,0,0]);}
  }
  await page.reload();await page.waitForFunction(()=>window.MCBlockLaunch);await expect(page.locator('#level-2')).toBeEnabled();await expect(page.locator('#level-3')).toBeDisabled();
  require('node:fs').writeFileSync('evidence/browser-victories.json',JSON.stringify(reports,null,2));

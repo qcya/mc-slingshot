@@ -32,7 +32,7 @@ test('leaving nickname editing retries a discarded delayed full-record restore',
  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await expect.poll(()=>reads).toBe(1);await page.locator('#profileBtn').click();
  const response=page.waitForResponse(r=>r.url().endsWith('/api/profile')&&r.request().method()==='GET');release();await response;await page.waitForTimeout(50);
  await page.locator('#profileBack').click();await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1'))?.filter(Number.isInteger).length)).toBe(10);
- expect(reads).toBeGreaterThanOrEqual(2);
+ expect(reads).toBeGreaterThanOrEqual(2);await expect(page.locator('#level-0 .personal-best')).toContainText('00:03.000');
 });
 
 test('a new player can view a board capped at one hundred people',async({page})=>{

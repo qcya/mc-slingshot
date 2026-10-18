@@ -1,9 +1,9 @@
-const {test,expect}=require('@playwright/test');const {ready,shot,shotPlan,chooseLevel}=require('./browser-helpers.cjs');
+const {test,expect}=require('@playwright/test');const {ready,shot,shotPlan,chooseLevel,selectAmmo}=require('./browser-helpers.cjs');
 
 test('原版灰色按钮和泥土选关背景加载，四种弹药在弹弓上尺寸一致',async({page})=>{
  await ready(page,{level:3});
- for(const [key,name] of [[1,'cobble'],[2,'tnt'],[3,'ender'],[4,'fire']]){
-  await page.keyboard.press(String(key));
+ for(const [level,key,name] of [[3,1,'cobble'],[3,2,'tnt'],[2,3,'ender'],[3,4,'fire']]){
+  await chooseLevel(page,level);await selectAmmo(page,key);
   const b=await page.locator('#stage').boundingBox();
   await page.screenshot({path:`evidence/sling-${name}.png`,clip:{x:b.x+180*b.width/1536,y:b.y+480*b.height/864,width:210*b.width/1536,height:205*b.height/864}});
  }
