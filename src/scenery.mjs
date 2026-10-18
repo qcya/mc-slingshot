@@ -31,9 +31,10 @@ export function driftingClouds(ctx,time){
 export function rearPixel(assets,m,x,y,world,visual){
   const p=assets.pixel(m,x,y);
   const average=assets.averages[MATERIALS[m].sprite];
-  // An even, subdued wall has no windows or bright furniture to suggest
-  // interactive openings. Foreground destruction does not relight the wall.
-  return [0,1,2].map(c=>(average[c]*.35+p[c]*.65)*.42).concat(p[3]);
+  // Muted appliances stay legible against the darker, noncolliding back wall.
+  // Neither layer brightens when foreground pixels disappear.
+  const shade=[19,20,21].includes(m)?.65:.42;
+  return [0,1,2].map(c=>(average[c]*.35+p[c]*.65)*shade).concat(p[3]);
 }
 
 export function foregroundPixel(assets,m,x,y,grid,visual){

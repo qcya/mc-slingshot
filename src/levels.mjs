@@ -159,21 +159,22 @@ export function buildLevel(number){
     // The open intake is guarded by a pillager; the zombie stays under the canopy.
     enemy(19.5,6,'pillager',{stationary:true});enemy(29.5,6,'pillager',{stationary:true});enemy(24.5,12);enemy(25.5,12,'zombie');enemy(21.5,16);enemy(22.5,16,'warden');enemy(27.5,16,'warden');enemy(28.5,16);
   }
-  // Appliances are solid foreground blocks. Relocate a planned prop within
-  // its room if it would overlap a spawn; omit it if there is no safe floor.
+  // Appliances decorate the noncolliding rear wall. Ore remains solid terrain.
+  // Keep props on a real floor and out of the initial mob silhouettes.
   const furniture=[[[21,12,19],[22,12,20],[26,12,21]],[[24,12,20],[27,8,21]],[[20,12,19],[21,12,20],[28,12,21],[20,9,21],[27,9,19]],[[23,9,21],[26,9,19]],[[20,12,20],[29,12,21],[23,12,19],[26,12,20]],[[19,12,19],[22,12,20],[28,11,21]],[[23,8,21],[20,15,20]],[[23,12,19],[26,12,20],[28,15,9]],[[19,15,9],[29,15,9]],[[20,11,21],[25,11,19],[28,15,20]]][level];
   if(level===2)furniture.push([21,15,20],[27,15,21]);
-  for(const prop of furniture)placeFurniture(grid,enemies,visual.rooms,...prop);
+  for(const prop of furniture)placeFurniture(grid,rear,enemies,visual.rooms,...prop);
   // Background objects never enter the destructible/support grid.
   const trees=[{x:31,base:14,height:5,kind:'cherry'}];
   return {...LEVELS[level],shots:LOADOUTS[level].reduce((a,b)=>a+b,0),number:level,grid,rear,enemies,trees,visual};
 }
 
-function placeFurniture(grid,enemies,rooms,x,y,material){
+function placeFurniture(grid,rear,enemies,rooms,x,y,material){
   const room=rooms.find(r=>(x+.5)*16>=r.x&&(x+.5)*16<r.x+r.w&&(y+.5)*16>=r.y&&(y+.5)*16<r.y+r.h);
   if(!room)return;
   const options=[];
   for(let ty=room.y/16;ty<(room.y+room.h)/16;ty++)for(let tx=room.x/16;tx<(room.x+room.w)/16;tx++){
+    if([19,20,21].includes(rear.grid.get(tx*16,ty*16)))continue;
     let clear=true;
     for(let py=0;py<16&&clear;py++)for(let px=0;px<16;px++)if(grid.get(tx*16+px,ty*16+py)){clear=false;break;}
     if(!clear)continue;
@@ -187,7 +188,10 @@ function placeFurniture(grid,enemies,rooms,x,y,material){
     options.push({x:tx,y:ty,d:Math.abs(tx-x)+Math.abs(ty-y)*2});
   }
   options.sort((a,b)=>a.d-b.d||a.y-b.y||a.x-b.x);
-  if(options.length)grid.tile(options[0].x,options[0].y,material);
+  if(options.length){
+    const target=[19,20,21].includes(material)?rear.grid:grid;
+    target.tile(options[0].x,options[0].y,material);
+  }
 }
 
 function patrolWidth(grid,enemy,propX=-1,propY=-1){
