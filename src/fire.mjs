@@ -84,7 +84,7 @@ export function advanceFire(world){
   const progress=Math.min(1,(world.time-fire.startedAt)/2.8),target=Math.floor(progress*fire.pixels.length);
   while(fire.burned<target){
    const p=fire.pixels[fire.burned++],m=world.grid.get(p.x,p.y);
-   if(!isCombustible(m))continue;world.grid.set(p.x,p.y,0);world.stats.removed++;
+   if(!isCombustible(m))continue;world.removeTerrainPixel(p.x,p.y);world.stats.removed++;
    if(fire.burned%23===0)world.emitPixel((p.x+.5)*world.s,(p.y+.5)*world.s,m,.35);
   }
   if(world.time>=fire.nextSoundAt){

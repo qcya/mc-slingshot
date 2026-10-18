@@ -12,7 +12,7 @@ function impact(w,projectile,enemy){
  w.processContact({bodyA:projectile.body,bodyB:enemy.body,collision:{normal:{x:1,y:0},supports:[{x:enemy.body.position.x,y:enemy.body.position.y}]}});
 }
 
-test('fire consumes connected foreground wood and leaves decorative rear wood intact',()=>{
+test('fire consumes connected foreground wood and leaves nonoverlapping rear wood intact',()=>{
  const w=world();
  for(const [tx,ty,m] of [[5,5,4],[4,5,19],[6,5,21],[5,4,17],[5,6,18]])w.grid.tile(tx,ty,m);
  w.rear.grid.tile(6,6,23);w.rear.grid.tile(5,7,15);

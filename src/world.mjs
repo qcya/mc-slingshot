@@ -110,7 +110,20 @@ export class SiegeWorld {
     return 0;
   }
   emitPixel(x,y,m,force=1){this.events.push({type:'pixel',x,y,m,force});}
-  flushGridPixels(){for(const p of this.grid.recent)if((p.x*7+p.y*11+this.stats.removed)%5===0)this.emitPixel((p.x+.5)*this.s,(p.y+.5)*this.s,p.m);this.grid.recent.length=0;}
+  clearRearPixel(x,y){
+    if(!this.rear.grid.get(x,y))return;
+    this.rear.grid.set(x,y,0);this.stats.backgroundRemoved++;
+  }
+  removeTerrainPixel(x,y){
+    this.grid.set(x,y,0);this.clearRearPixel(x,y);
+  }
+  flushGridPixels(){
+    for(const p of this.grid.recent){
+      this.clearRearPixel(p.x,p.y);
+      if((p.x*7+p.y*11+this.stats.removed)%5===0)this.emitPixel((p.x+.5)*this.s,(p.y+.5)*this.s,p.m);
+    }
+    this.grid.recent.length=0;
+  }
   damageDisk(x,y,radius,power,options={}){
     let n=this.grid.damageDisk(x/this.s,y/this.s,radius/this.s,power,options);
     this.flushGridPixels();
@@ -161,7 +174,11 @@ export class SiegeWorld {
   }
   blast(x,y,radius=98,power=160){
     this.stats.explosions++;this.events.push({type:'explosion',x,y,radius});
-    this.damageDisk(x,y,radius,power,{jagged:true,seed:this.stats.explosions});this.synchronize();
+    const damage={jagged:true,seed:this.stats.explosions};
+    this.damageDisk(x,y,radius,power,damage);
+    // Rear walls have no bodies, but TNT can destroy their exposed pixels too.
+    this.stats.backgroundRemoved+=this.rear.grid.damageDisk(x/this.s,y/this.s,radius/this.s,power,{...damage,canDamage:(gx,gy)=>!this.grid.get(gx,gy)});
+    this.rear.grid.recent.length=0;this.synchronize();
     for(const e of this.allMoving()){
       const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy),reach=radius+50;if(d>reach)continue;
       const speed=clamp(1600*(1-d/reach)/e.body.mass,0,650),ux=d>1?dx/d:(e.id%2?1:-1),uy=d>1?dy/d:0;
@@ -239,7 +256,7 @@ export class SiegeWorld {
   ignite(x,y,reach,sourceId){return igniteWood(this,x,y,reach,sourceId);}
   shatterGlass(body,point,speed){
     const id=body.plugin.tileId,cols=Math.ceil(this.grid.width/16),tx=id%cols*16,ty=Math.floor(id/cols)*16;let count=0;
-    for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.grid.set(x,y,0);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
+    for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.removeTerrainPixel(x,y);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
     this.stats.removed+=count;if(count)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});
   }
   step(dt){

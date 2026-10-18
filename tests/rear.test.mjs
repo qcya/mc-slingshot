@@ -8,12 +8,17 @@ function setup(){
 }
 for(const [name,damage] of [
  ['ordinary damage with the legacy background option',w=>w.damageDisk(242,210,18,500,{background:true})],
- ['a weak blast',w=>w.blast(242,210,22,1)],
- ['TNT',w=>{const tnt=w.spawnProjectile('tnt',242,210,0,0);tnt.fuse=1/120;w.step(1/120);assert.equal(tnt.dead,true);assert.equal(w.stats.explosions,1);}]
 ])test(`${name} leaves decorative rear cells and durability unchanged`,()=>{
  const w=setup(),cells=w.rear.grid.cells.slice(),hp=w.rear.grid.hp.slice();damage(w);
  assert.deepEqual(w.rear.grid.cells,cells);assert.deepEqual(w.rear.grid.hp,hp);
  assert.equal(w.stats.backgroundRemoved,0);
+});
+
+test('TNT directly destroys exposed rear walls',()=>{
+ const w=setup(),before=w.rear.grid.count();
+ const tnt=w.spawnProjectile('tnt',242,210,0,0);tnt.fuse=1/120;w.step(1/120);
+ assert.equal(tnt.dead,true);assert.equal(w.stats.explosions,1);
+ assert.ok(w.rear.grid.count()<before);assert.equal(w.stats.backgroundRemoved,before-w.rear.grid.count());
 });
 
 test('楼板被移除时后墙仍留在原位置，不产生可运动房屋残骸',()=>{

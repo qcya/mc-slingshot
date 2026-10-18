@@ -16,14 +16,14 @@ export class PixelGrid {
   fill(x,y,w,h,m){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)this.set(i,j,m);}
   tile(x,y,m){this.fill(x*16,y*16,16,16,m);}
   count(){let n=0;for(const m of this.cells)if(m)n++;return n;}
-  damageDisk(cx,cy,radius,power,{budget=Infinity,jagged=false,seed=0,onlyMaterial=0}={}){
+  damageDisk(cx,cy,radius,power,{budget=Infinity,jagged=false,seed=0,onlyMaterial=0,canDamage=null}={}){
     let n=0;
     for(let y=Math.max(0,Math.floor(cy-radius));y<Math.min(this.height,Math.ceil(cy+radius));y++){
       for(let x=Math.max(0,Math.floor(cx-radius));x<Math.min(this.width,Math.ceil(cx+radius));x++){
         const k=y*this.width+x,m=this.cells[k];if(!m||m===7||(onlyMaterial&&m!==onlyMaterial))continue;
         const d=Math.hypot(x+.5-cx,y+.5-cy);
         const rough=jagged?.92+((x*73856093^y*19349663^seed)>>>0)%100/1250:1;
-        if(d>radius*rough)continue;
+        if(d>radius*rough||(canDamage&&!canDamage(x,y,m)))continue;
         this.hp[k]-=power*(.45+.55*(1-d/radius));
         if(this.hp[k]<=0&&n<budget){this.set(x,y,0);this.recent.push({x,y,m});n++;}
       }

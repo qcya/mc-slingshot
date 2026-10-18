@@ -45,7 +45,8 @@ fields drive consumption and do not need renderer handling. Burn duration is
 belongs to a cardinally connected wood block whose tile-center distance is
 at most two blocks from its seed: the center plus two blocks in each direction,
 at most five blocks across. Only foreground wood participates in this graph;
-the rear layer is a dark decorative wall and cannot ignite or be damaged.
+the rear layer is a dark, noncolliding wall: it cannot ignite independently,
+but disappears with erased foreground pixels and can be damaged directly by TNT.
 Each record also has a `sourceIds` set: all tiles ignited by one charge share
 that charge's source ID. A second charge may add its own ID to existing flames
 without extending the wood's lifetime or consuming mineral pixels.
