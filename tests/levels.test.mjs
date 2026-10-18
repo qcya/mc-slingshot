@@ -5,11 +5,18 @@ import { buildLevel, LEVELS } from '../src/levels.mjs';
 import { SiegeWorld } from '../src/world.mjs';
 const Matter=createRequire(import.meta.url)('../vendor/matter.min.js');
 
-test('十个手工关卡从完整方块起步，装饰不参与承重，怪物开局站稳', () => {
+test('十个手工关卡使用完整方块和真实楼梯，装饰不参与承重，怪物开局站稳', () => {
   assert.equal(LEVELS.length,10);
   for(let level=0;level<10;level++){
     const scene=buildLevel(level),g=scene.grid;
     for(let ty=0;ty<18;ty++)for(let tx=0;tx<32;tx++){
+      if(scene.visual.roofTiles.has(ty*32+tx)){
+        for(let qy=0;qy<2;qy++)for(let qx=0;qx<2;qx++){
+          const initial=g.get(tx*16+qx*8,ty*16+qy*8);
+          for(let y=0;y<8;y++)for(let x=0;x<8;x++)assert.equal(g.get(tx*16+qx*8+x,ty*16+qy*8+y),initial);
+        }
+        continue;
+      }
       const initial=g.get(tx*16,ty*16);
       for(let y=0;y<16;y++)for(let x=0;x<16;x++)assert.equal(g.get(tx*16+x,ty*16+y),initial,`level ${level}, partial tile ${tx},${ty}`);
     }

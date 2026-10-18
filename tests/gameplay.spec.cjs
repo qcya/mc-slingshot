@@ -24,7 +24,7 @@ test('三种弹药实际发射，方块落稳，TNT延迟爆炸，珍珠穿墙',
 test('十关完整起步，攻击前后画面、重开库存与刚体数量可核验',async({page})=>{
  test.setTimeout(150000);await ready(page);const errors=[],failed=[],reports=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});
  for(let i=0;i<10;i++){
-  if(i)await chooseLevel(page,i);const before=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(before.enemiesAlive).toBeGreaterThan(0);expect(before.terrainPixels%256).toBe(0);
+  if(i)await chooseLevel(page,i);const before=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());expect(before.enemiesAlive).toBeGreaterThan(0);expect(before.terrainPixels%64).toBe(0); // Full blocks and genuine 8x8 stair quadrants.
   await page.locator('#stage').screenshot({path:`evidence/level-${i+1}-initial.png`});await shot(page,i?2:1);
   if(i)await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().explosions),{timeout:7000}).toBe(1);else await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().removed),{timeout:7000}).toBeGreaterThan(0);
   await page.waitForTimeout(500);await page.locator('#stage').screenshot({path:`evidence/level-${i+1}-after.png`});reports.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));await restart(page);
