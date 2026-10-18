@@ -1,7 +1,7 @@
 ﻿const {expect}=require('@playwright/test');
 let profileSequence=0;
 async function enterStart(page){if(await page.locator('#startScreen').isVisible())await page.locator('#startScreen').click();}
-async function levelCard(page,level){const target=Math.floor(level/6);for(let tries=0;tries<10;tries++){const current=Number((await page.locator('#pageStatus').textContent()).split('/')[0])-1;if(current===target)return page.locator('#level-'+level);await page.locator(current<target?'#nextPage':'#prevPage').click();}throw Error('Unable to reach level page');}
+async function levelCard(page,level){return page.locator('#level-'+level);}
 async function ready(page,{level=0,unlocked=10}={}){
  if(unlocked>1)await page.addInitScript(n=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:n,completed:[]})),unlocked);
  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await enterStart(page);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill(`T${Date.now().toString(36)}_${++profileSequence}`);await page.locator('#saveProfile').click();}await(await levelCard(page,level)).click();

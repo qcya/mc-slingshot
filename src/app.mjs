@@ -2,7 +2,7 @@
 import {Assets} from './assets.mjs';import {buildLevel,LEVELS} from './levels.mjs';import {SiegeWorld} from './world.mjs';import {Renderer} from './renderer.mjs';
 import {SLING_HOME,pullSling} from './sling.mjs';import {DrawAudio} from './draw-audio.mjs';
 import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,hotbarSlots,totalAmmo,spendAmmo,rewardFor} from './campaign.mjs';
-import {enterLandscape} from './fullscreen.mjs';
+import {enterLandscape,exitLandscape} from './fullscreen.mjs';
 import {mobAppearance} from './animation.mjs';
 import {updateOutcome} from './outcome.mjs';
 import {createOnlineClient} from './online.mjs';
@@ -13,8 +13,7 @@ import {TIME_SAVE_KEY,TIME_QUEUE_KEY,normalizeTimes,recordBestTime,timeBundle,pa
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const coarsePointer=matchMedia('(pointer:coarse)'),cancelledTouchClicks=new Set();
 const state={level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0};
-let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0,levelPage=0;
-const LEVELS_PER_PAGE=6;
+let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0,nativeImmersive=false,fullscreenBusy=false;
 const nativeOnline=globalThis.MC_PLATFORM?.ranking==='toy';
 const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=nativeOnline?createToyOnlineClient({getUser:()=>appStorage.user(),getTimes:()=>readLocal(TIME_SAVE_KEY,[])}):createOnlineClient({baseUrl:globalThis.MC_PLATFORM?.apiBaseUrl||''});let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
 const appStorage=createToyStorage({enabled:globalThis.MC_PLATFORM?.toy===true,storage:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)},onStatus:s=>{const node=$('#cloudState');if(node){node.hidden=!s.enabled;node.textContent=s.lastError?'云存档暂未同步，进度已暂存本机':s.dirty?'云存档正在同步…':'Toy 云存档已连接';}}});
@@ -50,7 +49,9 @@ async function showLeaderboard(){
   for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
  }catch(error){if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent=nativeOnline?`Toy 排行榜暂不可用：${error.message||error.code||'连接失败'}。通关成绩已保存在本机。`:'暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
-async function fullscreen(){await enterLandscape({isToy:globalThis.MC_PLATFORM?.toy===true,onStatus:text=>{const node=$('#fullscreenStatus');node.textContent=text;node.hidden=!text;}});}
+function fullscreenLabel(){const active=nativeImmersive||!!(document.fullscreenElement||document.webkitFullscreenElement);$('#fullscreenBtn').textContent=active?'取消全屏':'全屏';$('#rotateFullscreen').textContent=active?'取消全屏':'全屏游玩';return active;}
+async function fullscreen(){if(fullscreenBusy)return;fullscreenBusy=true;const onStatus=text=>{const node=$('#fullscreenStatus');node.textContent=text;node.hidden=!text;};try{if(fullscreenLabel()){const result=await exitLandscape({isNative:nativeImmersive,onStatus});if(result!=='failed')nativeImmersive=false;}else nativeImmersive=(await enterLandscape({isToy:globalThis.MC_PLATFORM?.toy===true,onStatus}))==='native';}finally{fullscreenBusy=false;fullscreenLabel();}}
+function audioLabels(){$('#soundToggle').textContent=assets.soundOn?'音效：开':'音效：关';$('#sfxVolume').value=Math.round(assets.soundVolume*100);$('#sfxValue').textContent=`${Math.round(assets.soundVolume*100)}%`;}
 function iconUrl(i){const icon=assets.icons[AMMO[i].id];return icon instanceof HTMLCanvasElement?icon.toDataURL():icon.src;}
 function hud(){
  state.shots=totalAmmo(state.inventory);
@@ -62,13 +63,12 @@ function hud(){
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}
 function menus(screen){
  state.screen=screen;state.paused=screen!=='play';
- for(const [id,name] of [['startScreen','home'],['levelMenu','levels'],['pauseMenu','pause'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
+ for(const [id,name] of [['startScreen','home'],['levelMenu','levels'],['pauseMenu','pause'],['settingsMenu','settings'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
  $('#gameRoot').classList.toggle('menu-open',screen!=='play');
 }
 function renderCards(){
  const container=$('#levelCards');container.replaceChildren();
- const pages=Math.ceil(LEVELS.length/LEVELS_PER_PAGE);levelPage=clamp(levelPage,0,pages-1);$('#pageStatus').textContent=`${levelPage+1} / ${pages}`;$('#prevPage').disabled=levelPage===0;$('#nextPage').disabled=levelPage===pages-1;
- LEVELS.slice(levelPage*LEVELS_PER_PAGE,(levelPage+1)*LEVELS_PER_PAGE).forEach((level,j)=>{const i=levelPage*LEVELS_PER_PAGE+j;
+ LEVELS.forEach((level,i)=>{
   const wrapper=document.createElement('div');wrapper.className='level-card-wrap';const b=document.createElement('button');b.className='level-card';b.dataset.level=i;b.id='level-'+i;b.disabled=!canEnter(progress,i);
   const number=document.createElement('span');number.className='level-number';number.textContent=String(i+1).padStart(2,'0');
   const name=document.createElement('strong');name.textContent=level.title.replace(/^\d{2} \/ /,'');
@@ -88,7 +88,7 @@ function loadLevel(n){
  Object.assign(state,{level:n,inventory:inventoryFor(n),selected:inventoryFor(n).findIndex(count=>count>0),ended:false,drag:false,angle:0,pouch:{...SLING_HOME},launch:null,quiet:0,winWait:0,power:0,launched:0});
  renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gamehint').classList.remove('faded');$('#gamehint').textContent=coarsePointer.matches?'拖住弹药，松手发射 · 另一指轻点取消':'拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();revealInventory(3200);return true;
 }
-function showLevels(){cancelDrag();levelPage=Math.floor(state.level/LEVELS_PER_PAGE);renderCards();menus('levels');}
+function showLevels(){cancelDrag();renderCards();menus('levels');}
 function showHome(){cancelDrag();loadLevel(0);menus('home');}
 function enterGame(){if(state.screen!=='home')return;showLevels();if(!profile)showProfile();}
 function pause(){if(state.screen==='play'){cancelDrag();menus('pause');}else if(state.screen==='pause'){menus('play');revealInventory();}}
@@ -142,7 +142,7 @@ async function start(){
  if(!window.Matter?.Engine)throw new Error('Matter.js 未加载。请通过启动脚本运行。');
  loadState.textContent='正在加载方块纹理与音效…';
  assets=await new Assets().load();renderer=new Renderer(canvas,assets);drawAudio=await new DrawAudio().load(assets.sounds.crossbow_pull.src);
- music=new BackgroundMusic();$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';
+ music=new BackgroundMusic();$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';drawAudio.setVolume(assets.soundVolume);drawAudio.setMuted(!assets.soundOn);audioLabels();
  if(globalThis.MC_PLATFORM?.toy)loadState.textContent='正在连接 Toy 云存档…';await appStorage.initialize();try{progress=readProgress(appStorage.getItem(SAVE_KEY));}catch{progress=readProgress(null);}
  for(let i=0;i<9;i++){
   const b=document.createElement('button');b.className='ball';const img=document.createElement('img');img.alt='';const count=document.createElement('span');count.className='stack-count';b.append(img,count);
@@ -151,14 +151,15 @@ async function start(){
  profile=readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;if(nativeOnline&&appStorage.user()?.nickname){const linked=await online.createProfile();profile={...linked.profile,token:linked.token};saveLocal(PROFILE_KEY,profile);}profileLabel();
  bestTimes=normalizeTimes(readLocal(TIME_SAVE_KEY,[]));queueBestTimes();loadLevel(0);renderCards();menus('home');if(profile)void syncResults();loadState.hidden=true;
  $('#startScreen').addEventListener('click',enterGame);$('#startScreen').addEventListener('keydown',e=>{if(e.key==='Enter'||e.code==='Space'){e.preventDefault();enterGame();}});$('#homeBtn').addEventListener('click',showHome);
- $('#prevPage').addEventListener('click',()=>{levelPage--;renderCards();});$('#nextPage').addEventListener('click',()=>{levelPage++;renderCards();});
+ const fullscreenChanged=()=>{if(!fullscreenLabel()){$('#fullscreenStatus').hidden=true;$('#fullscreenStatus').textContent='';}};document.addEventListener('fullscreenchange',fullscreenChanged);document.addEventListener('webkitfullscreenchange',fullscreenChanged);fullscreenLabel();
  document.addEventListener('click',e=>{if(e.target.closest('.loadout-info,.loadout-tooltip'))return;for(const w of document.querySelectorAll('.show-loadout')){w.classList.remove('show-loadout');w.querySelector('.loadout-info').setAttribute('aria-expanded','false');}});
  canvas.addEventListener('pointerdown',beginDrag);canvas.addEventListener('pointermove',moveDrag);canvas.addEventListener('pointerup',endDrag);
  canvas.addEventListener('pointercancel',cancelDrag);canvas.addEventListener('lostpointercapture',()=>{if(state.drag)cancelDrag();});
  canvas.addEventListener('mousedown',e=>{if(e.button===2){cancelDrag();e.preventDefault();}});canvas.addEventListener('contextmenu',e=>{cancelDrag();e.preventDefault();});
  $('#resume').addEventListener('click',pause);for(const id of ['restart','retryBtn'])$('#'+id).addEventListener('click',()=>loadLevel(state.level));
  for(const id of ['levelMenuBtn','resultLevels'])$('#'+id).addEventListener('click',showLevels);$('#nextBtn').addEventListener('click',()=>loadLevel(state.level+1));
- $('#soundToggle').addEventListener('click',()=>{assets.soundOn=!assets.soundOn;drawAudio.setMuted(!assets.soundOn);$('#soundToggle').textContent=assets.soundOn?'音效：开':'音效：关';});
+ $('#settingsBtn').addEventListener('click',()=>{audioLabels();menus('settings');});$('#settingsBack').addEventListener('click',()=>menus('pause'));$('#pauseHomeBtn').addEventListener('click',showHome);
+ $('#soundToggle').addEventListener('click',()=>{assets.setSoundEnabled(!assets.soundOn);drawAudio.setMuted(!assets.soundOn);audioLabels();});$('#sfxVolume').addEventListener('input',e=>{assets.setSoundVolume(Number(e.target.value)/100);drawAudio.setVolume(assets.soundVolume);audioLabels();});
  $('#musicToggle').addEventListener('click',()=>{music.setEnabled(!music.enabled);$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';});
  $('#profileForm').addEventListener('submit',saveProfile);$('#profileBtn').addEventListener('click',showProfile);$('#profileBack').addEventListener('click',()=>{menus(profileReturn);void syncResults();});
  $('#leaderboardBtn').addEventListener('click',showLeaderboard);$('#leaderboardRefresh').addEventListener('click',showLeaderboard);$('#leaderboardBack').addEventListener('click',showLevels);
@@ -176,14 +177,14 @@ async function start(){
  },{passive:false});
  $('#gameRoot').addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();if(state.screen==='play'&&e.clientY>r.bottom-r.height*.10)revealInventory();});
  window.addEventListener('keydown',e=>{
-  if(e.target instanceof HTMLInputElement)return;if(state.screen==='home'&&(e.key==='Enter'||e.code==='Space')){e.preventDefault();enterGame();return;}if(e.key==='Escape'){e.preventDefault();if(document.querySelector('.show-loadout')){document.querySelector('.show-loadout .loadout-info').click();return;}if(['profile','leaderboard'].includes(state.screen)){if(profile){showLevels();void syncResults();}}else if(state.screen==='levels')showHome();else pause();return;}if(state.screen!=='play')return;
+  if(e.target instanceof HTMLInputElement&&e.key!=='Escape')return;if(state.screen==='home'&&(e.key==='Enter'||e.code==='Space')){e.preventDefault();enterGame();return;}if(e.key==='Escape'){e.preventDefault();if(document.querySelector('.show-loadout')){document.querySelector('.show-loadout .loadout-info').click();return;}if(state.screen==='settings')menus('pause');else if(['profile','leaderboard'].includes(state.screen)){if(profile){showLevels();void syncResults();}}else if(state.screen==='levels')showHome();else pause();return;}if(state.screen!=='play')return;
   if(e.key>='1'&&e.key<='9')select(Number(e.key)-1);if(e.key.toLowerCase()==='r')loadLevel(state.level);if(e.code==='Space'){e.preventDefault();pause();}
  });
  window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.screen==='play')pause();void appStorage.flush();}});window.addEventListener('online',()=>{void syncResults();void appStorage.flush();});
  window.MCBlockLaunch={getStatus:status,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:loadLevel,select,
  getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),
- music:music.diagnostics(),sound:{...assets.audioStats,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
+ music:music.diagnostics(),sound:{...assets.audioStats,enabled:assets.soundOn,volume:assets.soundVolume,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
  requestAnimationFrame(frame);
 }
 start().catch(error=>{loadState.hidden=false;loadState.classList.add('error');loadState.textContent=`游戏未能启动：${error.message}`;console.error(error);});

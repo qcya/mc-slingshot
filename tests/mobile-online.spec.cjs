@@ -88,6 +88,6 @@ test.describe('Android 触屏布局与实际输入',()=>{
   await page.locator('#touchPause').tap();const time=await page.evaluate(()=>MCBlockLaunch.getStatus().time);await page.waitForTimeout(200);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().time)).toBe(time);
   await page.locator('#resume').tap();await page.screenshot({path:'evidence/android-landscape.png'});
   await page.setViewportSize({width:390,height:844});await expect(page.locator('#rotateHint')).toBeVisible();await page.locator('#touchPause').tap();await page.locator('#levelMenuBtn').tap();
-  await page.locator('#nextPage').tap();await expect(page.locator('#level-9')).toBeVisible();await page.screenshot({path:'evidence/android-portrait-menu.png'});
+  await expect(page.locator('#level-9')).toBeVisible();await page.screenshot({path:'evidence/android-portrait-menu.png'});
  });
 });

@@ -10,7 +10,10 @@ function tint(im,color){
   x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);return c;
 }
 export class Assets {
-  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.playing=0;this.audioStats={played:{},failed:0,lastError:null};}
+  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.soundVolume=1;this.activeSounds=new Map();this.playing=0;this.audioStats={played:{},failed:0,lastError:null};try{const saved=JSON.parse(localStorage.getItem('mc-block-launch.audio.v1'));if(typeof saved?.enabled==='boolean')this.soundOn=saved.enabled;if(Number.isFinite(saved?.volume))this.soundVolume=Math.max(0,Math.min(1,saved.volume));}catch{}}
+  saveAudio(){try{localStorage.setItem('mc-block-launch.audio.v1',JSON.stringify({enabled:this.soundOn,volume:this.soundVolume}));}catch{}for(const[a,base]of this.activeSounds)a.volume=this.soundOn?base*this.soundVolume:0;}
+  setSoundEnabled(enabled){this.soundOn=!!enabled;this.saveAudio();}
+  setSoundVolume(volume){if(!Number.isFinite(volume))return;this.soundVolume=Math.max(0,Math.min(1,volume));this.saveAudio();}
   async load(){
     await Promise.all(NAMES.map(async name=>{
       const im=await image(`assets/textures/${name}.png`);
@@ -38,8 +41,8 @@ export class Assets {
   }
   play(name,volume=.3){
     if(!this.soundOn||this.playing>=8||!this.sounds[name])return;
-    const a=this.sounds[name].cloneNode();a.volume=Math.min(.8,volume);this.playing++;
-    let done=false;const finish=()=>{if(!done){done=true;this.playing--;}};
+    const a=this.sounds[name].cloneNode(),base=Math.min(.8,volume);a.volume=base*this.soundVolume;this.activeSounds.set(a,base);this.playing++;
+    let done=false;const finish=()=>{if(!done){done=true;this.playing--;this.activeSounds.delete(a);}};
     a.addEventListener('ended',finish,{once:true});a.addEventListener('error',finish,{once:true});
     a.play().then(()=>{this.audioStats.played[name]=(this.audioStats.played[name]||0)+1;}).catch(error=>{this.audioStats.failed++;this.audioStats.lastError=error.message;finish();});
   }

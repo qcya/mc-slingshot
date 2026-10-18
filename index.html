@@ -1,19 +1,20 @@
 ﻿<!doctype html><html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#151515">
-<title>拉满的石 · Stone at Full Draw</title><link rel="icon" type="image/png" href="assets/sprites/game-icon.png"><link rel="stylesheet" href="style.css"></head><body>
+<title>拉满的石 · Stone at Full Draw</title><link rel="icon" type="image/png" href="assets/sprites/game-icon.png"><link rel="preload" as="image" href="assets/sprites/title-cover.png"><link rel="stylesheet" href="style.css"></head><body>
 <main class="viewport" id="gameRoot">
  <canvas id="stage" width="1536" height="864" aria-label="像素攻城二维物理游戏"></canvas><p id="fullscreenStatus" class="fullscreen-feedback" role="status" hidden></p>
  <div id="loadState" role="status">正在加载原版纹理与物理引擎…</div>
  <div class="gamehint faded" id="gamehint"></div>
  <nav class="touch-controls" aria-label="触屏操作"><button id="touchPause">暂停菜单</button></nav>
  <div class="inventory" id="inventory"><div id="ballbar" class="ballbar" aria-label="物品栏"></div></div>
- <section id="startScreen" class="start-screen hidden" aria-label="开始游戏" role="button" tabindex="0"><div class="start-title"><h1>拉满的石</h1><p>四种弹药 · 十关挑战</p></div><p class="start-prompt">点击任意位置开始游戏</p></section>
+ <section id="startScreen" class="start-screen hidden" aria-label="拉满的石，点击开始游戏" role="button" tabindex="0"><div class="start-title"><h1>拉满的石</h1><p>如果把弹弓放进我的世界，会发生什么？</p></div><p class="start-prompt">点击任意位置开始游戏</p></section>
  <section id="levelMenu" class="menu-screen hidden" aria-label="选关">
-  <div class="campaign-panel"><h1>选择关卡</h1><p class="menu-subtitle">主世界</p><div id="levelCards" class="level-grid"></div><div class="page-controls"><button id="prevPage" aria-label="上一页">←</button><span id="pageStatus">1 / 2</span><button id="nextPage" aria-label="下一页">→</button></div><div class="menu-actions"><button id="homeBtn">主界面</button><button id="profileBtn">设置昵称</button><button id="leaderboardBtn">排行榜</button><button id="fullscreenBtn">全屏</button></div><p class="menu-help" id="menuHelp">拖动发射 · 右键取消 · 滚轮换物品 · ESC 菜单</p><small id="cloudState" hidden role="status"></small></div>
+  <div class="campaign-panel"><h1>选择关卡</h1><p class="menu-subtitle">主世界</p><div id="levelCards" class="level-grid"></div><div class="menu-actions"><button id="homeBtn">主界面</button><button id="profileBtn">设置昵称</button><button id="leaderboardBtn">排行榜</button><button id="fullscreenBtn">全屏</button></div><p class="menu-help" id="menuHelp">拖动发射 · 右键取消 · 滚轮换物品 · ESC 菜单</p><small id="cloudState" hidden role="status"></small></div>
  </section>
  <section id="pauseMenu" class="menu-screen hidden" aria-label="暂停菜单"><div class="pause-panel"><h2>游戏暂停</h2>
-  <button id="resume">继续游戏</button><button id="restart" aria-label="↻ 重开">重新挑战</button><button id="levelMenuBtn">选择关卡</button><button id="soundToggle">音效：开</button><button id="musicToggle">音乐：开</button>
+  <button id="resume">继续游戏</button><button id="restart" aria-label="重新开始">重新开始</button><button id="settingsBtn">设置</button><button id="levelMenuBtn">选择关卡</button><button id="pauseHomeBtn">返回主菜单</button>
  </div></section>
+ <section id="settingsMenu" class="menu-screen hidden" aria-label="设置"><div class="dialog-panel settings-panel"><h2>设置</h2><button id="soundToggle">音效：开</button><label for="sfxVolume">音效音量 <output id="sfxValue" for="sfxVolume">100%</output></label><input id="sfxVolume" type="range" min="0" max="100" step="1" value="100"><button id="musicToggle">音乐：开</button><button id="settingsBack">返回暂停菜单</button></div></section>
  <section id="profileMenu" class="menu-screen hidden" aria-label="玩家昵称"><form class="dialog-panel" id="profileForm"><h2>你叫什么名字？</h2><p>设置昵称后开始挑战，十关全通后记录排行榜成绩。</p><label for="nickname">玩家昵称</label><input id="nickname" name="nickname" maxlength="16" minlength="1" autocomplete="nickname" required><p id="profileStatus" class="online-status" role="status"></p><button id="saveProfile" type="submit">开始冒险</button><button id="profileBack" type="button">返回</button></form></section>
  <section id="leaderboardMenu" class="menu-screen hidden" aria-label="排行榜"><div class="dialog-panel leaderboard-panel"><h2>主世界排行榜</h2><p>所有玩家可查看 · 全通后上榜 · 最多 100 人</p><p id="leaderboardStatus" class="online-status" role="status"></p><div class="ranking-scroll" id="rankingTable"><table><thead><tr><th>名次</th><th>玩家</th><th>总用时</th></tr></thead><tbody id="rankingRows"></tbody></table></div><button id="leaderboardRefresh">刷新</button><button id="leaderboardBack">返回选关</button></div></section>
  <section class="result hidden" id="result"><div class="result-inner"><span id="resultFlag">挑战成功</span><h2 id="resultTitle"></h2><img id="rewardIcon" class="reward-icon hidden" alt=""><p id="resultMsg"></p>
