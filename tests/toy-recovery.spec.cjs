@@ -7,10 +7,14 @@ for(const nickname of ['青春沿岸','普通新玩家'])test(`official SDK reco
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  try{
   page.on('pageerror',e=>errors.push(e.message));await page.goto(`http://127.0.0.1:${server.address().port}/host.html`);const frame=page.frameLocator('iframe');await expect(frame.locator('#startScreen')).toBeVisible();await frame.locator('#startScreen').click();await expect(frame.locator('#levelMenu')).toBeVisible();
-  await frame.locator('#nextPage').click();const owner=nickname==='青春沿岸';
-  if(owner){await expect.poll(()=>page.evaluate(()=>calls.filter(p=>p.kind==='rank'&&p.op==='submit').length)).toBe(1);expect(await page.evaluate(()=>calls.find(p=>p.kind==='rank'&&p.op==='submit').score)).toBe(9956486);await expect(frame.locator('#level-9')).toBeEnabled();}
-  else{await expect(frame.locator('#level-9')).toBeDisabled();expect(await page.evaluate(()=>calls.filter(p=>p.kind==='rank'&&p.op==='submit').length)).toBe(0);}
-  await frame.locator('#leaderboardBtn').click();await expect(frame.locator('#rankingRows')).toContainText('07:15.135');await expect(frame.locator('#rankingRows')).toContainText('06:37.000');await expect(frame.locator('#rankingRows tr').filter({hasText:'青春沿岸'})).toHaveCount(1);expect(errors).toEqual([]);
-  if(owner)await page.screenshot({path:'evidence/toy-recovered-records.png'});
+  await frame.locator('#nextPage').click();await expect(frame.locator('#level-9')).toBeDisabled();
+  expect(await page.evaluate(()=>calls.filter(p=>p.kind==='rank'&&p.op==='submit').length)).toBe(0);
+  await frame.locator('#leaderboardBtn').click();
+  for(const world of ['overworld','nether','end']){
+   await frame.locator(`#leaderboardMenu [data-world="${world}"]`).click();
+   await expect(frame.locator('#leaderboardStatus')).toHaveText('还没有全通成绩，来成为第一位挑战者。');
+   await expect(frame.locator('#rankingRows tr')).toHaveCount(0);
+  }
+  expect(errors).toEqual([]);expect(await page.evaluate(()=>calls.filter(p=>p.kind==='rank'&&p.op==='submit').length)).toBe(0);
  }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));fs.rmSync(temp,{recursive:true,force:true});}
 });

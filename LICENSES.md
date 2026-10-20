@@ -1,5 +1,12 @@
 # Third-party assets
 
+## Alpha 0.13.0 三世界素材
+
+- 新增下界、末地方块保留 Mojang 官方 Java 1.20.4 原始 PNG；来源版本、文件与校验见 [维度材质](docs/dimension-materials.md)。动画菌柄在运行时取首帧，不重绘纹理。
+- 新怪物、五种物品、熔岩图集和相应模型 UV 参照官方 Mojang/bedrock-samples；末影人皮肤由原 TGA 无损转为 PNG，Canvas 解释原图的打包透明度。完整来源见 [扩展战斗素材](docs/dimension-combat-assets.md)。
+- 13 个新原生 OGG 通过 Mojang 官方资源索引获取，各自原路径、SHA-1 与下载校验见 [声音清单](docs/combat-expansion-sounds.json)。
+- 新弹弓木叉与皮兜为本项目 Canvas 像素绘制，木纹复用已注明来源的原版原木纹理；铁砧物品图标由原版方块贴图组合。这些说明不改变上游素材的权利归属。
+
 ## Alpha 0.11.2 背景音乐
 
 - `assets/music/sweden.ogg`：C418《Sweden》，[作者曲目页](https://c418.bandcamp.com/track/sweden)。从 Mojang 官方 1.20.4 [asset index 12](https://piston-meta.mojang.com/v1/packages/129fc8163fdedb50c886731a839751c22aa0dbc6/12.json) 的 `minecraft/sounds/music/game/sweden.ogg` 获取原版游戏 OGG，未从第三方录音提取。

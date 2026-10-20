@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
+import {SCORE_SEASON} from '../src/dimensions.mjs';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
@@ -60,7 +61,75 @@ async function fixture(t,options={},initialState) {
 }
 const create=(f,nickname)=>f.request('/api/profile',{method:'POST',body:{nickname}});
 const stages=(timeMs=1000)=>Array.from({length:10},(_,stage)=>({stage,timeMs:typeof timeMs==='function'?timeMs(stage):timeMs}));
-const submit=(f,token,scores=stages())=>f.request('/api/results',{method:'POST',token,body:{stages:scores}});
+const submit=(f,token,scores=stages())=>f.request('/api/results',{method:'POST',token,body:{stages:scores,season:SCORE_SEASON}});
+
+test('world-scoped client calls preserve independent scores and identity across restart',async t=>{
+ const f=await fixture(t),{createOnlineClient}=await import('../src/online.mjs'),client=createOnlineClient({baseUrl:f.baseUrl}),p=await client.createProfile('Worlds');
+ await client.submitResult(p.token,{stages:stages(3000)});
+ await client.submitResult(p.token,{stages:stages(2000)},'nether');
+ await client.submitResult(p.token,{stages:stages(1000)},'end');
+ await f.restart();
+ // Recreate the client because the fixture restart chooses a new port.
+ const restored=createOnlineClient({baseUrl:f.baseUrl});
+ for(const [world,time] of [['overworld',30000],['nether',20000],['end',10000]]){
+  const board=await restored.leaderboard(world);assert.equal(board.entries.length,1);assert.equal(board.entries[0].totalTimeMs,time);assert.equal(board.entries[0].id,p.profile.id);
+  assert.equal((await restored.profile(p.token,world)).stages[0].timeMs,time/10);
+ }
+ await assert.rejects(restored.leaderboard('moon'));
+ for(const route of ['/api/leaderboard?world=moon','/api/profile?world=moon','/api/results?world=moon'])assert.equal((await f.request(route,{token:p.token,...(route.includes('results')?{method:'POST',body:{stages:stages(),season:SCORE_SEASON}}:{})})).status,400);
+});
+
+test('a legacy server cannot leak overworld records into a new world or receive its score',async()=>{
+ const {createOnlineClient}=await import('../src/online.mjs'),calls=[];
+ const client=createOnlineClient({fetchImpl:async(url,options)=>{
+  calls.push({url,method:options.method});return new Response(JSON.stringify(url==='api/health'?{ok:true,version:'0.12.1'}:{stages:stages(1000),entries:[]}),{status:200,headers:{'Content-Type':'application/json'}});
+ }});
+ await assert.rejects(client.profile('token','nether'),error=>error.status===503);
+ await assert.rejects(client.leaderboard('end'),error=>error.status===503);
+ await assert.rejects(client.submitResult('token',{stages:stages(1000)},'nether'),error=>error.status===503);
+ assert.ok(calls.every(call=>call.url==='api/health'&&call.method==='GET'));
+});
+
+test('old multidimension servers cannot restore old season times or receive new submissions',async()=>{
+ const {createOnlineClient}=await import('../src/online.mjs'),calls=[];
+ const client=createOnlineClient({fetchImpl:async(url,options)=>{
+  calls.push({url,method:options.method});return new Response(JSON.stringify({ok:true,worlds:['overworld','nether','end']}),{status:200});
+ }});
+ for(const world of ['overworld','nether','end']){
+  await assert.rejects(client.profile('token',world),error=>error.status===503);
+  await assert.rejects(client.leaderboard(world),error=>error.status===503);
+  await assert.rejects(client.submitResult('token',{stages:stages()},world),error=>error.status===503);
+ }
+ assert.ok(calls.every(call=>call.url==='api/health'&&call.method==='GET'));
+});
+
+for(const version of [1,2,3])test(`version ${version} migration archives old scores and starts three empty boards once`,async t=>{
+ const token=crypto.randomBytes(32).toString('base64url'),oldStages=Object.fromEntries(stages(2300).map(s=>[s.stage,version===1?{...s,shots:1}:s]));
+ const profile={id:crypto.randomBytes(16).toString('base64url'),nickname:'KeepMe',tokenHash:crypto.createHash('sha256').update(token).digest('hex'),stages:oldStages,...(version===3?{worlds:{nether:Object.fromEntries(stages(1800).map(s=>[s.stage,s])),end:{}}}:{})};
+ const original={version,profiles:[profile]},f=await fixture(t,{},original),backup=path.join(f.dataDir,'leaderboard.pre-v4.json');
+ assert.deepEqual(JSON.parse(await fs.readFile(backup,'utf8')),original);
+ const migrated=JSON.parse(await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8'));assert.equal(migrated.version,4);
+ assert.deepEqual(migrated.profiles[0].legacyStages,oldStages);assert.deepEqual(migrated.profiles[0].legacyWorlds,profile.worlds??{});
+ assert.equal(migrated.profiles[0].tokenHash,profile.tokenHash);assert.equal(migrated.profiles[0].id,profile.id);
+ for(const world of ['overworld','nether','end'])assert.deepEqual((await f.request(`/api/leaderboard?world=${world}`)).data.entries,[]);
+ assert.deepEqual((await f.request('/api/profile',{token})).data,{profile:{id:profile.id,nickname:profile.nickname},stages:[]});
+ assert.equal((await create(f,'keepme')).status,409);
+ await f.request('/api/results?world=nether',{method:'POST',token,body:{stages:stages(1800),season:SCORE_SEASON}});await f.restart();
+ assert.deepEqual(JSON.parse(await fs.readFile(backup,'utf8')),original);
+ assert.equal((await f.request('/api/leaderboard?world=nether')).data.entries[0].totalTimeMs,18000);
+ assert.deepEqual((await f.request('/api/leaderboard')).data.entries,[]);
+});
+
+test('legacy clients can read identity but cannot submit old times into any current board',async t=>{
+ const f=await fixture(t),p=(await create(f,'Legacy')).data;
+ for(const world of ['overworld','nether','end']){
+  assert.equal((await f.request(`/api/results?world=${world}`,{method:'POST',token:p.token,body:{stages:stages()}})).status,426);
+  assert.equal((await f.request(`/api/results?world=${world}`,{method:'POST',token:p.token,body:{stages:stages(),season:'old'}})).status,426);
+  assert.deepEqual((await f.request(`/api/leaderboard?world=${world}`)).data.entries,[]);
+ }
+ assert.equal((await f.request('/api/profile',{token:p.token})).status,200);
+ const health=(await f.request('/api/health')).data;assert.equal(health.scoreSeason,SCORE_SEASON);assert.deepEqual(health.worlds,['overworld','nether','end']);
+});
 
 test('anonymous identity and personal bests survive restart without exposing credentials',async t=>{
   const f=await fixture(t),player=await create(f,'  方块勇士  ');
@@ -76,7 +145,7 @@ test('anonymous identity and personal bests survive restart without exposing cre
   assert.equal(JSON.stringify(board.data).includes(player.data.token),false);
   const stored=await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8');
   assert.equal(stored.includes(player.data.token),false);
-  assert.equal(stored.includes('shots'),false);assert.equal(JSON.parse(stored).version,2);
+  assert.equal(stored.includes('shots'),false);assert.equal(JSON.parse(stored).version,4);
 });
 
 test('personal bests merge fastest times per stage and rank by their sum',async t=>{
@@ -104,7 +173,7 @@ test('profiles appear only after a complete ten-stage bundle',async t=>{
 test('the public board contains only the fastest 100 full clears',async t=>{
  const profiles=Array.from({length:105},(_,i)=>({id:crypto.randomBytes(16).toString('base64url'),nickname:`Rank${i}`,tokenHash:crypto.createHash('sha256').update(String(i)).digest('hex'),stages:Object.fromEntries(stages(1000+i).map(s=>[s.stage,s]))}));
  profiles.push({id:crypto.randomBytes(16).toString('base64url'),nickname:'NotFinished',tokenHash:crypto.createHash('sha256').update('partial').digest('hex'),stages:{}});
- const f=await fixture(t,{}, {version:2,profiles}),response=await f.request('/api/leaderboard'),entries=response.data.entries;
+ const f=await fixture(t,{}, {version:4,profiles:profiles.map(p=>({...p,worlds:{nether:{},end:{}}}))}),response=await f.request('/api/leaderboard'),entries=response.data.entries;
  assert.equal(response.status,200);assert.equal(entries.length,100);assert.equal(entries[0].nickname,'Rank0');assert.equal(entries[99].nickname,'Rank99');assert.equal(entries[99].rank,100);assert.ok(entries.every(e=>e.completed===10));
 });
 
@@ -117,10 +186,11 @@ test('nicknames are unique after normalization, including concurrent creation an
  await f.restart();assert.equal((await create(f,'STAR SEA')).status,409);
 });
 
-test('the explicitly marked sample entry keeps its displayed time and reserved name',async t=>{
- const token=crypto.randomBytes(32).toString('base64url'),p={id:crypto.randomBytes(16).toString('base64url'),nickname:'星海',tokenHash:crypto.createHash('sha256').update(token).digest('hex'),demo:true,stages:Object.fromEntries(stages(39700).map(s=>[s.stage,s]))};
- const f=await fixture(t,{}, {version:2,profiles:[p]});let entry=(await f.request('/api/leaderboard')).data.entries[0];assert.equal(entry.demo,true);assert.equal(entry.totalTimeMs,397000);
- assert.equal((await submit(f,token,stages(1000))).data.entry.totalTimeMs,397000);assert.equal((await create(f,'星海')).status,409);assert.equal((await f.request('/api/profile',{method:'PATCH',token,body:{nickname:'Changed'}})).status,403);
+test('legacy demonstration rows remain absent from every fresh board',async t=>{
+ const token=crypto.randomBytes(32).toString('base64url'),p={id:crypto.randomBytes(16).toString('base64url'),nickname:'Sample',tokenHash:crypto.createHash('sha256').update(token).digest('hex'),demo:true,stages:Object.fromEntries(stages(39700).map(s=>[s.stage,s]))};
+ const f=await fixture(t,{}, {version:2,profiles:[p]});
+ for(const world of ['overworld','nether','end'])assert.deepEqual((await f.request(`/api/leaderboard?world=${world}`)).data.entries,[]);
+ assert.equal((await create(f,'Sample')).status,409);
 });
 
 test('concurrent complete bundles atomically preserve independent stage bests and profiles',async t=>{
@@ -130,25 +200,6 @@ test('concurrent complete bundles atomically preserve independent stage bests an
   await f.restart();
   const entries=(await f.request('/api/leaderboard')).data.entries;
   assert.equal(entries.length,12);assert.ok(entries.every(x=>x.completed===10&&x.totalTimeMs===1045));
-});
-
-test('version one migration preserves identities, keeps full times and discards partial scores and shots',async t=>{
-  const token=crypto.randomBytes(32).toString('base64url'),partialToken=crypto.randomBytes(32).toString('base64url');
-  const legacyProfile=(name,credential,scores)=>({id:crypto.randomBytes(16).toString('base64url'),nickname:name,tokenHash:crypto.createHash('sha256').update(credential).digest('hex'),stages:Object.fromEntries(scores.map(score=>[score.stage,{...score,shots:1}]))});
-  const full=legacyProfile('Full',token,stages(2000)),partial=legacyProfile('Partial',partialToken,stages().slice(0,9));
-  const f=await fixture(t,{}, {version:1,profiles:[full,partial]});
-  assert.deepEqual((await f.request('/api/profile',{token})).data,{profile:{id:full.id,nickname:'Full'},stages:stages(2000)});
-  assert.deepEqual((await f.request('/api/profile',{token:partialToken})).data.stages,[]);
-  assert.deepEqual((await f.request('/api/leaderboard')).data.entries.map(p=>p.id),[full.id]);
-  let stored=JSON.parse(await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8'));
-  assert.equal(stored.version,2);assert.equal(JSON.stringify(stored).includes('shots'),false);assert.deepEqual(stored.profiles[1].stages,{});
-  await f.restart();
-  // Old shot count was one; a faster ten-stage run has no shot metadata at all.
-  assert.equal((await submit(f,token,stages(1000))).status,200);
-  assert.equal((await f.request('/api/profile',{token})).data.stages[0].timeMs,1000);
-  assert.equal((await f.request('/api/profile',{method:'PATCH',token:partialToken,body:{nickname:'Renamed'}})).status,200);
-  stored=JSON.parse(await fs.readFile(path.join(f.dataDir,'leaderboard.json'),'utf8'));
-  assert.equal(stored.profiles[0].tokenHash,full.tokenHash);assert.equal(stored.profiles[1].id,partial.id);
 });
 
 test('equal total times use stable identity order',async t=>{
@@ -175,7 +226,7 @@ test('API rejects malformed, unbounded and unauthorized input',async t=>{
   for(const nickname of ['', 'x'.repeat(17), '<script>', 'a\u202eb', 45, {name:'x'}])assert.equal((await create(f,nickname)).status,400);
   const invalid=[null,{}, {stage:0,shots:1,timeMs:1000},{stages:null},{stages:stages().slice(0,9)},{stages:[...stages(),{stage:10,timeMs:1000}]},{stages:stages().map(()=>({stage:0,timeMs:1000}))},{stages:stages(),extra:true}];
   for(const value of [{stage:-1,timeMs:1000},{stage:10,timeMs:1000},{stage:'0',timeMs:1000},{stage:0,timeMs:99},{stage:0,timeMs:3600001},{stage:0,timeMs:100.5},{stage:0,timeMs:'1000'},{stage:0,timeMs:1000,shots:50}])invalid.push({stages:[value,...stages().slice(1)]});
-  for(const body of invalid)assert.equal((await f.request('/api/results',{method:'POST',token:p.token,body})).status,400);
+  for(const body of invalid)assert.equal((await f.request('/api/results',{method:'POST',token:p.token,body:{...body,season:SCORE_SEASON}})).status,400);
   assert.equal((await submit(f,'bad')).status,401);
   assert.equal((await f.request('/api/profile')).status,401);
   assert.equal((await submit(f,p.token,stages(s=>s===0?100:3600000))).status,200);

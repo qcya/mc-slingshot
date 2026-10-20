@@ -1,0 +1,730 @@
+{
+  "verifiedAt": "2026-10-20T08:24:00.709Z",
+  "command": "node --test tests/playability.test.mjs tests/dimension-playability.test.mjs tests/dimension-maps.test.mjs",
+  "sourceHashes": {
+    "src/levels-overworld.mjs": "1b55910764bbde422b8882129720f4fc24c91757a6ec4da67c5386f29fbaebc8",
+    "src/levels-nether.mjs": "2ffd5f82e037bc21a144c2394c85d797cabb31b46d2e4f3d0bb716653443b21f",
+    "src/levels-end.mjs": "33cb9682f4fdcca9ba6d42867cfda007cbfdc505c64c8512a9a2b6ff6fc87daf",
+    "src/level-builder.mjs": "d34067771f4f37dffbab2af5682add532d87ac00793f3ee991a16a4fa5910cb4",
+    "src/campaign.mjs": "d48ca2a14dc5d2dde1cf03b3c8db228194d709245d840b3526413cd63c1fce29",
+    "src/combat.mjs": "aafbacc866c9f582284991221a4cf6c7987c71bf7656f3d86665b17c6fa316b4",
+    "src/world.mjs": "cf4d3d01fbd483b7f5bb19eb6dde6e32059c8ecaeefa7e1bd52ad72189f34c03",
+    "src/lava.mjs": "c9bf2e27a76a37e730dfcffbb5ec8f59890b5eea8c28cea22652430af973e537"
+  },
+  "levels": [
+    {
+      "dimension": "overworld",
+      "stage": 1,
+      "outcome": "win",
+      "plannedShots": 1,
+      "shotsFired": 1,
+      "totalInventory": 5,
+      "plannedUnused": 4,
+      "unusedAfterWin": 4,
+      "plannedAmmo": {
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 5
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 2,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 3,
+      "totalInventory": 6,
+      "plannedUnused": 2,
+      "unusedAfterWin": 3,
+      "plannedAmmo": {
+        "tnt": 1,
+        "cobble": 3
+      },
+      "loadout": {
+        "cobble": 5,
+        "tnt": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 3,
+      "outcome": "win",
+      "plannedShots": 7,
+      "shotsFired": 7,
+      "totalInventory": 7,
+      "plannedUnused": 0,
+      "unusedAfterWin": 0,
+      "plannedAmmo": {
+        "ender": 1,
+        "tnt": 1,
+        "cobble": 5
+      },
+      "loadout": {
+        "cobble": 5,
+        "tnt": 1,
+        "ender": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 4,
+      "outcome": "win",
+      "plannedShots": 7,
+      "shotsFired": 6,
+      "totalInventory": 10,
+      "plannedUnused": 3,
+      "unusedAfterWin": 4,
+      "plannedAmmo": {
+        "tnt": 3,
+        "cobble": 4
+      },
+      "loadout": {
+        "cobble": 6,
+        "tnt": 3,
+        "fire": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 5,
+      "outcome": "win",
+      "plannedShots": 6,
+      "shotsFired": 5,
+      "totalInventory": 10,
+      "plannedUnused": 4,
+      "unusedAfterWin": 5,
+      "plannedAmmo": {
+        "cobble": 3,
+        "tnt": 3
+      },
+      "loadout": {
+        "cobble": 6,
+        "tnt": 3,
+        "ender": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 6,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 4,
+      "totalInventory": 8,
+      "plannedUnused": 4,
+      "unusedAfterWin": 4,
+      "plannedAmmo": {
+        "tnt": 2,
+        "cobble": 1,
+        "ender": 1
+      },
+      "loadout": {
+        "cobble": 5,
+        "tnt": 2,
+        "ender": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 7,
+      "outcome": "win",
+      "plannedShots": 12,
+      "shotsFired": 7,
+      "totalInventory": 13,
+      "plannedUnused": 1,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "tnt": 3,
+        "ender": 2,
+        "cobble": 7
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 3,
+        "ender": 2
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 8,
+      "outcome": "win",
+      "plannedShots": 8,
+      "shotsFired": 8,
+      "totalInventory": 11,
+      "plannedUnused": 3,
+      "unusedAfterWin": 3,
+      "plannedAmmo": {
+        "tnt": 4,
+        "ender": 2,
+        "fire": 1,
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 4,
+        "tnt": 4,
+        "ender": 2,
+        "fire": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 9,
+      "outcome": "win",
+      "plannedShots": 9,
+      "shotsFired": 8,
+      "totalInventory": 11,
+      "plannedUnused": 2,
+      "unusedAfterWin": 3,
+      "plannedAmmo": {
+        "tnt": 3,
+        "cobble": 4,
+        "ender": 2
+      },
+      "loadout": {
+        "cobble": 6,
+        "tnt": 3,
+        "ender": 2
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "overworld",
+      "stage": 10,
+      "outcome": "win",
+      "plannedShots": 12,
+      "shotsFired": 12,
+      "totalInventory": 13,
+      "plannedUnused": 1,
+      "unusedAfterWin": 1,
+      "plannedAmmo": {
+        "ender": 2,
+        "tnt": 4,
+        "cobble": 6
+      },
+      "loadout": {
+        "cobble": 7,
+        "tnt": 4,
+        "ender": 2
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "nether",
+      "stage": 1,
+      "outcome": "win",
+      "plannedShots": 3,
+      "shotsFired": 3,
+      "totalInventory": 9,
+      "plannedUnused": 6,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "tnt": 1,
+        "cobble": 2
+      },
+      "loadout": {
+        "cobble": 6,
+        "tnt": 1,
+        "snowball": 2
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 8,
+          "flowing": true
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 2,
+      "outcome": "win",
+      "plannedShots": 9,
+      "shotsFired": 9,
+      "totalInventory": 12,
+      "plannedUnused": 3,
+      "unusedAfterWin": 3,
+      "plannedAmmo": {
+        "tnt": 1,
+        "cobble": 8
+      },
+      "loadout": {
+        "cobble": 9,
+        "tnt": 1,
+        "snowball": 2
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 3,
+      "outcome": "win",
+      "plannedShots": 8,
+      "shotsFired": 8,
+      "totalInventory": 10,
+      "plannedUnused": 2,
+      "unusedAfterWin": 2,
+      "plannedAmmo": {
+        "ender": 1,
+        "tnt": 1,
+        "cobble": 6
+      },
+      "loadout": {
+        "cobble": 7,
+        "tnt": 1,
+        "ender": 1,
+        "snowball": 1
+      },
+      "lavaSources": [
+        {
+          "x": 17,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 4,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 4,
+      "totalInventory": 13,
+      "plannedUnused": 9,
+      "unusedAfterWin": 9,
+      "plannedAmmo": {
+        "cobble": 2,
+        "tnt": 2
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 2,
+        "snowball": 1,
+        "wind": 2
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 5,
+          "flowing": true
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 5,
+      "outcome": "win",
+      "plannedShots": 12,
+      "shotsFired": 12,
+      "totalInventory": 16,
+      "plannedUnused": 4,
+      "unusedAfterWin": 4,
+      "plannedAmmo": {
+        "ender": 1,
+        "tnt": 2,
+        "cobble": 9
+      },
+      "loadout": {
+        "cobble": 11,
+        "tnt": 2,
+        "ender": 1,
+        "wind": 2
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 6,
+      "outcome": "win",
+      "plannedShots": 3,
+      "shotsFired": 3,
+      "totalInventory": 14,
+      "plannedUnused": 11,
+      "unusedAfterWin": 11,
+      "plannedAmmo": {
+        "tnt": 2,
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 3,
+        "ender": 1,
+        "snowball": 1,
+        "wind": 1
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 7,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 4,
+      "totalInventory": 14,
+      "plannedUnused": 10,
+      "unusedAfterWin": 10,
+      "plannedAmmo": {
+        "tnt": 2,
+        "ender": 1,
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 2,
+        "ender": 1,
+        "wind": 1,
+        "water": 2
+      },
+      "lavaSources": [
+        {
+          "x": 31,
+          "y": 4,
+          "flowing": true
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 8,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 4,
+      "totalInventory": 15,
+      "plannedUnused": 11,
+      "unusedAfterWin": 11,
+      "plannedAmmo": {
+        "ender": 1,
+        "tnt": 3
+      },
+      "loadout": {
+        "cobble": 9,
+        "tnt": 3,
+        "ender": 1,
+        "wind": 1,
+        "water": 1
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 9,
+      "outcome": "win",
+      "plannedShots": 4,
+      "shotsFired": 4,
+      "totalInventory": 16,
+      "plannedUnused": 12,
+      "unusedAfterWin": 12,
+      "plannedAmmo": {
+        "cobble": 3,
+        "tnt": 1
+      },
+      "loadout": {
+        "cobble": 9,
+        "tnt": 3,
+        "ender": 1,
+        "snowball": 1,
+        "wind": 1,
+        "water": 1
+      },
+      "lavaSources": [
+        {
+          "x": 16,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "nether",
+      "stage": 10,
+      "outcome": "win",
+      "plannedShots": 7,
+      "shotsFired": 7,
+      "totalInventory": 18,
+      "plannedUnused": 11,
+      "unusedAfterWin": 11,
+      "plannedAmmo": {
+        "cobble": 2,
+        "ender": 2,
+        "tnt": 3
+      },
+      "loadout": {
+        "cobble": 10,
+        "tnt": 4,
+        "ender": 2,
+        "wind": 1,
+        "water": 1
+      },
+      "lavaSources": [
+        {
+          "x": 15,
+          "y": 14
+        },
+        {
+          "x": 31,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "dimension": "end",
+      "stage": 1,
+      "outcome": "win",
+      "plannedShots": 3,
+      "shotsFired": 3,
+      "totalInventory": 9,
+      "plannedUnused": 6,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "ender": 1,
+        "slimeball": 1,
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 6,
+        "ender": 1,
+        "slimeball": 2
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 2,
+      "outcome": "win",
+      "plannedShots": 5,
+      "shotsFired": 5,
+      "totalInventory": 11,
+      "plannedUnused": 6,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "slimeball": 1,
+        "ender": 1,
+        "tnt": 1,
+        "cobble": 2
+      },
+      "loadout": {
+        "cobble": 7,
+        "tnt": 1,
+        "ender": 1,
+        "slimeball": 2
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 3,
+      "outcome": "win",
+      "plannedShots": 6,
+      "shotsFired": 6,
+      "totalInventory": 12,
+      "plannedUnused": 6,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "slimeball": 1,
+        "tnt": 1,
+        "ender": 1,
+        "cobble": 3
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 1,
+        "ender": 1,
+        "wind": 1,
+        "slimeball": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 4,
+      "outcome": "win",
+      "plannedShots": 6,
+      "shotsFired": 6,
+      "totalInventory": 13,
+      "plannedUnused": 7,
+      "unusedAfterWin": 7,
+      "plannedAmmo": {
+        "slimeball": 1,
+        "tnt": 1,
+        "anvil": 1,
+        "cobble": 3
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 1,
+        "ender": 2,
+        "slimeball": 1,
+        "anvil": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 5,
+      "outcome": "win",
+      "plannedShots": 7,
+      "shotsFired": 7,
+      "totalInventory": 14,
+      "plannedUnused": 7,
+      "unusedAfterWin": 7,
+      "plannedAmmo": {
+        "tnt": 3,
+        "cobble": 2,
+        "ender": 1,
+        "anvil": 1
+      },
+      "loadout": {
+        "cobble": 8,
+        "tnt": 3,
+        "ender": 1,
+        "snowball": 1,
+        "anvil": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 6,
+      "outcome": "win",
+      "plannedShots": 8,
+      "shotsFired": 8,
+      "totalInventory": 14,
+      "plannedUnused": 6,
+      "unusedAfterWin": 6,
+      "plannedAmmo": {
+        "cobble": 4,
+        "tnt": 2,
+        "anvil": 1,
+        "slimeball": 1
+      },
+      "loadout": {
+        "cobble": 9,
+        "tnt": 2,
+        "ender": 1,
+        "slimeball": 1,
+        "anvil": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 7,
+      "outcome": "win",
+      "plannedShots": 3,
+      "shotsFired": 3,
+      "totalInventory": 15,
+      "plannedUnused": 12,
+      "unusedAfterWin": 12,
+      "plannedAmmo": {
+        "slimeball": 1,
+        "tnt": 1,
+        "cobble": 1
+      },
+      "loadout": {
+        "cobble": 9,
+        "tnt": 2,
+        "ender": 2,
+        "wind": 1,
+        "slimeball": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 8,
+      "outcome": "win",
+      "plannedShots": 7,
+      "shotsFired": 7,
+      "totalInventory": 16,
+      "plannedUnused": 9,
+      "unusedAfterWin": 9,
+      "plannedAmmo": {
+        "cobble": 3,
+        "tnt": 2,
+        "ender": 1,
+        "anvil": 1
+      },
+      "loadout": {
+        "cobble": 10,
+        "tnt": 2,
+        "ender": 2,
+        "snowball": 1,
+        "anvil": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 9,
+      "outcome": "win",
+      "plannedShots": 5,
+      "shotsFired": 5,
+      "totalInventory": 17,
+      "plannedUnused": 12,
+      "unusedAfterWin": 12,
+      "plannedAmmo": {
+        "ender": 2,
+        "slimeball": 1,
+        "cobble": 2
+      },
+      "loadout": {
+        "cobble": 10,
+        "tnt": 3,
+        "ender": 2,
+        "wind": 1,
+        "slimeball": 1
+      },
+      "lavaSources": []
+    },
+    {
+      "dimension": "end",
+      "stage": 10,
+      "outcome": "win",
+      "plannedShots": 11,
+      "shotsFired": 11,
+      "totalInventory": 19,
+      "plannedUnused": 8,
+      "unusedAfterWin": 8,
+      "plannedAmmo": {
+        "ender": 2,
+        "anvil": 1,
+        "tnt": 3,
+        "cobble": 5
+      },
+      "loadout": {
+        "cobble": 11,
+        "tnt": 3,
+        "ender": 2,
+        "snowball": 1,
+        "wind": 1,
+        "anvil": 1
+      },
+      "lavaSources": []
+    }
+  ]
+}

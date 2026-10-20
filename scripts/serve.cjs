@@ -57,14 +57,17 @@ async function createGameServer(options={}){
           if(origin){let valid=corsAllowed;try{valid||=origin===allowedOrigin||new URL(origin).host===req.headers.host;}catch{}if(!valid)throw httpError(403,'Origin not allowed.');}
           if(req.headers['sec-fetch-site']==='cross-site'&&!corsAllowed)throw httpError(403,'Origin not allowed.');
         }
-        if(pathname==='/api/health')return send(res,200,{ok:true,version});
+        if(pathname==='/api/health')return send(res,200,{ok:true,version,...(leaderboard?{worlds:leaderboard.worlds,scoreSeason:leaderboard.scoreSeason}:{})});
         if(!leaderboard)throw httpError(503,'Leaderboard unavailable in this portable copy.');
-        if(pathname==='/api/leaderboard')return send(res,200,{entries:leaderboard.list()});
+        const worldParams=new URL(req.url,'http://localhost').searchParams.getAll('world');
+        if(worldParams.length>1)throw httpError(400,'Specify one world.');
+        const world=worldParams[0]??'overworld';
+        if(pathname==='/api/leaderboard')return send(res,200,{entries:leaderboard.list(world)});
         const authorization=req.headers.authorization||'',token=authorization.startsWith('Bearer ')?authorization.slice(7):'';
-        if(pathname==='/api/profile'&&req.method==='GET')return send(res,200,leaderboard.profile(token));
+        if(pathname==='/api/profile'&&req.method==='GET')return send(res,200,leaderboard.profile(token,world));
         const body=await readBody(req);
         if(pathname==='/api/profile')return req.method==='POST'?send(res,201,await leaderboard.create(body)):send(res,200,await leaderboard.update(token,body));
-        return send(res,200,await leaderboard.submit(token,body));
+        return send(res,200,await leaderboard.submit(token,body,world));
       }
       if(!['GET','HEAD'].includes(req.method)){res.setHeader('Allow','GET, HEAD');throw httpError(405,'Method not allowed.');}
       if(pathname==='/')pathname='/index.html';

@@ -1,8 +1,11 @@
 import { MATERIALS, AMMO } from './config.mjs';
 import {blockIcon} from './item-icons.mjs';
-const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(Boolean),'ladder','tnt_top',
-  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom','zombie','pillager','warden','fire_0','crossbow_standby'])];
-const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle'];
+import {makeAnvilIcon} from './combat-render.mjs';
+const ATLASES=['zombie','pillager','warden','fire_0','zombified_piglin','hoglin','shulker','enderman','lava_still','lava_flow','crimson_stem','warped_stem'];
+const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(n=>n&&n!=='anvil'),'ladder','tnt_top',
+  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby'])];
+const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle',
+ 'zombified_piglin_hurt','zombified_piglin_idle','hoglin_hurt','hoglin_idle','shulker_hurt','shulker_idle','shulker_open','shulker_close','enderman_hurt','enderman_idle','wind_burst','water_splash','anvil_land'];
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
@@ -26,17 +29,20 @@ export class Assets {
   async load(){
     await Promise.all(NAMES.map(async name=>{
       const im=await image(`assets/textures/${name}.png`);
-      if(!['zombie','pillager','warden','fire_0'].includes(name)&&(im.width!==16||im.height!==16))throw new Error(`纹理尺寸错误：${name}`);
+      if(!ATLASES.includes(name)&&(im.width!==16||im.height!==16))throw new Error(`纹理尺寸错误：${name}`);
       this.images[name]=im;
     }));
-    this.images.slingshot_frame=await image('assets/sprites/slingshot-frame.png');
+    // Animated stems use their first original 16px frame for the terrain cache.
+    for(const name of ['crimson_stem','warped_stem']){const c=document.createElement('canvas');c.width=c.height=16;c.getContext('2d').drawImage(this.images[name],0,0,16,16,0,0,16,16);this.images[name]=c;}
+    this.images.anvil=makeAnvilIcon(this.images.anvil_base,this.images.anvil_top);
     this.images.oak_leaves=tint(this.images.oak_leaves,'#76a745');
     this.images.spruce_leaves=tint(this.images.spruce_leaves,'#649877');
     const grass=document.createElement('canvas');grass.width=grass.height=16;
     const gx=grass.getContext('2d');gx.drawImage(this.images.grass_block_side,0,0);
     gx.drawImage(tint(this.images.grass_block_side_overlay,'#79b44e'),0,0);this.images.grass_block_side=grass;
     const ladder=document.createElement('canvas');ladder.width=ladder.height=16;const lc=ladder.getContext('2d');lc.drawImage(this.images.oak_planks,0,0);lc.drawImage(this.images.ladder,0,0);this.images.ladder_wall=ladder;
-    this.icons={cobble:blockIcon(this.images.cobblestone),tnt:blockIcon(this.images.tnt_side,this.images.tnt_top),ender:this.images.ender_pearl,fire:this.images.fire_charge};
+    this.icons=Object.fromEntries(AMMO.map(a=>[a.id,this.images[a.sprite]]));
+    this.icons.cobble=blockIcon(this.images.cobblestone);this.icons.tnt=blockIcon(this.images.tnt_side,this.images.tnt_top);
     for(const [name,im] of Object.entries(this.images))if(im.width===16&&im.height===16){
       const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);this.colors[name]=x.getImageData(0,0,16,16).data;
       const sums=[0,0,0];for(let i=0;i<1024;i+=4)for(let channel=0;channel<3;channel++)sums[channel]+=this.colors[name][i+channel];this.averages[name]=sums.map(v=>v/256);

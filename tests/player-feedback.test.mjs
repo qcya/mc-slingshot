@@ -1,9 +1,9 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {LOADOUTS,inventoryFor,hotbarSlots} from '../src/campaign.mjs';import {buildLevel} from '../src/levels.mjs';
-test('level-specific loadouts favor stones, fit three kinds and include a no-stone challenge',()=>{
- assert.ok(LOADOUTS.every(items=>items.filter(n=>n>0).length<=3));
+test('rebuilt level loadouts favor stones and supply only the original four kinds in overworld',()=>{
+ assert.ok(LOADOUTS.every(items=>items.length===4&&items.filter(n=>n>0).length<=4));
  assert.ok(LOADOUTS.filter(items=>items[0]>0).every(items=>items[0]>=items[1]));
- assert.ok(inventoryFor(0)[0]>=5);assert.ok(LOADOUTS.some(items=>items[0]===0));
+ assert.ok(inventoryFor(0)[0]>=5);assert.ok(LOADOUTS.every(items=>items[0]>0));
  for(const i of [1,4,8,9])assert.equal(inventoryFor(i)[3],0,'stone structures do not get an unnecessary fire charge');
 });
 test('the nine hotbar positions unlock independently from the current level inventory',()=>{

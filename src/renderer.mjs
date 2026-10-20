@@ -3,7 +3,8 @@ import {predictArc,arcRevision} from './aim.mjs';
 import {MobSprites} from './mobs.mjs';
 import {tntFlash,DEATH_POOF} from './animation.mjs';
 import {SLING_HOME,SLING_FRAME,pouchRotation} from './sling.mjs';
-import {skyAndLandscape,driftingClouds,rearPixel,foregroundPixel,contactShadows} from './scenery.mjs';
+import {skyAndLandscape,dimensionLandscape,driftingClouds,rearPixel,foregroundPixel,contactShadows} from './scenery.mjs';
+import {makeSlingArt} from './sling-art.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -13,6 +14,7 @@ export class Renderer {
     this.mobSprites=new MobSprites(assets);this.rearCanvas=document.createElement('canvas');this.rearCanvas.width=512;this.rearCanvas.height=288;
     this.rearPictures=new WeakMap();this.rearVersion=-1;this.arcKey='';
     this.background=document.createElement('canvas');this.background.width=WIDTH;this.background.height=HEIGHT;this.backgroundReady=false;
+    this.slingPicture=makeSlingArt(assets.colors.oak_log);
   }
   reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.arcKey='';this.backgroundReady=false;this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
   drawRear(world){
@@ -77,6 +79,7 @@ export class Renderer {
       else if(event.type==='impact')this.assets.play(event.sound||MATERIALS[event.m]?.sound||'stone',clamp(event.speed/2200,.12,.4));
       else if(event.type==='hurt')this.assets.play(event.sound,.18);
       else if(event.type==='ambient'&&navigator.userActivation?.hasBeenActive)this.assets.play(event.sound,.075);
+      else if(['gust','splash','snow'].includes(event.type)){this.effects.push({...event,life:.4,total:.4});if(event.sound)this.assets.play(event.sound,.25);}
     }
   }
   update(world,dt){
@@ -111,7 +114,9 @@ export class Renderer {
     }
   }
   backdrop(time){
-    const c=this.ctx;skyAndLandscape(c,this.assets);for(const t of this.scene.trees)this.tree(t);
+    const c=this.ctx;
+    if(this.scene.dimension&&this.scene.dimension!=='overworld'){dimensionLandscape(c,this.assets,this.scene.dimension);return;}
+    skyAndLandscape(c,this.assets);for(const t of this.scene.trees)this.tree(t);
     // A distant, dark rock layer keeps excavated ground visually underground.
     c.save();for(let x=0;x<32;x++)for(let y=14;y<18;y++)this.image(y<16?'dirt':'stone',x*TILE,y*TILE);
     c.fillStyle='#0009';c.fillRect(0,14*TILE,WIDTH,HEIGHT-14*TILE);c.restore();
@@ -132,17 +137,17 @@ export class Renderer {
   }
   launcher(state,world){
     const c=this.ctx,p=state.pouch,{left,right}=SLING_FRAME;
-    const angle=state.drag||state.launch?pouchRotation(state.vx,state.vy):.15;
+    const angle=pouchRotation(state.vx,state.vy);
     const a={x:p.x-Math.cos(angle)*15,y:p.y-Math.sin(angle)*15},b={x:p.x+Math.cos(angle)*15,y:p.y+Math.sin(angle)*15};
     const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
     c.save();c.beginPath();c.rect(0,0,WIDTH,SLING_FRAME.ground);c.clip();
-    c.drawImage(this.assets.images.slingshot_frame,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
+    if(this.slingPicture)c.drawImage(this.slingPicture,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
     // The left strap attaches to the inner face; drawing it behind the fork
     // hides that attachment and makes the visible band emerge from the outside.
     band(left,a,8,'#34251c');band(left,a,4,'#98765b');
-    c.save();c.translate(p.x,p.y);c.rotate(angle);c.fillStyle='#563824';c.beginPath();c.roundRect(-18,-9,36,18,5);c.fill();c.strokeStyle='#b68b5d';c.lineWidth=2;c.stroke();c.restore();
-    if(state.loaded)this.ball(p.x,p.y,state.ammo);
     band(right,b,9,'#39271c');band(right,b,4,'#b48c63');
+    c.save();c.translate(p.x,p.y);c.rotate(angle);c.fillStyle='#35281e';c.fillRect(-19,-10,38,20);c.fillStyle='#77573c';c.fillRect(-16,-8,32,16);c.fillStyle='#a58259';c.fillRect(-15,-7,30,3);c.restore();
+    if(state.loaded)this.ball(p.x,p.y,state.ammo);
     if(state.drag){
       const key=`${state.ammo.id}:${p.x.toFixed(1)}:${p.y.toFixed(1)}:${state.vx.toFixed(1)}:${state.vy.toFixed(1)}:${arcRevision(world)}`;
       if(key!==this.arcKey){this.arcKey=key;this.arc=predictArc(world,state.ammo.id,p,state.vx,state.vy);}
@@ -152,7 +157,13 @@ export class Renderer {
   draw(world,launcher,paused=false,visualTime=world.time){
     const c=this.ctx;c.imageSmoothingEnabled=false;
     if(!this.backgroundReady){this.ctx=this.background.getContext('2d',{alpha:false});this.ctx.imageSmoothingEnabled=false;this.backdrop(0);this.ctx=c;this.backgroundReady=true;}
-    c.drawImage(this.background,0,0);driftingClouds(c,visualTime);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
+    c.drawImage(this.background,0,0);if(!this.scene.dimension||this.scene.dimension==='overworld')driftingClouds(c,visualTime);this.drawRear(world);this.cacheGrid(world.grid);c.drawImage(this.terrain,0,0,WIDTH,HEIGHT);
+    if(world.lava?.cells.size){
+      const atlas=this.assets.images.lava_still,frame=Math.floor(world.time*6)%Math.floor(atlas.height/16);
+      for(const cell of world.lava.cells.values()){
+       const sx=(cell.gx%4)*4,sy=frame*16+(cell.gy%4)*4;c.drawImage(atlas,sx,sy,4,4,cell.x,cell.y,cell.size,cell.size);
+      }
+    }
     contactShadows(c,world,SLING_HOME);
     for(const e of world.debris){if(e.dead)continue;c.save();c.translate(e.body.position.x,e.body.position.y);c.rotate(e.body.angle);c.drawImage(this.cachePiece(e),e.offset.x,e.offset.y,e.w*PIXEL,e.h*PIXEL);c.restore();}
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
@@ -167,6 +178,10 @@ export class Renderer {
     for(const e of this.effects){
       if(e.type==='explosion'){const frame=Math.min(15,Math.floor((1-e.life/e.total)*16)),size=e.radius*2;c.drawImage(this.assets.explosions[frame],e.x-size/2,e.y-size/2,size,size);}
       else if(e.type==='portal'){c.fillStyle='#ad65dc';c.globalAlpha=e.life/e.total;for(const p of [e,e.to])for(let i=0;i<14;i++){const a=i/14*Math.PI*2,r=20+(1-e.life/e.total)*30;c.fillRect(p.x+Math.cos(a)*r,p.y+Math.sin(a)*r,6,6);}c.globalAlpha=1;}
+      else if(['gust','splash','snow'].includes(e.type)){
+        const radius=(e.radius||45)*(1-e.life/e.total),color=e.type==='splash'?'#76b9ef':e.type==='snow'?'#eaf8ff':'#d9e8ec';c.fillStyle=color;c.globalAlpha=e.life/e.total;
+        for(let i=0;i<24;i++){const a=i*Math.PI/12;c.fillRect(Math.round((e.x+Math.cos(a)*radius)/3)*3,Math.round((e.y+Math.sin(a)*radius)/3)*3,6,6);}c.globalAlpha=1;
+      }
     }
     if(paused){c.fillStyle='#15232da8';c.fillRect(0,0,WIDTH,HEIGHT);c.fillStyle='#fff';c.textAlign='center';c.font='bold 52px system-ui';c.fillText('已暂停',WIDTH/2,HEIGHT/2);c.textAlign='left';}
   }

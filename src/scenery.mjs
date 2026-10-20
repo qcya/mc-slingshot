@@ -28,6 +28,48 @@ export function driftingClouds(ctx,time){
  }
 }
 
+// Stable, noncolliding dimension scenery. Every silhouette is assembled from
+// the same original block textures as the foreground, then pushed into haze.
+export function dimensionLandscape(ctx,assets,dimension='overworld'){
+ if(dimension==='overworld'){skyAndLandscape(ctx,assets);return;}
+ ctx.fillStyle=dimension==='nether'?'#260d12':'#100c1d';ctx.fillRect(0,0,WIDTH,HEIGHT);
+ const texture=(name,x,y,size)=>{const im=assets.images[name];if(im)ctx.drawImage(im,x,y,size,size);};
+ const layer=(paint,tint,alpha)=>{
+  const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
+  paint(c);c.globalCompositeOperation='source-atop';c.globalAlpha=alpha;c.fillStyle=tint;c.fillRect(0,0,WIDTH,HEIGHT);ctx.drawImage(canvas,0,0);
+ };
+ if(dimension==='nether'){
+  const glow=ctx.createLinearGradient(0,280,0,HEIGHT);glow.addColorStop(0,'#260d1200');glow.addColorStop(1,'#9c391b88');ctx.fillStyle=glow;ctx.fillRect(0,0,WIDTH,HEIGHT);
+  layer(c=>{
+   for(let x=0;x<64;x++){
+    const top=[17,16,15,15,13,14,16,18,19,17,16,14,15,17,18,18][x%16];
+    for(let y=top;y<36;y++)c.drawImage(assets.images.netherrack,x*24,y*24,24,24);
+    const down=2+(x*7%5);for(let y=0;y<down;y++)c.drawImage(assets.images.netherrack,x*24,y*24,24,24);
+   }
+  },'#481b24',.74);
+  layer(c=>{
+   for(const [x,top,w] of [[40,340,64],[400,420,48],[650,380,64],[1130,340,48],[1430,390,64]])for(let y=top;y<HEIGHT;y+=32)for(let dx=0;dx<w;dx+=32)c.drawImage(assets.images.basalt_side,x+dx,y,32,32);
+   for(const [x,y] of [[470,490],[1050,450],[1320,520]]){c.drawImage(assets.images.nether_bricks,x,y,32,32);for(let dx=1;dx<5;dx++)c.drawImage(assets.images.nether_bricks,x+dx*32,y,32,32);}
+  },'#371a23',.66);
+  for(const [x,y] of [[176,580],[610,570],[1210,610]]){ctx.fillStyle='#b5542799';ctx.fillRect(x,y,80,6);ctx.fillStyle='#dc8a3a66';ctx.fillRect(x+15,y,36,3);}
+ }else{
+  for(let i=0;i<55;i++){ctx.fillStyle=i%4?'#4a385c':'#6d5585';const x=(i*283+71)%WIDTH,y=(i*137+43)%540;ctx.fillRect(Math.floor(x/3)*3,Math.floor(y/3)*3,3,3);}
+  layer(c=>{
+   for(const [x,y,w] of [[-48,510,7],[350,570,6],[750,460,5],[1110,550,8]]){
+    for(let dx=0;dx<w;dx++)c.drawImage(assets.images.end_stone,x+dx*24,y,24,24);
+    for(let dy=1;dy<4;dy++)for(let dx=dy;dx<w-dy;dx++)c.drawImage(assets.images.end_stone,x+dx*24,y+dy*24,24,24);
+   }
+  },'#41354e',.77);
+  layer(c=>{
+   for(const [x,y,h] of [[144,520,7],[860,460,6],[1340,550,9]])for(let j=0;j<h;j++)c.drawImage(assets.images.obsidian,x,y-j*24,24,24);
+  },'#282136',.45);
+ }
+ // Cavities reveal a darker matching world material below the common horizon.
+ const under=dimension==='nether'?'blackstone':'end_stone';
+ for(let x=0;x<32;x++)for(let y=14;y<18;y++)texture(under,x*48,y*48,48);
+ ctx.fillStyle=dimension==='nether'?'#17090bd9':'#100b1cdd';ctx.fillRect(0,672,WIDTH,HEIGHT-672);
+}
+
 export function rearPixel(assets,m,x,y,world,visual){
   const p=assets.pixel(m,x,y);
   const average=assets.averages[MATERIALS[m].sprite];

@@ -1,9 +1,8 @@
 import {clamp} from './config.mjs';
 export const SLING_HOME={x:285,y:545};
-// The supplied sprite extends below ground; never expose its buried end.
-// Fixed centers of the two marked leather bindings, in world coordinates.
-export const SLING_FRAME={x:190,y:484,width:186,height:248,ground:672,left:{x:255,y:522},right:{x:327,y:546}};
-export function pouchRotation(vx,vy){return Math.hypot(vx,vy)<.001?.15:Math.atan2(vy,vx)+Math.PI/2;}
+// Centers of the leather wraps on the inside of the two fork tips.
+export const SLING_FRAME={x:216,y:498,width:138,height:174,ground:672,left:{x:249,y:516},right:{x:321,y:516}};
+export function pouchRotation(vx,vy){return Math.hypot(vx,vy)<.001?Math.PI/2:Math.atan2(vy,vx)+Math.PI/2;}
 export function pullSling(point){
  const dx=SLING_HOME.x-point.x,dy=SLING_HOME.y-point.y,length=Math.hypot(dx,dy),scale=length>135?135/length:1;
  const origin={x:SLING_HOME.x-dx*scale,y:clamp(SLING_HOME.y-dy*scale,410,648)};

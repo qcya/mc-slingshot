@@ -1,4 +1,5 @@
-export const TIME_SAVE_KEY='mc-block-launch.best-times.v1',TIME_QUEUE_KEY='mc-block-launch.pending.v2';
+// Rebuilt courses start a new season. Leave the old keys available for backup.
+export const TIME_SAVE_KEY='mc-block-launch.best-times.v2',TIME_QUEUE_KEY='mc-block-launch.pending.v3';
 const valid=t=>Number.isSafeInteger(t)&&t>=100&&t<=3600000;
 export function normalizeTimes(value){return Array.from({length:10},(_,i)=>valid(value?.[i])?value[i]:null);}
 export function recordBestTime(value,stage,timeMs){

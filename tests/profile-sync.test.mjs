@@ -1,14 +1,29 @@
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import fs from 'node:fs';
 import {parseTimeBundle,normalizeTimes,recordBestTime,timeBundle} from '../src/timing.mjs';
+import {WORLDS,worldSaveKey} from '../src/dimensions.mjs';
 const source=fs.readFileSync(new URL('../src/app.mjs',import.meta.url),'utf8');
 // Execute the actual application functions with controlled storage/network/DOM.
 const functions=source.slice(source.indexOf('function readLocal('),source.indexOf('async function showLeaderboard('));
 function fixture(){
  const storage=new Map(),nodes=new Map();const node=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',value:'新昵称',disabled:false,classList:{toggle(){}}});return nodes.get(id);};
- const context=vm.createContext({console,queueMicrotask,parseTimeBundle,normalizeTimes,recordBestTime,timeBundle,TIME_SAVE_KEY:'times',bestTimes:[],PROFILE_KEY:'profile',PENDING_KEY:'pending',profile:{id:'id',token:'token',nickname:'旧昵称'},profileRevision:0,profileReturn:'levels',syncing:false,state:{screen:'levels'},online:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:node,cancelDrag(){},menus(screen){context.state.screen=screen;}});
+ const context=vm.createContext({console,queueMicrotask,WORLDS,worldSaveKey,parseTimeBundle,normalizeTimes,recordBestTime,timeBundle,TIME_SAVE_KEY:'times',bestTimes:[],PROFILE_KEY:'profile',PENDING_KEY:'pending',profile:{id:'id',token:'token',nickname:'旧昵称'},profileRevision:0,profileReturn:'levels',syncing:false,state:{world:'overworld',screen:'levels'},online:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:node,renderCards(){},cancelDrag(){},menus(screen){context.state.screen=screen;}});
  vm.runInContext('const appStorage=localStorage;const nativeOnline=false;',context);vm.runInContext(functions,context);return {context,storage,node};
 }
 const bundle=t=>({stages:Array.from({length:10},(_,stage)=>({stage,timeMs:t}))});
+
+test('offline queues from different worlds upload to their own boards',async()=>{
+ const {context:c,storage}=fixture(),submitted=[];
+ storage.set('pending',JSON.stringify([bundle(3000)]));storage.set('pending.nether',JSON.stringify([bundle(2000)]));
+ c.online.submitResult=async(token,score,world)=>submitted.push([world,score.stages[0].timeMs]);
+ await c.syncResults();assert.deepEqual(submitted,[['overworld',3000],['nether',2000]]);
+ assert.equal(storage.get('pending.nether'),'[]');
+});
+test('late restore after world selection cannot fill the other world times',async()=>{
+ const {context:c,storage}=fixture();let release;
+ c.online.profile=()=>new Promise(resolve=>release=resolve);const restore=c.restoreTimes();
+ c.state.world='end';c.profileRevision++;c.bestTimes=[];release(bundle(2000));await restore;
+ assert.equal(storage.has('times.end'),false);assert.equal(c.bestTimes.length,0);
+});
 test('a faster full run queued during upload is drained without another win or reload',async()=>{
  const {context:c,storage}=fixture(),submitted=[];let release;
  storage.set('pending',JSON.stringify([bundle(5000)]));
