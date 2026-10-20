@@ -7,7 +7,12 @@ function buildToy({output}={}){
  for(const file of ['index.html','style.css','assets','vendor'])fs.cpSync(path.join(root,file),path.join(output,file),{recursive:true,filter:source=>fs.statSync(source).isDirectory()||/\.(html|js|css|png|ogg)$/.test(source)});
  // Toy/CDN static hosts need not advertise .mjs with a module MIME type.
  // Emit one ordinary script so neither ESM MIME nor source imports can block boot.
- esbuild.buildSync({entryPoints:[path.join(root,'game.js')],bundle:true,format:'iife',platform:'browser',target:'es2020',minify:true,outfile:path.join(output,'game.js')});
+ const canvasImages={};
+ for(const directory of ['textures','effects'])for(const name of fs.readdirSync(path.join(root,'assets',directory)).sort())if(name.endsWith('.png')){
+  const relative=`assets/${directory}/${name}`;
+  canvasImages[relative]=`data:image/png;base64,${fs.readFileSync(path.join(root,relative)).toString('base64')}`;
+ }
+ esbuild.buildSync({entryPoints:[path.join(root,'game.js')],bundle:true,format:'iife',platform:'browser',target:'es2020',minify:true,define:{__MC_CANVAS_IMAGES__:JSON.stringify(canvasImages)},outfile:path.join(output,'game.js')});
  fs.writeFileSync(path.join(output,'toy-config.js'),`globalThis.MC_PLATFORM=${JSON.stringify({toy:true,ranking:'toy'})};\n`);
  const entry=path.join(output,'index.html');fs.writeFileSync(entry,fs.readFileSync(entry,'utf8').replace('<script type="module" src="game.js">','<script src="toy-config.js"></script><script src="vendor/toy-sdk.min.js"></script><script defer src="game.js">'));
  return {output,ranking:'Toy SDK'};

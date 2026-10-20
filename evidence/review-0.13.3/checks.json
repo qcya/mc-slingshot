@@ -1,0 +1,46 @@
+{
+  "version": "0.13.3",
+  "verifiedAt": "2026-10-20T13:44:48.313Z",
+  "node": {
+    "passed": 286,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 13,
+    "failed": 0,
+    "scope": "startup, guide, Toy package, real SDK RPC, cloud recovery, cross-origin canvas"
+  },
+  "canvasImages": {
+    "count": 82,
+    "originalBytes": 53247
+  },
+  "doctor": {
+    "ok": true,
+    "findings": [
+      {
+        "severity": "WARN",
+        "file": "slug",
+        "message": "lowercase hyphen-case is preferred for shareable Toy URLs"
+      },
+      {
+        "severity": "WARN",
+        "file": ".",
+        "message": "3 个 JS/CSS 产物的文件名都不含内容指纹（形如 assets/index-Ct-l33m_.js）；每次更新访客都要重新下载全部资源。多数构建工具默认已开启：Vite 开箱即用，webpack 配 output.filename '[name].[contenthash].js'。仅为建议，不影响本次发布"
+      }
+    ]
+  },
+  "zip": {
+    "bytes": 5826718,
+    "sha256": "57cd7565af25cdb83203ec315fc4e1769c6cfa0b995f304ebe4640c4a6151153"
+  },
+  "publication": {
+    "uploaded": false,
+    "manualUpload": true,
+    "boardsUnchanged": [
+      2,
+      3,
+      4
+    ],
+    "saveKeysChanged": false
+  }
+}

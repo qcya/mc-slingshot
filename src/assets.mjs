@@ -6,7 +6,10 @@ const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>
   'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby','ice'])];
 const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle',
  'zombified_piglin_hurt','zombified_piglin_idle','hoglin_hurt','hoglin_idle','shulker_hurt','shulker_idle','shulker_open','shulker_close','enderman_hurt','enderman_idle','wind_burst','water_splash','anvil_land'];
-function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}
+// Toy may serve PNG files from a separate CDN. Embed the canvas sources in the
+// build so pixel sampling, skin conversion and inventory data URLs stay readable.
+const PACKAGED_IMAGES=typeof __MC_CANVAS_IMAGES__==='undefined'?null:__MC_CANVAS_IMAGES__;
+function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`素材无法加载或跨域访问未获许可：${url}`));im.src=PACKAGED_IMAGES?.[url]??url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
   x.drawImage(im,0,0);x.globalCompositeOperation='multiply';x.fillStyle=color;x.fillRect(0,0,c.width,c.height);
