@@ -9,6 +9,7 @@ const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','porta
 // Toy may serve PNG files from a separate CDN. Embed the canvas sources in the
 // build so pixel sampling, skin conversion and inventory data URLs stay readable.
 const PACKAGED_IMAGES=typeof __MC_CANVAS_IMAGES__==='undefined'?null:__MC_CANVAS_IMAGES__;
+const PACKAGED_SOUNDS=typeof __MC_SOUND_SOURCES__==='undefined'?null:__MC_SOUND_SOURCES__;
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`素材无法加载或跨域访问未获许可：${url}`));im.src=PACKAGED_IMAGES?.[url]??url;});}
 function tint(im,color){
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');
@@ -52,7 +53,7 @@ export class Assets {
     }
     this.explosions=await Promise.all(Array.from({length:16},(_,i)=>image(`assets/effects/explosion_${i}.png`)));
     await Promise.all(SOUNDS.map(async name=>{
-      const response=await fetch(`assets/sfx/${name}.ogg`);if(!response.ok)throw new Error(`缺少音效：${name}`);
+      const path=`assets/sfx/${name}.ogg`,response=await fetch(PACKAGED_SOUNDS?.[path]??path);if(!response.ok)throw new Error(`缺少音效：${name}`);
       const blob=await response.blob();this.sounds[name]=new Audio(URL.createObjectURL(blob));
     }));
     return this;

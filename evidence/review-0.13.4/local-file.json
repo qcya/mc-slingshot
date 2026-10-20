@@ -1,0 +1,29 @@
+{
+  "protocol": "file:",
+  "drawSound": {
+    "active": false,
+    "starts": 1,
+    "stops": 1,
+    "state": "running",
+    "signalRms": 0,
+    "source": "minecraft:crossbow_loading",
+    "failed": false
+  },
+  "sound": {
+    "played": {
+      "bow": 1
+    },
+    "failed": 0,
+    "lastError": null,
+    "enabled": true,
+    "volume": 1
+  },
+  "launched": 1,
+  "errors": [],
+  "blocked": [
+    {
+      "url": "file:///C:/Users/ADMINI%7E1/AppData/Local/Temp/mc-toy-file-arugLS/site/assets/music/sweden.ogg",
+      "failure": "net::ERR_ABORTED"
+    }
+  ]
+}

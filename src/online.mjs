@@ -1,7 +1,7 @@
 // Relative URLs also work beneath a reverse proxy prefix such as /mc-block-launch/.
 // Keep the returned profile token in local storage; never put it in a URL.
 import {dimension,SCORE_SEASON} from './dimensions.mjs';
-export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeoutMs=8000}={}) {
+export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeoutMs=8000,offline=globalThis.location?.protocol==='file:'}={}) {
   const prefix=baseUrl?`${baseUrl.replace(/\/+$/,'')}/`:'';
   let worldCapabilities=null;
   async function scoped(route,world){
@@ -16,6 +16,7 @@ export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeou
     return id==='overworld'?route:`${route}?world=${id}`;
   }
   async function request(route,{method='GET',token,body}={}) {
+    if(offline)throw Object.assign(Error('本地试玩仅保存本机记录，在线排行榜请进入发布后的游戏。'),{status:0});
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
     try {
       const response=await fetchImpl(`${prefix}api/${route}`,{

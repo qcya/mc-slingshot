@@ -1,0 +1,9 @@
+{
+  "cors": false,
+  "pixels": 5308416,
+  "embeddedItemIcons": 9,
+  "cdnRequests": [
+    "/toy/Stone_at_Full_Draw/assets/textures/dirt.png"
+  ],
+  "errors": []
+}

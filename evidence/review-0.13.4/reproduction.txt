@@ -1,0 +1,47 @@
+
+Running 1 test using 1 worker
+
+node.exe : (node:52272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+所在位置 C:\Users\Administrator\AppData\Roaming\npm\npx.ps1:24 字符: 5
++     & "node$exe"  "$basedir/node_modules/npm/bin/npx-cli.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:52272) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 tests\toy-file.spec.cjs:5:1 › extracted Toy package opens directly from file URL with native draw and release sounds (12.6s)
+
+
+  1) tests\toy-file.spec.cjs:5:1 › extracted Toy package opens directly from file URL with native draw and release sounds
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('#loadState')
+    Expected: hidden
+    Received: visible
+    Timeout:  12000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('#loadState') with timeout 12000ms
+      - waiting for locator('#loadState')
+        27 × locator resolved to <div role="status" class="error" id="loadState">游戏未能启动：Failed to fetch</div>
+           - unexpected value "visible"
+
+
+       8 |   page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>blocked.push({url:r.url(),failure:r.failure()?.errorText}));
+       9 |   await page.goto(pathToFileURL(path.join(build.output,'index.html')).href);
+    > 10 |   await expect(page.locator('#loadState')).toBeHidden({timeout:12000});await expect(page.locator('#startScreen')).toBeVisible();
+         |                                            ^
+      11 |   await page.locator('#guideBtn').click();await expect(page.locator('#itemGuide article')).toHaveCount(9);await page.locator('#guideBack').click();
+      12 |   await page.locator('#startScreen').click();if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill('Local tester');await page.locator('#saveProfile').click();}
+      13 |   await expect(page.locator('#levelMenu')).toBeVisible();await page.locator('#level-0').click();
+        at C:\Users\Administrator\Desktop\mc-block-launch\tests\toy-file.spec.cjs:10:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\toy-file-extracted-Toy-pac-1fcfe-ive-draw-and-release-sounds\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\toy-file-extracted-Toy-pac-1fcfe-ive-draw-and-release-sounds\error-context.md
+
+  1 failed
+    tests\toy-file.spec.cjs:5:1 › extracted Toy package opens directly from file URL with native draw and release sounds

@@ -12,8 +12,15 @@ function buildToy({output}={}){
   const relative=`assets/${directory}/${name}`;
   canvasImages[relative]=`data:image/png;base64,${fs.readFileSync(path.join(root,relative)).toString('base64')}`;
  }
- esbuild.buildSync({entryPoints:[path.join(root,'game.js')],bundle:true,format:'iife',platform:'browser',target:'es2020',minify:true,define:{__MC_CANVAS_IMAGES__:JSON.stringify(canvasImages)},outfile:path.join(output,'game.js')});
- fs.writeFileSync(path.join(output,'toy-config.js'),`globalThis.MC_PLATFORM=${JSON.stringify({toy:true,ranking:'toy'})};\n`);
+ // fetch(file://...) is blocked in local previews. Keep original sound bytes
+ // available without a filesystem fetch; WebAudio reads the resulting blob URL.
+ const soundSources={};
+ for(const name of fs.readdirSync(path.join(root,'assets','sfx')).sort())if(name.endsWith('.ogg')){
+  const relative=`assets/sfx/${name}`;
+  soundSources[relative]=`data:audio/ogg;base64,${fs.readFileSync(path.join(root,relative)).toString('base64')}`;
+ }
+ esbuild.buildSync({entryPoints:[path.join(root,'game.js')],bundle:true,format:'iife',platform:'browser',target:'es2020',minify:true,define:{__MC_CANVAS_IMAGES__:JSON.stringify(canvasImages),__MC_SOUND_SOURCES__:JSON.stringify(soundSources)},outfile:path.join(output,'game.js')});
+ fs.writeFileSync(path.join(output,'toy-config.js'),`globalThis.MC_PLATFORM=location.protocol==='file:'?${JSON.stringify({toy:false,ranking:'offline'})}:${JSON.stringify({toy:true,ranking:'toy'})};\n`);
  const entry=path.join(output,'index.html');fs.writeFileSync(entry,fs.readFileSync(entry,'utf8').replace('<script type="module" src="game.js">','<script src="toy-config.js"></script><script src="vendor/toy-sdk.min.js"></script><script defer src="game.js">'));
  return {output,ranking:'Toy SDK'};
 }

@@ -10,5 +10,9 @@ test('Toy build contains executable relative assets and native SDK config but no
   const key=`assets/${directory}/${name}`,data=`data:image/png;base64,${fs.readFileSync(key).toString('base64')}`;
   assert.ok(script.includes(key)&&script.includes(data),`${key} must be embedded byte-for-byte for origin-clean canvas use`);
  }
+ for(const name of fs.readdirSync('assets/sfx').filter(n=>n.endsWith('.ogg'))){
+  const key=`assets/sfx/${name}`,data=`data:audio/ogg;base64,${fs.readFileSync(key).toString('base64')}`;
+  assert.ok(script.includes(key)&&script.includes(data),`${key} must retain its original audio bytes in local-file previews`);
+ }
  for(const f of ['.git','node_modules','scripts','src','connection.json','package.json','leaderboard.json'])assert.ok(!fs.existsSync(path.join(output,f)),f);
 });
