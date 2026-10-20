@@ -3,7 +3,7 @@ import {blockIcon} from './item-icons.mjs';
 import {makeAnvilIcon} from './combat-render.mjs';
 const ATLASES=['zombie','pillager','warden','fire_0','zombified_piglin','hoglin','shulker','enderman','lava_still','lava_flow','crimson_stem','warped_stem'];
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(n=>n&&n!=='anvil'),'ladder','tnt_top',
-  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby'])];
+  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby','ice'])];
 const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle',
  'zombified_piglin_hurt','zombified_piglin_idle','hoglin_hurt','hoglin_idle','shulker_hurt','shulker_idle','shulker_open','shulker_close','enderman_hurt','enderman_idle','wind_burst','water_splash','anvil_land'];
 function image(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error(`缺少必需素材：${url}`));im.src=url;});}

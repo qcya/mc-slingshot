@@ -22,12 +22,17 @@ Base URL: https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5
 | anvil_top.png | textures/blocks/anvil_top_damaged_0.png |
 | lava_still.png | textures/blocks/lava_still.png |
 | lava_flow.png | textures/blocks/lava_flow.png |
+| ice.png | textures/blocks/ice.png |
 
 Entity cuboid dimensions and UVs follow official `models/entity/piglin.geo.json`,
 `hoglin.geo.json`, `shulker.geo.json` and `enderman.geo.json`. The game projects
 the cuboids into 2D; it does not display the entire skin atlas as a sprite.
 The anvil inventory sprite is rendered at runtime from its original block
 textures as three stacked cuboids (`makeAnvilIcon`).
+
+The freeze shell uses the original ice texture at reduced opacity over the
+actual creature. Hoglin legs rotate around the official local hip pivots
+(front Y=12/Z=-3, rear Y=8/Z=17), with Y inverted for the canvas projection.
 
 The Enderman's Bedrock material uses packed alpha for emissive information.
 `MobSprites` presents the model's faces as opaque in Canvas, so the original
@@ -46,6 +51,12 @@ Inventory order is stone, TNT, pearl, fire charge, snowball, wind charge,
 water bottle, slimeball, anvil. The Nether introduces snowball, wind charge
 and water bottle; the End adds slimeball and anvil. All nine positions remain
 finite level inventory slots.
+
+`enemy.frozen` fully immobilizes the enemy's rigid body and pauses its AI pose
+and Shulker shell cycle. It has no automatic timeout. A valid damaging hit
+breaks the ice without absorbing that hit; fire/lava melt it. Static or slow
+projectiles and wind do not break ice. Thawing restores the original Matter
+mass/inertia and pauses elapsed AI timers instead of skipping their cycle.
 
 `world.lava.cells` is a bounded map of world-space `{x,y,size,gx,gy}` cells.
 Source positions supplied to `SiegeWorld` use whole block coordinates.

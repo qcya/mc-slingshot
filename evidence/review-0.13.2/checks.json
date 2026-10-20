@@ -1,0 +1,54 @@
+{
+  "version": "0.13.2",
+  "verifiedAt": "2026-10-20T13:31:36.302Z",
+  "node": {
+    "passed": 286,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 84,
+    "failed": 0
+  },
+  "campaigns": {
+    "physicsStages": 30,
+    "nativeBrowserStages": 20,
+    "selfHostedBrowserStages": 10
+  },
+  "doctor": {
+    "ok": true,
+    "findings": [
+      {
+        "severity": "WARN",
+        "file": "slug",
+        "message": "lowercase hyphen-case is preferred for shareable Toy URLs"
+      },
+      {
+        "severity": "WARN",
+        "file": ".",
+        "message": "3 个 JS/CSS 产物的文件名都不含内容指纹（形如 assets/index-Ct-l33m_.js）；每次更新访客都要重新下载全部资源。多数构建工具默认已开启：Vite 开箱即用，webpack 配 output.filename '[name].[contenthash].js'。仅为建议，不影响本次发布"
+      }
+    ]
+  },
+  "zip": {
+    "bytes": 5777743,
+    "sha256": "47433cae3fa03f9d4afab5d2a4828ddeda7e43eb2abfae6c42a2238c329c9e59"
+  },
+  "publication": {
+    "manualUpload": true,
+    "uploaded": false,
+    "boardIds": [
+      2,
+      3,
+      4
+    ],
+    "scoreSeason": "three-dimensions-v2",
+    "saveKeysChanged": false
+  },
+  "visualReview": [
+    "guide-desktop.png",
+    "guide-phone-landscape.png",
+    "guide-phone-portrait.png",
+    "ice-shells.png",
+    "hoglin-gait.png"
+  ]
+}

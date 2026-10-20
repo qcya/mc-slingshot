@@ -36,10 +36,10 @@ export function mobGeometry(skin,phase,direction,pose={}){
  if(skin==='hoglin'){
   box('body',-8,-25,-7,16,14,26,1,1);
   box('mane',0,-32,-10,0,10,19,90,33);
-  box('frontLeftLeg',2,-14,-6,6,14,6,41,42,-swing*.55,-14);
-  box('frontRightLeg',-8,-14,-6,6,14,6,66,42,swing*.55,-14);
-  box('backLeftLeg',3,-11,13,5,11,5,0,45,swing*.55,-11);
-  box('backRightLeg',-8,-11,13,5,11,5,21,45,-swing*.55,-11);
+  box('frontLeftLeg',2,-14,-6,6,14,6,41,42,-swing*.55,-12,-3);
+  box('frontRightLeg',-8,-14,-6,6,14,6,66,42,swing*.55,-12,-3);
+  box('backLeftLeg',3,-11,13,5,11,5,0,45,swing*.55,-8,17);
+  box('backRightLeg',-8,-11,13,5,11,5,21,45,-swing*.55,-8,17);
   const tilt=.87+Math.sin(phase*.5)*.035;
   box('head',-7,-27,-24,14,6,19,61,1,tilt,-22,-5);
   box('leftTusk',6,-33,-19,2,11,2,1,13,tilt,-22,-5);

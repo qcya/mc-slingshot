@@ -44,6 +44,10 @@ for(const world of ['nether','end'])test.describe.serial(`${world} complete nati
  let context,page,session;const reports=[],plans=require(`../evidence/${world}-playability.json`);
  test.beforeAll(async({browser})=>{
   session={account:`browser-${world}`,nickname:`Browser ${world}`,cloud:{[TOY_CLOUD_KEY]:JSON.stringify({version:1,values:{[TIME_SAVE_KEY]:JSON.stringify(Array(10).fill(1000))}})},submissions:[],scores:{2:encodeTime(10000)}};
+  if(world==='end'){
+   session.cloud[TOY_DIMENSIONS_CLOUD_KEY]=JSON.stringify({version:1,values:{[worldSaveKey(TIME_SAVE_KEY,'nether')]:JSON.stringify(Array(10).fill(1000))}});
+   session.scores[3]=encodeTime(10000);
+  }
   context=await browser.newContext({viewport:{width:1536,height:1100}});page=await context.newPage();
   await platform(page,session);await page.clock.install({time:new Date('2026-10-20T00:00:00Z')});
   await page.goto(base);await page.waitForFunction(()=>window.MCBlockLaunch);await enterStart(page);await expect(page.locator('#levelMenu')).toBeVisible();
@@ -67,14 +71,14 @@ for(const world of ['nether','end'])test.describe.serial(`${world} complete nati
   expect(saved.times.filter(Number.isInteger)).toHaveLength(plan.level);expect(saved.times[plan.level-1]).toBe(Math.round(final.time*1000));expect(JSON.parse(saved.overworld)).toEqual(Array(10).fill(1000));
   await expect(page.locator('#resultTiming')).toContainText(formatTime(saved.times[plan.level-1]));
   await expect.poll(()=>JSON.parse(session.cloud[TOY_DIMENSIONS_CLOUD_KEY]||'{"values":{}}').values[timeKey]).toBe(JSON.stringify(saved.times));
-  const other=world==='nether'?'end':'nether';expect(JSON.parse(session.cloud[TOY_DIMENSIONS_CLOUD_KEY]).values[worldSaveKey(TIME_SAVE_KEY,other)]).toBeUndefined();
+  const other=world==='nether'?'end':'nether';expect(JSON.parse(session.cloud[TOY_DIMENSIONS_CLOUD_KEY]).values[worldSaveKey(TIME_SAVE_KEY,other)]).toBe(world==='end'?JSON.stringify(Array(10).fill(1000)):undefined);
   if(plan.level<10)expect(session.submissions).toEqual([]);
   await page.screenshot({path:`evidence/dimension-browser-${world}-clear-${plan.level}.png`});reports.push({level:plan.level,shots:final.launched,remaining:final.inventory,timeMs:saved.times[plan.level-1]});
   if(plan.level===10){
    await expect.poll(()=>session.submissions.length).toBe(1);expect(session.submissions[0].board).toBe(world==='nether'?3:4);
    expect(session.submissions[0].score).toBe(10000000-Math.ceil(saved.times.reduce((a,b)=>a+b,0)/10));
    expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),prefix+worldSaveKey(TIME_QUEUE_KEY,world))).toEqual([]);
-   await page.locator('#resultLevels').click();await page.screenshot({path:`evidence/dimension-browser-${world}-complete-menu.png`});
+   await page.locator('#resultLevels').click();await expect(page.locator('#levelMenu [data-world="end"]')).toBeEnabled();await page.screenshot({path:`evidence/dimension-browser-${world}-complete-menu.png`});
    const restoredContext=await browser.newContext({viewport:{width:1536,height:1100}}),restored=await restoredContext.newPage();
    try{await platform(restored,session);await restored.goto(base);await restored.waitForFunction(()=>window.MCBlockLaunch);await enterStart(restored);await restored.locator(`#levelMenu [data-world="${world}"]`).click();await restored.locator('#nextPage').click();await expect(restored.locator('#level-9')).toBeEnabled();await expect(restored.locator('#level-9')).toContainText(formatTime(saved.times[9]));expect(await restored.evaluate(key=>localStorage.getItem(key),prefix+timeKey)).toBe(JSON.stringify(saved.times));}finally{await restoredContext.close();}
   }

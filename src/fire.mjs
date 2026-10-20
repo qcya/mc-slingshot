@@ -1,6 +1,6 @@
 import {BLOCK} from './config.mjs';
 
-import {heavyMob,damageEnemy,fireImmune} from './combat.mjs';
+import {heavyMob,damageEnemy,fireImmune,thawEnemy} from './combat.mjs';
 // Only wood products burn. Stone appliances, soil and decorative foliage do not.
 export const isCombustible=m=>[4,10,12,13,14,15,17,18,19,21,22,23].includes(m);
 
@@ -74,6 +74,7 @@ export function igniteWood(world,x,y,reach=world.s*2,sourceId){
 // A charge grants exactly three delayed ticks, even if the victim remains in
 // its flames or overlaps several burning tiles. A later charge is independent.
 export function burnEnemy(world,enemy,sourceId,{totalDamage=null}={}){
+ if(enemy.alive&&!enemy.dead)thawEnemy(world,enemy);
  if(!enemy.alive||enemy.dead||fireImmune(enemy)||enemy.burnSources.has(sourceId))return false;
  enemy.burnSources.add(sourceId);
  if(enemy.skin==='enderman'){damageEnemy(world,enemy,100,{source:sourceId,kind:'fire'});return true;}

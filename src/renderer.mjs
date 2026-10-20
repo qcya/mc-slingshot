@@ -124,10 +124,16 @@ export class Renderer {
   }
   mob(e,world){
     this.mobSprites.draw(this.ctx,e,world);
-    if(e.alive&&e.frozenUntil>world.time){
-      const c=this.ctx,x=e.body.position.x,y=e.body.bounds.max.y;c.save();c.fillStyle='#caefffcc';
-      for(let i=0;i<5;i++){const dx=(i-2)*10,dy=6+((i*7+Math.floor(world.time*8))%17);c.fillRect(x+dx-2,y-dy,4,4);}
-      c.restore();
+    if(e.alive&&e.frozen){
+      const c=this.ctx,w=e.skin==='warden'?144:e.skin==='hoglin'?148:e.dimensions.width+34;
+      const h=e.skin==='warden'?172:e.skin==='hoglin'?110:e.skin==='shulker'?70+e.shellAmount*26:e.dimensions.height+20;
+      const x=Math.round(e.body.position.x-w/2),y=Math.round(e.body.bounds.max.y+5-h);
+      c.save();c.fillStyle='#76c4ef55';c.fillRect(x,y,w,h);
+      c.beginPath();c.rect(x,y,w,h);c.clip();c.globalAlpha=.35;
+      for(let dy=0;dy<h;dy+=32)for(let dx=0;dx<w;dx+=32)c.drawImage(this.assets.images.ice,x+dx,y+dy,32,32);
+      c.globalAlpha=1;c.strokeStyle='#d1f4ff';c.lineWidth=3;c.strokeRect(x+1.5,y+1.5,w-3,h-3);
+      c.strokeStyle='#65acdf';c.lineWidth=2;c.strokeRect(x+5,y+5,w-10,h-10);
+      c.fillStyle='#f1fcffb0';c.fillRect(x+8,y+8,Math.min(26,w-16),3);c.fillRect(x+8,y+8,3,18);c.restore();
     }
     if(e.alive&&e.burningUntil>world.time){
       const w=e.dimensions.width+12,h=e.dimensions.height*.8,frame=Math.floor(world.time*12+e.id)%32,c=this.ctx;

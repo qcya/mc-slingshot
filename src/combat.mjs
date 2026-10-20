@@ -26,9 +26,28 @@ export function projectileGravity(M,body,ammo,gravity){
 }
 function random(e){e.combatSeed=(Math.imul(e.combatSeed,1664525)+1013904223)>>>0;return e.combatSeed/4294967296;}
 export function initCombat(e,time,options){
- e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.slowUntil=0;e.frozenUntil=0;
+ e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.frozen=false;
  if(e.skin==='shulker'){e.stationary=true;e.shellOpen=false;e.shellUntil=time+2.4+random(e)*1.8;e.shellAmount=0;}
  if(e.skin==='enderman'){e.teleportCount=0;e.teleportSpots=(options.teleportSpots||[]).map(p=>({...p}));}
+}
+export function freezeEnemy(world,e){
+ if(!e.alive||e.dead||e.frozen)return false;
+ e.frozen=true;e.freezeAt=world.time;e.burnTicks.length=0;e.burningUntil=0;
+ world.M.Body.setVelocity(e.body,{x:0,y:0});world.M.Body.setAngularVelocity(e.body,0);
+ // Clear the last collision's warm-start displacement before making it static.
+ e.body.positionImpulse.x=0;e.body.positionImpulse.y=0;
+ world.M.Body.setStatic(e.body,true);
+ world.events.push({type:'snow',x:e.body.position.x,y:e.body.position.y,radius:e.dimensions.width/2+8});
+ return true;
+}
+export function thawEnemy(world,e){
+ if(!e.frozen)return false;
+ e.frozen=false;world.M.Body.setStatic(e.body,false);world.M.Sleeping.set(e.body,false);
+ // Resume the pose and shell cycle where they were frozen, without a timer jump.
+ const duration=world.time-e.freezeAt;e.actionUntil+=duration;if(e.actionStart!==undefined)e.actionStart+=duration;
+ if(e.shellUntil!==undefined)e.shellUntil+=duration;e.lastX=e.body.position.x;
+ world.events.push({type:'snow',x:e.body.position.x,y:e.body.position.y,radius:e.dimensions.width/2+8});
+ return true;
 }
 export function advanceCombat(world,e,dt){
  if(e.skin==='shulker'){
@@ -92,6 +111,7 @@ export function projectileDamage(world,target,p,speed){
 }
 export function gust(world,x,y,radius=125){
  for(const e of world.allMoving()){
+  if(e.frozen)continue;
   const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy);if(d>radius)continue;
   const force=(1-d/radius)*Math.min(9,15/Math.sqrt(e.body.mass));
   world.M.Sleeping.set(e.body,false);world.M.Body.setVelocity(e.body,{x:e.body.velocity.x+(d>2?dx/d:1)*force,y:e.body.velocity.y+(d>2?dy/d:0)*force-force*.65});e.externalUntil=world.time+1;

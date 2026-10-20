@@ -10,6 +10,7 @@ import {createOnlineClient} from './online.mjs';
 import {createToyOnlineClient} from './toy-online.mjs';
 import {createToyStorage} from './toy-storage.mjs';
 import {BackgroundMusic} from './music.mjs';
+import {ITEM_GUIDE,MOB_GUIDE} from './guide.mjs';
 import {buildTitleScene} from './title-scene.mjs';
 import {TIME_SAVE_KEY,TIME_QUEUE_KEY,normalizeTimes,recordBestTime,timeBundle,parseTimeBundle,formatTime} from './timing.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
@@ -24,7 +25,7 @@ function saveLocal(key,value){try{appStorage.setItem(key,JSON.stringify(value));
 function currentWorld(){return state.world||'overworld';}
 function readWorld(key,fallback,id=currentWorld()){return readLocal(worldSaveKey(key,id),fallback);}
 function saveWorld(key,value,id=currentWorld()){saveLocal(worldSaveKey(key,id),value);}
-function accessibleWorld(id){return worldUnlocked(id,readWorld(TIME_SAVE_KEY,[],'overworld'));}
+function accessibleWorld(id){return worldUnlocked(id,readWorld(TIME_SAVE_KEY,[],'overworld'),readWorld(TIME_SAVE_KEY,[],'nether'));}
 function loadWorldProgress(){bestTimes=normalizeTimes(readWorld(TIME_SAVE_KEY,[]));progress=progressFromTimes(bestTimes);saveWorld(SAVE_KEY,progress);}
 function pendingResults(id=currentWorld()){const raw=readWorld(PENDING_KEY,[],id);return Array.isArray(raw)?raw.map(parseTimeBundle).filter(Boolean):[];}
 function queueBestTimes(){const bundle=timeBundle(bestTimes);if(bundle)saveWorld(PENDING_KEY,[bundle]);}
@@ -78,6 +79,16 @@ function fullscreenLabel(){const active=nativeImmersive||!!(document.fullscreenE
 async function fullscreen(){if(fullscreenBusy)return;fullscreenBusy=true;const onStatus=text=>{const node=$('#fullscreenStatus');node.textContent=text;node.hidden=!text;};try{if(fullscreenLabel()){const result=await exitLandscape({isNative:nativeImmersive,onStatus});if(result!=='failed')nativeImmersive=false;}else nativeImmersive=(await enterLandscape({isToy:globalThis.MC_PLATFORM?.toy===true,onStatus}))==='native';}finally{fullscreenBusy=false;fullscreenLabel();}}
 function audioLabels(){$('#soundToggle').textContent=assets.soundOn?'音效：开':'音效：关';$('#sfxVolume').value=Math.round(assets.soundVolume*100);$('#sfxValue').textContent=`${Math.round(assets.soundVolume*100)}%`;}
 function iconUrl(i){const icon=assets.icons[AMMO[i].id];return icon instanceof HTMLCanvasElement?icon.toDataURL():icon.src;}
+let guideReturn='home';
+function showGuide(){guideReturn=state.screen;$('#guideBack').textContent=guideReturn==='settings'?'返回设置':'返回主菜单';menus('guide');$('#guideContent').scrollTop=0;$('#guideContent').focus();}
+function renderGuide(){
+ const list=$('#itemGuide');list.replaceChildren();
+ for(const [i,ammo] of AMMO.entries()){
+  const card=document.createElement('article'),img=document.createElement('img'),text=document.createElement('div'),title=document.createElement('h4'),p=document.createElement('p');
+  card.dataset.item=ammo.id;img.src=iconUrl(i);img.alt='';title.textContent=ammo.label;p.textContent=ITEM_GUIDE[ammo.id];text.append(title,p);card.append(img,text);list.append(card);
+ }
+ for(const [name,description] of MOB_GUIDE){const title=document.createElement('h4'),p=document.createElement('p');title.textContent=name;p.textContent=description;$('#mobGuide').append(title,p);}
+}
 function hud(){
  state.shots=totalAmmo(state.inventory);
  for(const [i,b] of [...$('#ballbar').children].entries()){
@@ -89,14 +100,15 @@ function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#invent
 function menus(screen){
  state.screen=screen;state.paused=screen!=='play';
  if(state.paused)assets?.pauseAll();else assets?.resumeAll();
- for(const [id,name] of [['startScreen','home'],['updatesMenu','updates'],['levelMenu','levels'],['pauseMenu','pause'],['settingsMenu','settings'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
+ for(const [id,name] of [['startScreen','home'],['updatesMenu','updates'],['guideMenu','guide'],['levelMenu','levels'],['pauseMenu','pause'],['settingsMenu','settings'],['result','result'],['profileMenu','profile'],['leaderboardMenu','leaderboard']])$('#'+id).classList.toggle('hidden',screen!==name);
  $('#updatesBtn').classList.toggle('hidden',screen!=='home');
+ $('#guideBtn').classList.toggle('hidden',screen!=='home');
  $('#gameRoot').classList.toggle('menu-open',screen!=='play');
 }
 function renderWorldTabs(){
  for(const nav of document.querySelectorAll('[data-worlds]')){
   if(!nav.children.length)for(const w of WORLDS){const b=document.createElement('button');b.textContent=w.label;b.dataset.world=w.id;b.setAttribute('role','tab');b.addEventListener('click',()=>switchWorld(w.id));nav.append(b);}
-  for(const b of nav.children){const active=b.dataset.world===currentWorld(),locked=!!nav.closest('#levelMenu')&&!accessibleWorld(b.dataset.world);b.textContent=dimension(b.dataset.world).label+(locked?'·锁定':'');b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.disabled=locked;b.title=locked?'通关主世界十关后解锁':'';}
+  for(const b of nav.children){const active=b.dataset.world===currentWorld(),locked=!!nav.closest('#levelMenu')&&!accessibleWorld(b.dataset.world);b.textContent=dimension(b.dataset.world).label+(locked?'·锁定':'');b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.disabled=locked;b.title=locked?(b.dataset.world==='end'?'通关下界十关后解锁':'通关主世界十关后解锁'):'';}
  }
 }
 function switchWorld(id){
@@ -138,7 +150,7 @@ function result(win){
  if(win){progress=finishLevel(progress,state.level);saveWorld(SAVE_KEY,progress);bestTimes=recordBestTime(bestTimes,state.level,Math.max(100,Math.round(world.time*1000)));saveWorld(TIME_SAVE_KEY,bestTimes);queueBestTimes();if(timeBundle(bestTimes))void syncResults();}
  $('#resultTiming').hidden=!win;if(win)$('#resultTiming').textContent=`本次用时 ${formatTime(world.time*1000)} · 个人最快 ${formatTime(bestTimes[state.level])}`;
  $('#resultFlag').textContent=win?'挑战成功':'再试一次';$('#resultTitle').textContent=reward?`已解锁 ${reward}`:win?(state.level===levelsFor(currentWorld()).length-1?`${dimension(currentWorld()).label}十关已通关`:'敌对生物已清除'):'弹药用完了';
- $('#resultMsg').textContent=reward?'下一关可以使用这件新物品。':win?(state.level===9?(currentWorld()==='overworld'?'下界与末地已解锁，返回选关继续挑战。':'本世界挑战完成，可以重玩或返回选关。'):'可以继续下一关，也可以重玩当前关卡。'):'调整角度，合理使用每一件物品。';
+ $('#resultMsg').textContent=reward?'下一关可以使用这件新物品。':win?(state.level===9?(currentWorld()==='overworld'?'下界已解锁，通关下界十关后再挑战末地。':currentWorld()==='nether'?'末地已解锁，返回选关继续挑战。':'三个世界挑战完成，可以重玩或返回选关。'):'可以继续下一关，也可以重玩当前关卡。'):'调整角度，合理使用每一件物品。';
  $('#rewardIcon').classList.toggle('hidden',!reward);if(reward)$('#rewardIcon').src=iconUrl(AMMO.findIndex(a=>a.label===reward));
  $('#nextBtn').classList.toggle('hidden',!win||state.level===levelsFor(currentWorld()).length-1);$('#nextBtn').textContent='进入下一关';menus('result');
 }
@@ -192,9 +204,10 @@ async function start(){
   b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
  }
  profile=readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;if(nativeOnline&&appStorage.user()?.nickname){const linked=await online.createProfile();profile={...linked.profile,token:linked.token};saveLocal(PROFILE_KEY,profile);}profileLabel();
- loadWorldProgress();queueBestTimes();showHome();renderCards();if(profile)void syncResults();loadState.hidden=true;
+ loadWorldProgress();queueBestTimes();showHome();renderCards();renderGuide();if(profile)void syncResults();loadState.hidden=true;
  $('#startScreen').addEventListener('click',enterGame);$('#startScreen').addEventListener('keydown',e=>{if(e.key==='Enter'||e.code==='Space'){e.preventDefault();enterGame();}});$('#homeBtn').addEventListener('click',showHome);
  $('#updatesBtn').addEventListener('click',()=>menus('updates'));$('#updatesBack').addEventListener('click',()=>menus('home'));
+ $('#guideBtn').addEventListener('click',showGuide);$('#settingsGuide').addEventListener('click',showGuide);$('#guideBack').addEventListener('click',()=>menus(guideReturn));
  $('#prevPage').addEventListener('click',()=>{if(levelPage>0){levelPage--;renderCards();}});$('#nextPage').addEventListener('click',()=>{if((levelPage+1)*5<levelsFor(currentWorld()).length){levelPage++;renderCards();}});
  const fullscreenChanged=()=>{if(!fullscreenLabel()){$('#fullscreenStatus').hidden=true;$('#fullscreenStatus').textContent='';}};document.addEventListener('fullscreenchange',fullscreenChanged);document.addEventListener('webkitfullscreenchange',fullscreenChanged);fullscreenLabel();
  document.addEventListener('click',e=>{if(e.target.closest('.loadout-info,.loadout-tooltip'))return;for(const w of document.querySelectorAll('.show-loadout')){w.classList.remove('show-loadout');w.querySelector('.loadout-info').setAttribute('aria-expanded','false');}});
@@ -222,12 +235,12 @@ async function start(){
  },{passive:false});
  $('#gameRoot').addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();if(state.screen==='play'&&e.clientY>r.bottom-r.height*.10)revealInventory();});
  window.addEventListener('keydown',e=>{
-  if(e.target instanceof HTMLInputElement&&e.key!=='Escape')return;if(state.screen==='home'&&(e.key==='Enter'||e.code==='Space')){e.preventDefault();enterGame();return;}if(e.key==='Escape'){e.preventDefault();if(document.querySelector('.show-loadout')){document.querySelector('.show-loadout .loadout-info').click();return;}if(state.screen==='updates')menus('home');else if(state.screen==='settings')menus('pause');else if(['profile','leaderboard'].includes(state.screen)){if(profile){showLevels();void syncResults();}}else if(state.screen==='levels')showHome();else pause();return;}if(state.screen!=='play')return;
+  if(e.target instanceof HTMLInputElement&&e.key!=='Escape')return;if(state.screen==='home'&&!(e.target instanceof HTMLButtonElement)&&(e.key==='Enter'||e.code==='Space')){e.preventDefault();enterGame();return;}if(e.key==='Escape'){e.preventDefault();if(document.querySelector('.show-loadout')){document.querySelector('.show-loadout .loadout-info').click();return;}if(state.screen==='guide')menus(guideReturn);else if(state.screen==='updates')menus('home');else if(state.screen==='settings')menus('pause');else if(['profile','leaderboard'].includes(state.screen)){if(profile){showLevels();void syncResults();}}else if(state.screen==='levels')showHome();else pause();return;}if(state.screen!=='play')return;
   if(e.key>='1'&&e.key<='9')select(Number(e.key)-1);if(e.key.toLowerCase()==='r')loadLevel(state.level);if(e.code==='Space'){e.preventDefault();pause();}
  });
  window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.screen==='play')pause();void appStorage.flush();}});window.addEventListener('online',()=>{void syncResults();void appStorage.flush();});
  window.MCBlockLaunch={getStatus:status,switchWorld,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:n=>loadLevel(n),select,
- getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
+ getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,frozen:!!e.frozen,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),
  music:music.diagnostics(),sound:{...assets.audioStats,enabled:assets.soundOn,volume:assets.soundVolume,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};
  requestAnimationFrame(frame);

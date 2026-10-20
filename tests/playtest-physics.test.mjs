@@ -62,16 +62,23 @@ test('a resting burning stone cannot ignite a mob by being nudged',()=>{
  const w=fixture(),e=w.addEnemy(800,720,'warden'),p=w.spawnProjectile('cobble',750,700,0,0);p.ignited=true;
  collide(w,p,e);assert.equal(e.hp,300);assert.equal(e.burnTicks.length,0);
 });
-test('snowball stops grounded patrol for four seconds without holding a falling mob in midair',()=>{
+test('snowball fully immobilizes an airborne mob until a damaging hit breaks the ice',()=>{
  const w=fixture(),e=w.addEnemy(800,720,'hoglin');advance(w,.2);
+ M.Body.setPosition(e.body,{x:800,y:400});M.Body.setVelocity(e.body,{x:2,y:3});
  collide(w,w.spawnProjectile('snowball',700,600,500,0),e,{x:8,y:0});
- const x=e.body.position.x;advance(w,2);assert.ok(Math.abs(e.body.position.x-x)<2);
- M.Body.setPosition(e.body,{x,y:400});M.Sleeping.set(e.body,false);const top=e.body.position.y;advance(w,.4);assert.ok(e.body.position.y>top+20);
+ const position={...e.body.position},pose={...e.pose};advance(w,6);
+ assert.equal(e.frozen,true);assert.equal(e.body.isStatic,true);assert.deepEqual(e.body.position,position);assert.deepEqual(e.pose,pose);
+ collide(w,w.spawnProjectile('cobble',700,300,0,0),e);assert.equal(e.frozen,true,'a resting stone cannot break ice');
+ collide(w,w.spawnProjectile('cobble',700,300,500,0),e,{x:8,y:0});
+ assert.equal(e.frozen,false);assert.equal(e.body.isStatic,false);assert.equal(e.hp,200);assert.equal(e.body.mass,3.6);
+ advance(w,.4);assert.ok(e.body.position.y>position.y+20);
 });
 test('current-season completion times, not legacy unlocked flags, determine progression and dimensions',()=>{
  assert.equal(typeof campaign.progressFromTimes,'function');assert.equal(typeof campaign.worldUnlocked,'function');
  assert.deepEqual(campaign.progressFromTimes([]),{unlocked:1,completed:[]});
  assert.deepEqual(campaign.progressFromTimes([7317,null,4000]),{unlocked:2,completed:[0,2]});
  assert.equal(campaign.worldUnlocked('nether',[7317]),false);assert.equal(campaign.worldUnlocked('end',[]),false);
- const all=Array(10).fill(1000);assert.equal(campaign.worldUnlocked('nether',all),true);assert.equal(campaign.worldUnlocked('end',all),true);
+ const all=Array(10).fill(1000);assert.equal(campaign.worldUnlocked('nether',all),true);assert.equal(campaign.worldUnlocked('end',all),false);
+ assert.equal(campaign.worldUnlocked('end',all,all.slice(0,9)),false);
+ assert.equal(campaign.worldUnlocked('end',all,all),true);assert.equal(campaign.worldUnlocked('end',[],all),false);
 });

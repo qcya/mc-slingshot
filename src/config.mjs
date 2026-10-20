@@ -47,7 +47,7 @@ export const AMMO=[
   {id:'tnt',label:'TNT',sprite:'tnt_side',size:28,mass:2.4,detail:'四秒引信 · 碰撞仅碎玻璃'},
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'无损穿两格墙 · 五秒后淡出，穿墙重新计时'},
   {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'},
-  {id:'snowball',label:'雪球',sprite:'snowball',size:28,mass:.7,detail:'命中定身四秒 · 固定目标方便补射'},
+  {id:'snowball',label:'雪球',sprite:'snowball',size:28,mass:.7,detail:'整只冰封 · 有效攻击破冰，火与熔岩融冰'},
   {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
   {id:'water',label:'喷溅型水瓶',sprite:'splash_water',size:28,mass:1,detail:'范围灭火 · 冷却熔岩形成黑曜石'},
   {id:'slimeball',label:'黏液球',sprite:'slime_ball',size:28,mass:2.2,restitution:.88,detail:'高弹性反弹 · 每只生物只伤一次'},

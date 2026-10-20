@@ -1,0 +1,171 @@
+{
+  "world": "nether",
+  "stages": [
+    {
+      "level": 1,
+      "shots": 3,
+      "remaining": [
+        4,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 14000
+    },
+    {
+      "level": 2,
+      "shots": 9,
+      "remaining": [
+        1,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 50950
+    },
+    {
+      "level": 3,
+      "shots": 5,
+      "remaining": [
+        4,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 26175
+    },
+    {
+      "level": 4,
+      "shots": 4,
+      "remaining": [
+        6,
+        0,
+        0,
+        0,
+        1,
+        2,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 20433
+    },
+    {
+      "level": 5,
+      "shots": 9,
+      "remaining": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 51883
+    },
+    {
+      "level": 6,
+      "shots": 3,
+      "remaining": [
+        7,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 14492
+    },
+    {
+      "level": 7,
+      "shots": 4,
+      "remaining": [
+        7,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2,
+        0,
+        0
+      ],
+      "timeMs": 20450
+    },
+    {
+      "level": 8,
+      "shots": 4,
+      "remaining": [
+        9,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "timeMs": 23258
+    },
+    {
+      "level": 9,
+      "shots": 5,
+      "remaining": [
+        5,
+        2,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "timeMs": 27992
+    },
+    {
+      "level": 10,
+      "shots": 13,
+      "remaining": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "timeMs": 74092
+    }
+  ],
+  "submissions": [
+    {
+      "board": 3,
+      "score": 9967627
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
 import {igniteWood,igniteImpact,advanceFire,burnEnemy,splashWater} from './fire.mjs';
-import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust} from './combat.mjs';
+import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust,freezeEnemy,thawEnemy} from './combat.mjs';
 import {LavaField} from './lava.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
@@ -58,6 +58,7 @@ export class SiegeWorld {
   patrol(dt){
     for(const e of this.enemies){
       if(e.dead||!e.alive)continue;const b=e.body,x=b.position.x,feet=b.bounds.max.y;
+      if(e.frozen)continue;
       const distance=Math.min(3,Math.abs(x-e.lastX));e.lastX=x;
       const influenced=this.time<e.externalUntil;
       const half=e.dimensions.width/2,ground=this.sample(x-half*.65,feet+3)||this.sample(x+half*.65,feet+3);
@@ -66,12 +67,11 @@ export class SiegeWorld {
       advanceCombat(this,e,dt);
       if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:`${e.skin}_idle`});
       if(!grounded)continue;
-      if(e.frozenUntil>this.time){this.M.Body.setVelocity(b,{x:0,y:b.velocity.y});continue;}
       if(!walking){this.M.Body.setVelocity(b,{x:b.velocity.x*.7,y:b.velocity.y});continue;}e.walkDistance+=distance;
       const ahead=x+e.facing*(half+7),wall=this.sample(ahead,feet-e.dimensions.height*.26)||this.sample(ahead,feet-e.dimensions.height*.71),edge=!this.sample(ahead,feet+5);
       if((wall||edge)&&this.time>e.turnAt){e.facing*=-1;e.turnAt=this.time+.4;e.turns++;}
       if(wall||edge){this.M.Body.setVelocity(b,{x:0,y:b.velocity.y});continue;}
-      this.M.Sleeping.set(b,false);this.M.Body.setVelocity(b,{x:e.facing*.36*(this.time<e.slowUntil?.25:1),y:b.velocity.y});
+      this.M.Sleeping.set(b,false);this.M.Body.setVelocity(b,{x:e.facing*.36,y:b.velocity.y});
     }
   }
   synchronize(){
@@ -173,7 +173,7 @@ export class SiegeWorld {
     }
   }
   hurt(e,damage){
-    if(!e.alive||!Number.isFinite(damage)||damage<3)return;e.hp-=damage;if(Math.abs(e.hp)<1e-8)e.hp=0;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
+    if(!e.alive||!Number.isFinite(damage)||damage<3)return;thawEnemy(this,e);e.hp-=damage;if(Math.abs(e.hp)<1e-8)e.hp=0;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
     this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:`${e.skin}_hurt`});
     if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setAngularVelocity(e.body,0);}
   }
@@ -186,11 +186,13 @@ export class SiegeWorld {
     this.rear.grid.recent.length=0;this.synchronize();
     for(const e of this.allMoving()){
       const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy),reach=radius+50;if(d>reach)continue;
+      const blastDamage=heavyMob(e)||e.skin==='shulker'?150:Math.max(0,180*(1-d/reach));
+      if(e.type==='enemy'&&blastDamage>=3)thawEnemy(this,e);
       const speed=clamp(1600*(1-d/reach)/e.body.mass,0,650),ux=d>1?dx/d:(e.id%2?1:-1),uy=d>1?dy/d:0;
       this.M.Sleeping.set(e.body,false);
       this.M.Body.setVelocity(e.body,{x:e.body.velocity.x+ux*speed/60,y:e.body.velocity.y+(uy-.5)*speed/60});
       e.externalUntil=this.time+.8;
-      if(e.type==='enemy')damageEnemy(this,e,heavyMob(e)||e.skin==='shulker'?150:Math.max(0,180*(1-d/reach)),{source:`blast:${this.stats.explosions}`,kind:'tnt'});
+      if(e.type==='enemy')damageEnemy(this,e,blastDamage,{source:`blast:${this.stats.explosions}`,kind:'tnt'});
     }
   }
   processContact(pair){
@@ -222,7 +224,7 @@ export class SiegeWorld {
     if(ammo){
       const kind=ammo.ammo.id;
       if(kind==='snowball'){
-        if(other?.type==='enemy'){other.slowUntil=this.time+4;other.frozenUntil=this.time+4;this.events.push({type:'snow',x:point.x,y:point.y,radius:34});}
+        if(other?.type==='enemy')freezeEnemy(this,other);
         this.remove(ammo);return;
       }
       if(kind==='wind'){this.remove(ammo);gust(this,point.x,point.y);return;}

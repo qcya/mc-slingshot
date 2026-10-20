@@ -7,7 +7,11 @@ export function progressFromTimes(times){
  let firstMissing=0;while(firstMissing<10&&current[firstMissing]!==null)firstMissing++;
  return {unlocked:Math.min(10,firstMissing+1),completed};
 }
-export function worldUnlocked(id,overworldTimes){return id==='overworld'||(['nether','end'].includes(id)&&normalizeTimes(overworldTimes).every(time=>time!==null));}
+export function worldUnlocked(id,overworldTimes,netherTimes){
+ if(id==='overworld')return true;
+ const overworldCleared=normalizeTimes(overworldTimes).every(time=>time!==null);
+ return overworldCleared&&(id==='nether'||id==='end'&&normalizeTimes(netherTimes).every(time=>time!==null));
+}
 // Slots: cobblestone, TNT, ender pearl, fire charge. Clear stages 1–3 to unlock each.
 export const LOADOUTS=[
  [5,0,0,0], [5,1,0,0], [5,1,1,0], [6,3,0,1], [6,3,1,0],

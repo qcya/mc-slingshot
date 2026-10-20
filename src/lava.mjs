@@ -1,4 +1,4 @@
-import {heavyMob,fireImmune,damageEnemy} from './combat.mjs';
+import {heavyMob,fireImmune,damageEnemy,thawEnemy} from './combat.mjs';
 // Bounded fluid cells follow foreground pixels. Stable lava permits round loss.
 export class LavaField{
  constructor(world,sources=[]){this.world=world;this.size=world.s*4;this.cells=new Map();this.sources=sources.map((p,i)=>({x:Math.floor(p.x)*4,y:Math.floor(p.y)*4,id:i,active:true}));this.nextAt=0;this.settling=false;this.revision=0;}
@@ -27,9 +27,10 @@ export class LavaField{
   const next=new Map();for(const [k,c]of desired)if(this.cells.has(k)||c.parent===null||this.cells.has(c.parent))next.set(k,c);
   this.settling=next.size!==this.cells.size||[...next.keys()].some(k=>!this.cells.has(k));if(this.settling)this.revision++;this.cells=next;
   for(const e of w.enemies){
-   if(!e.alive||e.dead||fireImmune(e))continue;const b=e.body.bounds;
+   if(!e.alive||e.dead)continue;const b=e.body.bounds;
    const touching=[...this.cells.values()].some(c=>b.max.x>c.x&&b.min.x<c.x+c.size&&b.max.y>c.y&&b.min.y<c.y+c.size);
-   if(touching&&w.time>=(e.lavaDamageAt||0)){e.lavaDamageAt=w.time+.6;e.burningUntil=Math.max(e.burningUntil,w.time+.65);damageEnemy(w,e,heavyMob(e)?50:40,{kind:'lava'});}
+   if(touching)thawEnemy(w,e);
+   if(touching&&!fireImmune(e)&&w.time>=(e.lavaDamageAt||0)){e.lavaDamageAt=w.time+.6;e.burningUntil=Math.max(e.burningUntil,w.time+.65);damageEnemy(w,e,heavyMob(e)?50:40,{kind:'lava'});}
   }
  }
  cool(x,y,radius){

@@ -16,7 +16,7 @@ test('Hoglin shares Warden armor and requires three distinct stones',()=>{const 
 test('closed Shulker takes three distinct stones, visibly open Shulker one',()=>{const w=fixture(),e=w.addEnemy(600,720,'shulker');const p=w.spawnProjectile('cobble',500,600,0,0);hit(w,p,e);hit(w,p,e);assert.equal(e.hp,200);hit(w,w.spawnProjectile('cobble',500,600,0,0),e);assert.equal(e.hp,100);hit(w,w.spawnProjectile('cobble',500,600,0,0),e);assert.equal(e.alive,false);const open=w.addEnemy(800,720,'shulker');for(let i=0;i<1200&&open.shellAmount<.5;i++)w.step(1/120);assert.ok(open.pose.openAmount>=.5);hit(w,w.spawnProjectile('cobble',700,600,0,0),open);assert.equal(open.alive,false);});
 test('Shulker cycles different closed and open durations with visible lid motion',()=>{const w=fixture(),e=w.addEnemy(600,720,'shulker');const states=new Set(),durations=[];let last=e.shellOpen;for(let i=0;i<2200;i++){w.step(1/120);states.add(e.shellOpen);if(e.shellOpen!==last){durations.push(e.shellUntil-w.time);last=e.shellOpen;}}assert.equal(states.size,2);assert.ok(new Set(durations.map(n=>n.toFixed(2))).size>2);assert.ok(e.pose.openAmount>=0&&e.pose.openAmount<=1);});
 test('Enderman teleports once to a supported in-bounds spot and ignores repeat projectile contact',()=>{const w=fixture(),spots=[{x:400,feet:720},{x:700,feet:720},{x:1000,feet:720},{x:1300,feet:720}],e=w.addEnemy(400,720,'enderman',{teleportSpots:spots});const p=w.spawnProjectile('cobble',350,600,0,0);hit(w,p,e);assert.equal(e.alive,true);assert.equal(e.teleportCount,1);assert.notEqual(e.body.position.x,400);assert.ok(spots.some(s=>s.x===e.body.position.x));const hp=e.hp;hit(w,p,e);assert.equal(e.hp,hp);assert.equal(e.teleportCount,1);hit(w,w.spawnProjectile('cobble',350,600,0,0),e);assert.equal(e.alive,false);});
-test('five extra inventory items have distinct safe utility and heavy damage behavior',()=>{assert.equal(AMMO.length,9);const w=fixture(),e=w.addEnemy(600,720,'hoglin');hit(w,w.spawnProjectile('snowball',500,600,0,0),e);assert.equal(e.hp,300);assert.ok(e.slowUntil>w.time);hit(w,w.spawnProjectile('wind',500,600,0,0),e);assert.equal(e.hp,300);assert.ok(e.externalUntil>w.time);const slime=w.spawnProjectile('slimeball',500,600,0,0);assert.ok(slime.body.restitution>.7);hit(w,w.spawnProjectile('anvil',500,600,0,0),e);assert.equal(e.hp,150);});
+test('five extra inventory items have distinct safe utility and heavy damage behavior',()=>{assert.equal(AMMO.length,9);const w=fixture(),e=w.addEnemy(600,720,'hoglin');hit(w,w.spawnProjectile('snowball',500,600,0,0),e);assert.equal(e.hp,300);assert.equal(e.frozen,true);hit(w,w.spawnProjectile('wind',500,600,0,0),e);assert.equal(e.hp,300);assert.equal(e.frozen,true);assert.equal(e.body.velocity.x,0);const slime=w.spawnProjectile('slimeball',500,600,0,0);assert.ok(slime.body.restitution>.7);hit(w,w.spawnProjectile('anvil',500,600,0,0),e);assert.equal(e.hp,150);});
 test('water cancels remaining burn damage',()=>{const w=fixture(),e=w.addEnemy(600,720,'hoglin');hit(w,w.spawnProjectile('fire',500,600,0,0),e);assert.equal(e.burnTicks.length,3);hit(w,w.spawnProjectile('water',500,600,0,0),e);assert.equal(e.burnTicks.length,0);assert.equal(e.burningUntil,0);step(w,2);assert.equal(e.hp,300);});
 test('lava stays behind a solid dam then moves downward through a broken opening',()=>{const w=fixture({lavaSources:[{x:12,y:5}]});w.grid.fill(10*16,6*16,5*16,16,3);step(w,2);assert.ok(w.lava);assert.ok([...w.lava.cells.values()].every(c=>c.y<6*48));w.grid.fill(12*16,6*16,16,16,0);step(w,2);assert.ok([...w.lava.cells.values()].some(c=>c.y>=7*48));assert.ok(w.lava.cells.size<=4096);});
 test('new mob geometry has separate real body parts instead of humanoid atlas reuse',()=>{for(const [skin,parts] of [['zombified_piglin',['snout','leftEar','rightEar']],['hoglin',['frontLeftLeg','backLeftLeg','leftTusk']],['shulker',['shellBase','shellLid','head']],['enderman',['leftArm','rightLeg','head']]]){const geometry=mobGeometry(skin,1.2,1,{openAmount:.8});for(const part of parts)assert.ok(geometry.some(f=>f.part===part),`${skin}:${part}`);}});
@@ -51,7 +51,7 @@ test('anvil falls more steeply than stone and its aim dots follow actual flight'
  assert.ok(Math.abs(anvil.body.position.x-arc[4].x)<.01);assert.ok(Math.abs(anvil.body.position.y-arc[4].y)<.01);
 });
 
-test('snowball slows actual patrol for four seconds and movement recovers after it expires',()=>{
+test('snowball keeps a grounded target frozen beyond four seconds and a followup hit restores patrol',()=>{
  const normal=fixture(),slowed=fixture(),a=normal.addEnemy(600,720),b=slowed.addEnemy(600,720);
  step(normal,.3);step(slowed,.3);hit(slowed,slowed.spawnProjectile('snowball',500,600,0,0),b);
  // Contact helper advances its clock; keep behavior timers synchronized.
@@ -60,8 +60,24 @@ test('snowball slows actual patrol for four seconds and movement recovers after 
  const slowDistance=Math.abs(b.body.position.x-bx);
  assert.ok(slowDistance<Math.abs(a.body.position.x-ax)*.5);
  assert.ok(slowDistance<1);assert.equal(b.hp,100);
- step(slowed,4);b.behavior='walk';b.actionUntil=slowed.time+2;const resumedX=b.body.position.x;step(slowed,1);
- assert.ok(Math.abs(b.body.position.x-resumedX)>slowDistance*2);
+ step(slowed,4);assert.equal(b.frozen,true);assert.ok(Math.abs(b.body.position.x-bx)<1);
+ hit(slowed,slowed.spawnProjectile('ender',500,600,0,0),b);
+ assert.equal(b.frozen,false);assert.equal(b.alive,false,'a normal target takes the usual lethal followup hit');
+ const armored=slowed.addEnemy(900,720,'hoglin');hit(slowed,slowed.spawnProjectile('snowball',500,600,0,0),armored);hit(slowed,slowed.spawnProjectile('cobble',500,600,0,0),armored);
+ armored.behavior='walk';armored.actionUntil=slowed.time+2;const resumedX=armored.body.position.x;step(slowed,1);
+ assert.ok(Math.abs(armored.body.position.x-resumedX)>slowDistance*2);
+});
+
+test('walking Hoglin leg tops stay attached to their local hips in both directions',()=>{
+ for(const direction of [-1,1])for(const phase of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+  const yaw=-direction*1.08;
+  for(const [part,x,y,z] of [['backLeftLeg',5.5,-11,15.5],['backRightLeg',-5.5,-11,15.5],['frontLeftLeg',5,-14,-3],['frontRightLeg',-5,-14,-3]]){
+   const hipY=y-(-x*Math.sin(yaw)+z*Math.cos(yaw))*.16;
+   const faces=mobGeometry('hoglin',phase,direction).filter(f=>f.part===part&&['front','back','side'].includes(f.face));
+   assert.ok(faces.length>0);
+   for(const face of faces)for(const v of face.vertices.slice(0,2))assert.ok(Math.abs(v.y-hipY)<3,`${part}, phase ${phase}, direction ${direction}: hip detached by ${v.y-hipY}`);
+  }
+ }
 });
 
 test('Hoglin survives one real TNT launch and landing, then dies to a second blast',()=>{
