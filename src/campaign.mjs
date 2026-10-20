@@ -1,9 +1,17 @@
 ﻿export const SAVE_KEY='mc-block-launch.campaign.v1';
 export const CAMPAIGN_LENGTH=10;
+import {normalizeTimes} from './timing.mjs';
+// A legacy "unlocked:10" flag is not evidence of clearing a rebuilt map.
+export function progressFromTimes(times){
+ const current=normalizeTimes(times),completed=current.flatMap((time,i)=>time===null?[]:[i]);
+ let firstMissing=0;while(firstMissing<10&&current[firstMissing]!==null)firstMissing++;
+ return {unlocked:Math.min(10,firstMissing+1),completed};
+}
+export function worldUnlocked(id,overworldTimes){return id==='overworld'||(['nether','end'].includes(id)&&normalizeTimes(overworldTimes).every(time=>time!==null));}
 // Slots: cobblestone, TNT, ender pearl, fire charge. Clear stages 1–3 to unlock each.
 export const LOADOUTS=[
  [5,0,0,0], [5,1,0,0], [5,1,1,0], [6,3,0,1], [6,3,1,0],
- [5,2,1,0], [8,3,2,0], [4,4,2,1], [6,3,2,0], [7,4,2,0]
+ [5,2,1,0], [8,3,2,0], [6,4,3,1], [6,3,2,0], [9,4,2,0]
 ];
 // Each dimension keeps its own ten-stage campaign and finite supplies.
 export const WORLD_LOADOUTS={

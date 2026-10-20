@@ -11,7 +11,7 @@ async function platform(page,{offline=false,account='toy-A'}={}){
 test('Toy mode uses real cross-origin nickname/ranking API and restores cloud identity in a fresh browser',async({browser})=>{
  cloud={};reads=writes=0;const context=await browser.newContext(),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await platform(page);await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await require('./browser-helpers.cjs').enterStart(page);
  await page.locator('#nickname').fill('ToyCrossPlayer');await page.locator('#saveProfile').click();await expect(page.locator('#levelMenu')).toBeVisible();await expect.poll(()=>writes).toBeGreaterThan(0);
- expect(JSON.stringify(cloud)).toContain('ToyCrossPlayer');expect(reads).toBe(1);
+ await expect.poll(()=>JSON.stringify(cloud)).toContain('ToyCrossPlayer');expect(reads).toBe(1);
  await page.locator('#leaderboardBtn').click();await expect(page.locator('#leaderboardStatus')).toHaveText('还没有全通成绩，来成为第一位挑战者。');await expect(page.locator('#rankingRows tr')).toHaveCount(0);await page.locator('#leaderboardBack').click();
  await page.locator('#level-0').click();const box=await page.locator('#stage').boundingBox(),p=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),x=box.x+p.x*box.width/1536,y=box.y+p.y*box.height/864;
  await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-65,y+25,{steps:5});await page.waitForFunction(()=>MCBlockLaunch.getDiagnostics().preview.length===5);await page.mouse.down({button:'right'});await page.mouse.up({button:'right'});await page.mouse.up();expect(errors).toEqual([]);await context.close();

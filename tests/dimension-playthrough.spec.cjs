@@ -2,12 +2,12 @@
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 const {createGameServer}=require('../scripts/serve.cjs');
 const {aim,enterStart}=require('./browser-helpers.cjs');
-let server,directory,base,AMMO,inventoryFor,worldSaveKey,TIME_SAVE_KEY,TIME_QUEUE_KEY,formatTime,TOY_DIMENSIONS_CLOUD_KEY;
+let server,directory,base,AMMO,inventoryFor,worldSaveKey,TIME_SAVE_KEY,TIME_QUEUE_KEY,formatTime,TOY_DIMENSIONS_CLOUD_KEY,TOY_CLOUD_KEY,encodeTime;
 
 test.beforeAll(async()=>{
  ({AMMO}=await import('../src/config.mjs'));({inventoryFor}=await import('../src/campaign.mjs'));
  ({worldSaveKey}=await import('../src/dimensions.mjs'));({TIME_SAVE_KEY,TIME_QUEUE_KEY,formatTime}=await import('../src/timing.mjs'));
- ({TOY_DIMENSIONS_CLOUD_KEY}=await import('../src/toy-storage.mjs'));
+ ({TOY_DIMENSIONS_CLOUD_KEY,TOY_CLOUD_KEY}=await import('../src/toy-storage.mjs'));({encodeTime}=await import('../src/toy-online.mjs'));
  directory=await fs.mkdtemp(path.join(os.tmpdir(),'mc-dimension-playthrough-'));
  server=await createGameServer({dataDir:directory});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));base=`http://127.0.0.1:${server.address().port}`;
 });
@@ -43,7 +43,7 @@ async function launch(page,move){
 for(const world of ['nether','end'])test.describe.serial(`${world} complete native campaign`,()=>{
  let context,page,session;const reports=[],plans=require(`../evidence/${world}-playability.json`);
  test.beforeAll(async({browser})=>{
-  session={account:`browser-${world}`,nickname:`Browser ${world}`,cloud:{},submissions:[],scores:{}};
+  session={account:`browser-${world}`,nickname:`Browser ${world}`,cloud:{[TOY_CLOUD_KEY]:JSON.stringify({version:1,values:{[TIME_SAVE_KEY]:JSON.stringify(Array(10).fill(1000))}})},submissions:[],scores:{2:encodeTime(10000)}};
   context=await browser.newContext({viewport:{width:1536,height:1100}});page=await context.newPage();
   await platform(page,session);await page.clock.install({time:new Date('2026-10-20T00:00:00Z')});
   await page.goto(base);await page.waitForFunction(()=>window.MCBlockLaunch);await enterStart(page);await expect(page.locator('#levelMenu')).toBeVisible();
@@ -64,14 +64,14 @@ for(const world of ['nether','end'])test.describe.serial(`${world} complete nati
   const prefix=`mc-slingshot.toy.${encodeURIComponent(session.account)}.`,timeKey=worldSaveKey(TIME_SAVE_KEY,world),progressKey=worldSaveKey('mc-block-launch.campaign.v1',world);
   const saved=await page.evaluate(({prefix,timeKey,progressKey,TIME_SAVE_KEY})=>({times:JSON.parse(localStorage.getItem(prefix+timeKey)),progress:JSON.parse(localStorage.getItem(prefix+progressKey)),overworld:localStorage.getItem(prefix+TIME_SAVE_KEY)}),{prefix,timeKey,progressKey,TIME_SAVE_KEY});
   expect(saved.progress.completed).toEqual(Array.from({length:plan.level},(_,i)=>i));expect(saved.progress.unlocked).toBe(Math.min(10,plan.level+1));
-  expect(saved.times.filter(Number.isInteger)).toHaveLength(plan.level);expect(saved.times[plan.level-1]).toBe(Math.round(final.time*1000));expect(saved.overworld).toBeNull();
+  expect(saved.times.filter(Number.isInteger)).toHaveLength(plan.level);expect(saved.times[plan.level-1]).toBe(Math.round(final.time*1000));expect(JSON.parse(saved.overworld)).toEqual(Array(10).fill(1000));
   await expect(page.locator('#resultTiming')).toContainText(formatTime(saved.times[plan.level-1]));
   await expect.poll(()=>JSON.parse(session.cloud[TOY_DIMENSIONS_CLOUD_KEY]||'{"values":{}}').values[timeKey]).toBe(JSON.stringify(saved.times));
   const other=world==='nether'?'end':'nether';expect(JSON.parse(session.cloud[TOY_DIMENSIONS_CLOUD_KEY]).values[worldSaveKey(TIME_SAVE_KEY,other)]).toBeUndefined();
   if(plan.level<10)expect(session.submissions).toEqual([]);
   await page.screenshot({path:`evidence/dimension-browser-${world}-clear-${plan.level}.png`});reports.push({level:plan.level,shots:final.launched,remaining:final.inventory,timeMs:saved.times[plan.level-1]});
   if(plan.level===10){
-   await expect.poll(()=>session.submissions.length).toBe(1);expect(session.submissions[0].board).toBe(world==='nether'?2:3);
+   await expect.poll(()=>session.submissions.length).toBe(1);expect(session.submissions[0].board).toBe(world==='nether'?3:4);
    expect(session.submissions[0].score).toBe(10000000-Math.ceil(saved.times.reduce((a,b)=>a+b,0)/10));
    expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),prefix+worldSaveKey(TIME_QUEUE_KEY,world))).toEqual([]);
    await page.locator('#resultLevels').click();await page.screenshot({path:`evidence/dimension-browser-${world}-complete-menu.png`});

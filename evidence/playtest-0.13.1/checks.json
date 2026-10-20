@@ -1,0 +1,412 @@
+{
+  "checkedAt": "2026-10-20T10:10:54.214Z",
+  "version": "0.13.1",
+  "unit": {
+    "command": "npm test",
+    "passed": 280,
+    "failed": 0
+  },
+  "browser": {
+    "fullSuite": {
+      "command": "PW_TEST_PORT=18776 (isolated MC_DATA_DIR) npx playwright test",
+      "passed": 75,
+      "failed": 2
+    },
+    "targetedRetest": {
+      "command": "PW_TEST_PORT=18777 (isolated MC_DATA_DIR) npx playwright test tests/minecraft-feedback.spec.cjs tests/toy-platform.spec.cjs tests/sling-anchors.spec.cjs",
+      "passed": 6,
+      "failed": 0
+    },
+    "distinctCases": 77,
+    "finalFailed": 0,
+    "cases": [
+      {
+        "test": "tests\\aim-integration.spec.cjs:2:1 › mouse coordinates map to the same sling launch parameters as the preview",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\audio-lifecycle.spec.cjs:3:1 › real fuse audio freezes while paused, resumes from its position, and releases on stop",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\audio-pause.spec.cjs:4:1 › pausing freezes real effect playback, resuming continues it, and restart clears old sounds",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\boot.spec.cjs:2:1 › 正常 Matter 启动，四种弹药资源完整，选关菜单可切换已解锁关卡",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\boot.spec.cjs:8:1 › 引擎缺失时显示明确错误，不能静默进入降级物理",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\boot.spec.cjs:12:1 › 损坏入口显示错误，避免无提示白屏",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-combat.spec.cjs:3:1 › Enderman retains its original purple eyes when the Bedrock skin is drawn in Canvas",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 1: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 2: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 3: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 4: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 5: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 6: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 7: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 8: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 9: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › nether complete native campaign › nether stage 10: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 1: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 2: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 3: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 4: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 5: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 6: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 7: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 8: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 9: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-playthrough.spec.cjs:55:26 › end complete native campaign › end stage 10: mouse launch, finite inventory, result and world save",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-scores.spec.cjs:17:1 › legacy unlocks and scores cannot open rebuilt stages or other worlds",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-scores.spec.cjs:30:1 › three offline queues upload to separate boards and reload without mixing times",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\dimension-scores.spec.cjs:42:1 › an old leaderboard response cannot replace the newly selected world",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\feedback.spec.cjs:2:1 › 独立堆叠库存、方块三面图标、物品栏自动隐藏及滚轮唤回",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\feedback.spec.cjs:11:1 › ESC 冻结物理且取消蓄力，云在游戏中移动，人物继续巡逻",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\gameplay.spec.cjs:2:1 › ?????????????????????????????????",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\gameplay.spec.cjs:13:1 › 三种弹药实际发射，方块落稳，TNT延迟爆炸，珍珠穿墙",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\gameplay.spec.cjs:25:1 › 十关完整起步，攻击前后画面、重开库存与刚体数量可核验",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\interaction.spec.cjs:2:1 › 原版弩上弦声实际输出，反向和低角度均五点，右键取消不扣弹",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\interaction.spec.cjs:12:1 › 小力度和反向发射实际扣除当前圆石，重开恢复库存",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\interaction.spec.cjs:17:1 › 两颗 TNT 相互炸飞，消耗各自库存且没有黑洞物品",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\interaction.spec.cjs:25:1 › 用户 PNG、阁楼梯子与怪物停顿抬手实际显示",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\linked-background.spec.cjs:3:1 › roof damage updates the visible rear hole for stone, fire and TNT",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-hotbar.spec.cjs:2:1 › single remaining ammo shows one before launch and zero after it is spent",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-hotbar.spec.cjs:5:1 › startup uses a dedicated live game scene before five world buttons",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-hotbar.spec.cjs:8:1 › materials open only on a deliberate click, stay short and close on another click",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-hotbar.spec.cjs:11:1 › nine permanent slots preserve unlocked absent and spent items as dark zero stacks",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:2:1 › recorded times, full level titles and item buttons fit one centered line at every menu size",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:18:1 › five vertical world buttons per page in landscape and portrait",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:23:1 › pause presents five actions, settings pause physics and sound volume persists",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:26:1 › fullscreen button reflects browser entry and exit",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:29:1 › unsupported orientation hint cannot block fullscreen reentry after an external exit",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\menu-settings.spec.cjs:32:1 › first-column material popup remains inside the narrow landscape panel",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\minecraft-feedback.spec.cjs:3:1 › 原版灰色按钮和泥土选关背景加载，四种弹药在弹弓上尺寸一致",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\minecraft-feedback.spec.cjs:17:1 › 十关真实鼠标发射在限定库存内通关，包括新增地窖中的怪物",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\minecraft-feedback.spec.cjs:44:1 › 真实圆石击杀依次显示红闪、倒地和白色消散，全部结束后才显示胜利",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:3:1 › 网络不可用仍能保存昵称，重连后取得在线身份且不会卡在开局",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:11:1 › 开局昵称、共享排行榜和改名能实际往返服务器",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:25:1 › leaving nickname editing retries a discarded delayed full-record restore",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:38:1 › a new player can view a board capped at one hundred people",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:44:1 › overlapping board refreshes cannot append duplicate rows or replace newer results",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:55:1 › an occupied nickname stays in the form with a clear message",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:66:1 › the sample uses the requested nickname without an extra display suffix",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\mobile-online.spec.cjs:74:2 › Android 触屏布局与实际输入 › one pause control, five-point aim, anywhere second-finger cancel and direct hotbar access",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\music.spec.cjs:2:1 › default Sweden music plays after a gesture, loops quietly, and can be switched off independently",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\player-feedback.spec.cjs:2:1 › a first clear shows run and best times and the menu preserves its best",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\player-feedback.spec.cjs:8:1 › touch loadout disclosure closes on the second tap",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\player-feedback.spec.cjs:12:1 › loadout information is click-only and the hotbar uses nine permanent slots",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\playtest-progression.spec.cjs:16:1 › legacy unlock flags cannot open uncleared rebuilt stages or other worlds",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\playtest-progression.spec.cjs:24:1 › a fully cleared current Overworld opens both new dimensions, each starting at stage one",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\playthrough.spec.cjs:2:1 › 新存档锁关，实际圆石通关解锁TNT，第二关解锁珍珠并保存",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\sling-anchors.spec.cjs:2:1 › front and reverse pulls keep the bands attached to both binding centers",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\tap-launch.spec.cjs:4:1 › a tap without pulling keeps the loaded stone, while a tiny intentional pull still launches",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\toy-package.spec.cjs:3:1 › actual Toy package starts on a plain static host without MJS MIME support",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\toy-package.spec.cjs:13:1 › bundled official SDK exchanges real parent messages for identity, cloud and native board without a home API",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\toy-platform.spec.cjs:11:1 › Toy mode uses real cross-origin nickname/ranking API and restores cloud identity in a fresh browser",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\toy-platform.spec.cjs:21:1 › Toy cloud failure preserves playable local mode without overwriting the remote save",
+        "passed": true,
+        "source": "targeted-retest"
+      },
+      {
+        "test": "tests\\toy-recovery.spec.cjs:3:40 › official SDK recovery for 青春沿岸",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\toy-recovery.spec.cjs:3:40 › official SDK recovery for 普通新玩家",
+        "passed": true,
+        "source": "full"
+      },
+      {
+        "test": "tests\\visual.spec.cjs:2:1 › 窄窗口菜单可操作，游戏没有顶部按钮和共享数量，物品栏完整显示",
+        "passed": true,
+        "source": "full"
+      }
+    ]
+  },
+  "platform": "Toy native SDK uses a test host, not live Bilibili",
+  "toyWrites": 0
+}

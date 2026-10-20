@@ -59,7 +59,7 @@ test('snowball slows actual patrol for four seconds and movement recovers after 
  step(normal,1);step(slowed,1);
  const slowDistance=Math.abs(b.body.position.x-bx);
  assert.ok(slowDistance<Math.abs(a.body.position.x-ax)*.5);
- assert.ok(slowDistance>1);assert.equal(b.hp,100);
+ assert.ok(slowDistance<1);assert.equal(b.hp,100);
  step(slowed,4);b.behavior='walk';b.actionUntil=slowed.time+2;const resumedX=b.body.position.x;step(slowed,1);
  assert.ok(Math.abs(b.body.position.x-resumedX)>slowDistance*2);
 });

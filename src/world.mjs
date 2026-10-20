@@ -4,7 +4,7 @@ import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
 import {DEATH_TOPPLE} from './animation.mjs';
 import {igniteWood,igniteImpact,advanceFire,burnEnemy,splashWater} from './fire.mjs';
-import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,gust} from './combat.mjs';
+import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust} from './combat.mjs';
 import {LavaField} from './lava.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
@@ -43,7 +43,7 @@ export class SiegeWorld {
     const body=projectileBody(this.M,ammo,x,y,options);
     this.M.Body.setMass(body,ammo.mass);
     this.M.Body.setVelocity(body,{x:vx/60,y:vy/60});
-    const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0},body);
+    const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0,expiresAt:kind==='ender'?this.time+5:Infinity,ignited:false},body);
     if(kind==='tnt')this.events.push({type:'fuse',x,y});
     this.projectiles.push(p);return p;
   }
@@ -66,6 +66,7 @@ export class SiegeWorld {
       advanceCombat(this,e,dt);
       if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:`${e.skin}_idle`});
       if(!grounded)continue;
+      if(e.frozenUntil>this.time){this.M.Body.setVelocity(b,{x:0,y:b.velocity.y});continue;}
       if(!walking){this.M.Body.setVelocity(b,{x:b.velocity.x*.7,y:b.velocity.y});continue;}e.walkDistance+=distance;
       const ahead=x+e.facing*(half+7),wall=this.sample(ahead,feet-e.dimensions.height*.26)||this.sample(ahead,feet-e.dimensions.height*.71),edge=!this.sample(ahead,feet+5);
       if((wall||edge)&&this.time>e.turnAt){e.facing*=-1;e.turnAt=this.time+.4;e.turns++;}
@@ -206,7 +207,11 @@ export class SiegeWorld {
     const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
     // TNT has no direct damage. Ender pearls hurt creatures, never materials.
     const contactDamage=(target,entity,mass,targetMass)=>{
-      if(entity?.type==='ammo'){projectileDamage(this,target,entity,speed);return;}
+      if(entity?.type==='ammo'){
+        const hit=projectileDamage(this,target,entity,speed);
+        if(hit&&entity.ignited&&entity.ammo.id==='cobble')burnEnemy(this,target,`ammo:${entity.id}`,{totalDamage:50});
+        return;
+      }
       if(!armoredMob(target))this.hurt(target,impactDamage(speed,mass,targetMass));
     };
     if(ea?.type==='enemy')contactDamage(ea,eb,b.mass,a.mass);
@@ -217,7 +222,7 @@ export class SiegeWorld {
     if(ammo){
       const kind=ammo.ammo.id;
       if(kind==='snowball'){
-        if(other?.type==='enemy'){other.slowUntil=this.time+4;this.events.push({type:'snow',x:point.x,y:point.y,radius:34});}
+        if(other?.type==='enemy'){other.slowUntil=this.time+4;other.frozenUntil=this.time+4;this.events.push({type:'snow',x:point.x,y:point.y,radius:34});}
         this.remove(ammo);return;
       }
       if(kind==='wind'){this.remove(ammo);gust(this,point.x,point.y);return;}
@@ -233,12 +238,12 @@ export class SiegeWorld {
       }
       if(['cobble','tnt','anvil'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
-      if(kind==='ender'&&ammo.uses===0&&(otherBody.plugin.terrain||other?.type==='debris')){
+      if(kind==='ender'&&ammo.uses===0&&Math.hypot((this.before.get(ammo.body.id)||ammo.body.velocity).x,(this.before.get(ammo.body.id)||ammo.body.velocity).y)*60>=180&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
         const exit=findSafeExit((x,y)=>!!this.sample(x,y),ammo.body.position,velocity,ammo.ammo.size/2,TILE*2,this.s/2,n);
         if(exit){
           const old={...ammo.body.position};this.M.Body.setPosition(ammo.body,exit);this.M.Body.setVelocity(ammo.body,{x:velocity.x*.95,y:velocity.y*.95});
-          this.M.Sleeping.set(ammo.body,false);ammo.uses++;this.stats.portals++;this.events.push({type:'portal',x:old.x,y:old.y,to:exit});return;
+          this.M.Sleeping.set(ammo.body,false);ammo.uses++;ammo.expiresAt=this.time+5;this.stats.portals++;this.events.push({type:'portal',x:old.x,y:old.y,to:exit});return;
         }
       }
       if(kind==='ender')return;
@@ -269,6 +274,9 @@ export class SiegeWorld {
       this.before.set(b.id,{...b.velocity,omega:b.angularVelocity});
     }
     this.contacts.length=0;this.M.Engine.update(this.engine,dt*1000);
+    for(const p of this.projectiles)if(!p.dead&&p.ammo.id==='cobble'&&!p.ignited&&this.lava.touchesCircle(p.body.position.x,p.body.position.y,p.ammo.size/2)){
+      p.ignited=true;this.events.push({type:'fire',x:p.body.position.x,y:p.body.position.y,sound:'fire_burn'});
+    }
     for(const pair of this.contacts)this.processContact(pair);
     for(const p of this.projectiles){
       if(p.dead)continue;p.age+=dt;p.fuse-=dt;
@@ -289,7 +297,7 @@ export class SiegeWorld {
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
-      if(e.type==='ammo'&&e.age>18&&e.ammo.id!=='cobble')this.remove(e);
+      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&e.ammo.id!=='cobble'))this.remove(e);
     }
     this.projectiles=this.projectiles.filter(e=>!e.dead);this.debris=this.debris.filter(e=>!e.dead);
     this.synchronize();
@@ -299,6 +307,6 @@ export class SiegeWorld {
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,lava:this.lava.snapshot(),lavaCells:this.lava.cells.size,lavaCooled:this.stats.lavaCooled,
-    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses})),
+    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses,ignited:p.ignited,opacity:projectileOpacity(p,this.time)})),
     particlesPending:this.events.length};}
 }

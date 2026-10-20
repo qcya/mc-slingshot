@@ -72,7 +72,7 @@ test('the sample uses the requested nickname without an extra display suffix',as
 test.describe('Android 触屏布局与实际输入',()=>{
  test.use({viewport:{width:844,height:390},isMobile:true,hasTouch:true});
  test('one pause control, five-point aim, anywhere second-finger cancel and direct hotbar access',async({page,context})=>{
-  await page.addInitScript(()=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:10,completed:[]})));
+  await page.addInitScript(()=>localStorage.setItem('mc-block-launch.best-times.v2',JSON.stringify([1000,1000])));
   await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await require('./browser-helpers.cjs').enterStart(page);await page.locator('#nickname').fill('MobileTester');await page.locator('#saveProfile').tap();await page.locator('#level-2').tap();
   await expect(page.locator('.touch-controls button')).toHaveCount(1);await expect(page.locator('#touchPause')).toHaveText('\u6682\u505c\u83dc\u5355');
   const box=await page.locator('#stage').boundingBox(),p=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),pause=await page.locator('#touchPause').boundingBox(),hint=await page.locator('#gamehint').boundingBox();

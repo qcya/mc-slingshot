@@ -2,7 +2,8 @@ import { WIDTH,HEIGHT,PIXEL,TILE,AMMO,MATERIALS,clamp } from './config.mjs';
 import {predictArc,arcRevision} from './aim.mjs';
 import {MobSprites} from './mobs.mjs';
 import {tntFlash,DEATH_POOF} from './animation.mjs';
-import {SLING_HOME,SLING_FRAME,pouchRotation} from './sling.mjs';
+import {SLING_HOME,SLING_FRAME,pocketGeometry} from './sling.mjs';
+import {projectileOpacity} from './combat.mjs';
 import {skyAndLandscape,dimensionLandscape,driftingClouds,rearPixel,foregroundPixel,contactShadows} from './scenery.mjs';
 import {makeSlingArt} from './sling-art.mjs';
 export class Renderer {
@@ -123,6 +124,11 @@ export class Renderer {
   }
   mob(e,world){
     this.mobSprites.draw(this.ctx,e,world);
+    if(e.alive&&e.frozenUntil>world.time){
+      const c=this.ctx,x=e.body.position.x,y=e.body.bounds.max.y;c.save();c.fillStyle='#caefffcc';
+      for(let i=0;i<5;i++){const dx=(i-2)*10,dy=6+((i*7+Math.floor(world.time*8))%17);c.fillRect(x+dx-2,y-dy,4,4);}
+      c.restore();
+    }
     if(e.alive&&e.burningUntil>world.time){
       const w=e.dimensions.width+12,h=e.dimensions.height*.8,frame=Math.floor(world.time*12+e.id)%32,c=this.ctx;
       c.save();c.globalAlpha=.85;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
@@ -137,17 +143,18 @@ export class Renderer {
   }
   launcher(state,world){
     const c=this.ctx,p=state.pouch,{left,right}=SLING_FRAME;
-    const angle=pouchRotation(state.vx,state.vy);
-    const a={x:p.x-Math.cos(angle)*15,y:p.y-Math.sin(angle)*15},b={x:p.x+Math.cos(angle)*15,y:p.y+Math.sin(angle)*15};
+    const g=pocketGeometry(p,state.ammo.size),a=g.left,b=g.right;
     const band=(a,b,width,color)=>{c.strokeStyle=color;c.lineWidth=width;c.lineCap='butt';c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();};
     c.save();c.beginPath();c.rect(0,0,WIDTH,SLING_FRAME.ground);c.clip();
     if(this.slingPicture)c.drawImage(this.slingPicture,SLING_FRAME.x,SLING_FRAME.y,SLING_FRAME.width,SLING_FRAME.height);c.restore();
     // The left strap attaches to the inner face; drawing it behind the fork
     // hides that attachment and makes the visible band emerge from the outside.
-    band(left,a,8,'#34251c');band(left,a,4,'#98765b');
-    band(right,b,9,'#39271c');band(right,b,4,'#b48c63');
-    c.save();c.translate(p.x,p.y);c.rotate(angle);c.fillStyle='#35281e';c.fillRect(-19,-10,38,20);c.fillStyle='#77573c';c.fillRect(-16,-8,32,16);c.fillStyle='#a58259';c.fillRect(-15,-7,30,3);c.restore();
+    band(left,a,5,'#35271d');band(left,a,2,'#9a6b43');
+    band(right,b,5,'#35271d');band(right,b,2,'#bb8a53');
+    const pocketPath=()=>{const r=g.radius,h=g.belly;c.beginPath();c.moveTo(g.localLeft.x,g.localLeft.y);c.lineTo(-r*.78,h-5);c.lineTo(-r*.42,h);c.lineTo(r*.42,h);c.lineTo(r*.78,h-5);c.lineTo(g.localRight.x,g.localRight.y);c.closePath();};
+    c.save();c.translate(p.x,p.y);c.rotate(g.angle);pocketPath();c.fillStyle='#765034';c.fill();c.strokeStyle='#35271d';c.lineWidth=2;c.stroke();c.restore();
     if(state.loaded)this.ball(p.x,p.y,state.ammo);
+    c.save();c.translate(p.x,p.y);c.rotate(g.angle);c.beginPath();c.moveTo(-g.radius*.78,g.belly-5);c.lineTo(-g.radius*.42,g.belly);c.lineTo(g.radius*.42,g.belly);c.lineTo(g.radius*.78,g.belly-5);c.strokeStyle='#3a291e';c.lineWidth=5;c.stroke();c.strokeStyle='#bb8a55';c.lineWidth=2;c.stroke();c.restore();
     if(state.drag){
       const key=`${state.ammo.id}:${p.x.toFixed(1)}:${p.y.toFixed(1)}:${state.vx.toFixed(1)}:${state.vy.toFixed(1)}:${arcRevision(world)}`;
       if(key!==this.arcKey){this.arcKey=key;this.arc=predictArc(world,state.ammo.id,p,state.vx,state.vy);}
@@ -172,8 +179,9 @@ export class Renderer {
       c.save();c.globalAlpha=Math.min(1,(fire.endsAt-world.time)*2);c.drawImage(atlas,0,frame*16,16,16,fire.x,fire.y-12,fire.size,fire.size+12);c.restore();
     }
     this.launcher(launcher,world);
-    for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.rotate(p.body.angle);
-      this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){const s=p.ammo.size;c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-s/2,-s/2,s,s);}c.restore();}
+    for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.globalAlpha=projectileOpacity(p,world.time);
+      c.save();c.rotate(p.body.angle);this.ball(0,0,p.ammo);if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){const s=p.ammo.size;c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-s/2,-s/2,s,s);}c.restore();
+      if(p.ignited){const frame=Math.floor(world.time*12+p.id)%32;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,-20,-30,40,46);}c.restore();}
     for(const p of this.particles){c.globalAlpha=Math.min(1,p.life/(p.poof ? .15 : .8));c.fillStyle=p.color;c.fillRect(Math.round(p.x/3)*3,Math.round(p.y/3)*3,p.size,p.size);}c.globalAlpha=1;
     for(const e of this.effects){
       if(e.type==='explosion'){const frame=Math.min(15,Math.floor((1-e.life/e.total)*16)),size=e.radius*2;c.drawImage(this.assets.explosions[frame],e.x-size/2,e.y-size/2,size,size);}

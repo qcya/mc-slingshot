@@ -10,7 +10,7 @@ test('roof damage updates the visible rear hole for stone, fire and TNT',async({
   const renderer=new Renderer(document.querySelector('#check'),assets);
   window.resetLayerCheck=()=>{
    const scene=buildLevel(3),world=new SiegeWorld(Matter,scene);
-   const launcher={pouch:{x:285,y:545},loaded:false};
+   const launcher={pouch:{x:285,y:545},ammo:{size:28},loaded:false};
    renderer.reset(scene);
    let target;
    for(let x=320;x<464&&!target;x++)for(let y=0;y<160;y++)if(world.grid.get(x,y)&&world.rear.grid.get(x,y)){target={x:(x+.5)*3,y:(y+.5)*3};break;}

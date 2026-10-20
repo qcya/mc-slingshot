@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-20T10:11:37.082Z",
+  "release": "/srv/mc-block-launch/releases/0.13.1-review-20261020T100810Z",
+  "previous": "/srv/mc-block-launch/releases/0.13.0-review-20261020T083758Z",
+  "backup": "/srv/mc-block-launch/backups/0.13.1-review-20261020T100810Z-leaderboard.json",
+  "dataBefore": "15c4b4fcbfb96fc9352d4df64e88e35d9eaea1461da6f883b58bd532a2cedfa2",
+  "dataAfter": "15c4b4fcbfb96fc9352d4df64e88e35d9eaea1461da6f883b58bd532a2cedfa2",
+  "mineBefore": "/srv/mc-deep-mine/releases/20261020T092146Z-0c237bcab952",
+  "mineAfter": "/srv/mc-deep-mine/releases/20261020T092146Z-0c237bcab952",
+  "archiveSha256": "5a97502d3730cadb6f5aa823094a4b8072d07995be52c4d25d19a907e5ec7b1e",
+  "scoreDataPreserved": true,
+  "servicePort": 8770,
+  "miningServicePort": 8771,
+  "miningServicePreserved": true,
+  "tls": {
+    "url": "https://qcya.fun:8443/mc-block-launch/api/health",
+    "trustedCertificate": true,
+    "route": "LAN address override with original domain/SNI; not an external mobile data test",
+    "health": {
+      "ok": true,
+      "version": "0.13.1",
+      "worlds": [
+        "overworld",
+        "nether",
+        "end"
+      ],
+      "scoreSeason": "three-dimensions-v2"
+    }
+  },
+  "toyWrites": 0
+}

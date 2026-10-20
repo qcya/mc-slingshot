@@ -25,5 +25,5 @@ test('four finite ammo slots unlock TNT, pearl and fire after stages one, two an
 test('early and middle stages keep a measured finite retry allowance',()=>{
  assert.equal(totalAmmo(inventoryFor(0)),5,'the opening now emphasizes ordinary stones');
  for(const loadout of LOADOUTS){assert.ok(totalAmmo(loadout)>0&&totalAmmo(loadout)<18);assert.ok(loadout.filter(n=>n>0).length<=4);}
- assert.deepEqual(inventoryFor(9),[7,4,2,0],'final-stage thirteen-shot budget shifts from explosives to stones');
+ assert.deepEqual(inventoryFor(9),[9,4,2,0],'final-stage fifteen-shot budget keeps ordinary stones as the main retry allowance');
 });

@@ -22,9 +22,9 @@ test('level selector clamps invalid indices while preserving the build contract'
 });
 
 
-test('the final siege preserves its accepted geometry, thirteen shots, and safe cap sentries',()=>{
+test('the final siege preserves its accepted geometry, fifteen shots, and safe cap sentries',()=>{
  const scene=buildLevel(9);
- assert.deepEqual(inventoryFor(9),[7,4,2,0]);assert.equal(scene.shots,13);
+ assert.deepEqual(inventoryFor(9),[9,4,2,0]);assert.equal(scene.shots,15);
  for(const x of [21,22,23,26,27,28])assert.equal(scene.grid.get(x*16,12*16),0,'both boss intakes remain open');
  assert.ok(scene.rear.grid.cells.every(m=>![6,9,17,18,22,23].includes(m)),'background allows decorative appliances, not windows, doors or ore');
  assert.deepEqual(scene.enemies.slice(0,2).map(e=>({x:e.x,feet:e.feet,stationary:e.stationary})),[

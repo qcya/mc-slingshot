@@ -14,17 +14,16 @@ async function boot(page,player,values={}){
  await page.goto(base);await page.waitForFunction(()=>window.MCBlockLaunch);await page.locator('#startScreen').click();await expect(page.locator('#levelMenu')).toBeVisible();
 }
 const bundle=timeMs=>({stages:Array.from({length:10},(_,stage)=>({stage,timeMs}))});
-test('world selection preserves old overworld progress while ignoring old season times and queues',async({page})=>{
+test('legacy unlocks and scores cannot open rebuilt stages or other worlds',async({page})=>{
  const player=await identity('FreshSeason');
  await boot(page,player,{'mc-block-launch.campaign.v1':{unlocked:4,completed:[0,1,2]},'mc-block-launch.best-times.v1':Array(10).fill(1000),'mc-block-launch.pending.v2':[bundle(1000)]});
- await expect(page.locator('#level-3')).toBeEnabled();await expect(page.locator('#level-4')).toBeDisabled();
+ await expect(page.locator('#level-0')).toBeEnabled();await expect(page.locator('#level-1')).toBeDisabled();
  await expect(page.locator('#level-0')).not.toContainText('00:01.000');
  for(const world of ['nether','end']){
-  await page.locator(`#levelMenu [data-world="${world}"]`).click();
-  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().dimension)).toBe(world);
-  await expect(page.locator('#level-0')).toBeEnabled();await expect(page.locator('#level-1')).toBeDisabled();
+  await expect(page.locator(`#levelMenu [data-world="${world}"]`)).toBeDisabled();
+  expect(await page.evaluate(id=>MCBlockLaunch.switchWorld(id),world)).toBe(false);
  }
- await page.locator('#levelMenu [data-world="overworld"]').click();await expect(page.locator('#level-3')).toBeEnabled();
+ await expect(page.locator('#level-3')).toBeDisabled();
  for(const world of ['overworld','nether','end'])expect((await (await fetch(`${base}/api/leaderboard?world=${world}`)).json()).entries.some(row=>row.id===player.profile.id)).toBe(false);
  expect(await page.evaluate(key=>localStorage.getItem(key),TIME_SAVE_KEY)).toBeNull();
 });

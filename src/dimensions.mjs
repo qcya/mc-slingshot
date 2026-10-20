@@ -1,7 +1,8 @@
 export const WORLDS=Object.freeze([
- Object.freeze({id:'overworld',label:'主世界',board:1}),
- Object.freeze({id:'nether',label:'下界',board:2}),
- Object.freeze({id:'end',label:'末地',board:3}),
+ // Keep legacy map scores on board 1 when updating the existing Toy work.
+ Object.freeze({id:'overworld',label:'主世界',board:2}),
+ Object.freeze({id:'nether',label:'下界',board:3}),
+ Object.freeze({id:'end',label:'末地',board:4}),
 ]);
 // Changing the level architecture starts a fresh score season in every world.
 export const SCORE_SEASON='three-dimensions-v2';

@@ -11,6 +11,9 @@ export const profileFor=skin=>MOB_PROFILES[skin]||MOB_PROFILES.zombie;
 export const heavyMob=e=>e.skin==='warden'||e.skin==='hoglin';
 export const armoredMob=e=>!!profileFor(e.skin).armored;
 export const fireImmune=e=>!!profileFor(e.skin).fireImmune;
+// Walking enemies must not turn a resting object into a fresh weapon.
+export const MIN_PROJECTILE_HIT_SPEED=180;
+export function projectileOpacity(p,time){return p.ammo.id==='ender'?Math.max(0,Math.min(1,1-(time-p.expiresAt)/.75)):1;}
 export function projectileBody(M,ammo,x,y,options={}){
  const square=ammo.shape==='box'||['cobble','tnt'].includes(ammo.id);
  return square?M.Bodies.rectangle(x,y,ammo.size,ammo.size,options):M.Bodies.circle(x,y,ammo.size/2,options,16);
@@ -23,7 +26,7 @@ export function projectileGravity(M,body,ammo,gravity){
 }
 function random(e){e.combatSeed=(Math.imul(e.combatSeed,1664525)+1013904223)>>>0;return e.combatSeed/4294967296;}
 export function initCombat(e,time,options){
- e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.slowUntil=0;
+ e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.slowUntil=0;e.frozenUntil=0;
  if(e.skin==='shulker'){e.stationary=true;e.shellOpen=false;e.shellUntil=time+2.4+random(e)*1.8;e.shellAmount=0;}
  if(e.skin==='enderman'){e.teleportCount=0;e.teleportSpots=(options.teleportSpots||[]).map(p=>({...p}));}
 }
@@ -81,11 +84,11 @@ export function projectileDamage(world,target,p,speed){
  const kind=p.ammo.id;
  if(['tnt','fire','snowball','wind','water'].includes(kind))return;
  const velocity=world.before.get(p.body.id)||p.body.velocity;
- if(kind==='ender'&&Math.hypot(velocity.x,velocity.y)*60<30)return;
+ if(Math.hypot(velocity.x,velocity.y)*60<MIN_PROJECTILE_HIT_SPEED)return false;
  if(target.projectileHits.has(p.id))return;
  target.projectileHits.add(p.id);
  const armored=armoredMob(target),damage=kind==='anvil'?150:armored?(kind==='ender'?75:100):250;
- damageEnemy(world,target,damage,{source:`ammo:${p.id}`,kind});
+ return damageEnemy(world,target,damage,{source:`ammo:${p.id}`,kind});
 }
 export function gust(world,x,y,radius=125){
  for(const e of world.allMoving()){

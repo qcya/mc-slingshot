@@ -1,5 +1,12 @@
 # Independent score isolation review — 2026-10-20
 
+Follow-up: the user's later decision preserves the existing Toy work. The
+new-work prerequisite discussed below is superseded: board 1 stays archived,
+and the three current worlds use boards 2, 3 and 4 in the existing work. Do
+not delete or recreate that work. The new regression in
+`tests/toy-existing-work.test.mjs` verifies that the adapter never reads or
+writes board 1.
+
 Reviewed `scripts/leaderboard.cjs`, `scripts/serve.cjs`, `src/online.mjs`,
 `src/toy-online.mjs`, `src/toy-storage.mjs` and `src/dimensions.mjs` independently
 from their implementation. No score code was edited by this reviewer.

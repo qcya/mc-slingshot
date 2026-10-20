@@ -73,17 +73,18 @@ export function igniteWood(world,x,y,reach=world.s*2,sourceId){
 
 // A charge grants exactly three delayed ticks, even if the victim remains in
 // its flames or overlaps several burning tiles. A later charge is independent.
-export function burnEnemy(world,enemy,sourceId){
+export function burnEnemy(world,enemy,sourceId,{totalDamage=null}={}){
  if(!enemy.alive||enemy.dead||fireImmune(enemy)||enemy.burnSources.has(sourceId))return false;
  enemy.burnSources.add(sourceId);
  if(enemy.skin==='enderman'){damageEnemy(world,enemy,100,{source:sourceId,kind:'fire'});return true;}
- for(let tick=1;tick<=3;tick++)enemy.burnTicks.push({at:world.time+tick*.6,damage:heavyMob(enemy)?50:100/3});
+ for(let tick=1;tick<=3;tick++)enemy.burnTicks.push({at:world.time+tick*.6,damage:totalDamage===null?(heavyMob(enemy)?50:100/3):totalDamage/3});
  enemy.burningUntil=Math.max(enemy.burningUntil,world.time+1.8);return true;
 }
 
 export function splashWater(world,x,y,radius=96){
  world.fires=world.fires.filter(f=>Math.hypot(f.x+f.size/2-x,f.y+f.size/2-y)>radius+f.size/2);
  for(const enemy of world.enemies){if(Math.hypot(enemy.body.position.x-x,enemy.body.position.y-y)>radius+enemy.dimensions.width/2)continue;enemy.burnTicks.length=0;enemy.burningUntil=0;}
+ for(const p of world.projectiles)if(p.ignited&&Math.hypot(p.body.position.x-x,p.body.position.y-y)<=radius)p.ignited=false;
  world.lava.cool(x,y,radius);world.events.push({type:'splash',x,y,radius,sound:'water_splash'});
 }
 

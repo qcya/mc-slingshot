@@ -3,7 +3,7 @@ let profileSequence=0;
 async function enterStart(page){if(await page.locator('#startScreen').isVisible())await page.locator('#startScreen').click();}
 async function levelCard(page,level){const card=page.locator('#level-'+level);if(!await card.count()){await page.locator(level>=5?'#nextPage':'#prevPage').click();}return card;}
 async function ready(page,{level=0,unlocked=10}={}){
- if(unlocked>1)await page.addInitScript(n=>localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:n,completed:[]})),unlocked);
+ if(unlocked>1)await page.addInitScript(n=>{localStorage.setItem('mc-block-launch.campaign.v1',JSON.stringify({unlocked:n,completed:[]}));if(localStorage.getItem('mc-block-launch.best-times.v2')===null)localStorage.setItem('mc-block-launch.best-times.v2',JSON.stringify(Array.from({length:n-1},()=>1000000)));},unlocked);
  await page.goto('/');await page.waitForFunction(()=>window.MCBlockLaunch);await enterStart(page);if(await page.locator('#profileMenu').isVisible()){await page.locator('#nickname').fill(`T${Date.now().toString(36)}_${++profileSequence}`);await page.locator('#saveProfile').click();}await(await levelCard(page,level)).click();
  await expect.poll(()=>page.evaluate(()=>MCBlockLaunch.getStatus().screen)).toBe('play');
 }
