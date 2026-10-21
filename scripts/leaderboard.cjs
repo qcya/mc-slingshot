@@ -27,14 +27,19 @@ function results(body,season){
   if(new Set(stages.map(score=>score.stage)).size!==10)fail(400,'Each stage must appear exactly once.');
   return stages;
 }
-function stageMap(profile,world){return world==='overworld'?profile.stages:profile.worlds[world];}
+function stageMap(profile,world){return world==='overworld'?profile.stages:profile.worlds[world]||{};}
 function publicEntry(profile,world='overworld'){
+  if(world==='total'){
+    const entries=['overworld','nether','end','sift'].map(id=>publicEntry(profile,id));
+    const stages=entries.flatMap((entry,worldIndex)=>entry.stages.map(s=>({...s,stage:worldIndex*10+s.stage})));
+    return {id:profile.id,nickname:profile.nickname,completed:stages.length,totalTimeMs:stages.reduce((n,s)=>n+s.timeMs,0),stages};
+  }
   const stages=Object.values(stageMap(profile,world)).sort((a,b)=>a.stage-b.stage);
   return {id:profile.id,nickname:profile.nickname,completed:stages.length,totalTimeMs:stages.reduce((n,s)=>n+s.timeMs,0),stages,...(profile.demo===true?{demo:true}:{})};
 }
 async function createLeaderboard({dataDir}){
-  const {dimension,WORLDS,SCORE_SEASON}=await import('../src/dimensions.mjs');
-  function worldId(world='overworld'){try{return dimension(world).id;}catch{fail(400,'Unknown world.');}}
+  const {dimension,ranking,WORLDS,RANKINGS,SCORE_SEASON}=await import('../src/dimensions.mjs');
+  function worldId(world='overworld',board=false){try{return (board?ranking:dimension)(world).id;}catch{fail(400,'Unknown world.');}}
   await fs.mkdir(dataDir,{recursive:true,mode:0o700});
   const filename=path.join(dataDir,'leaderboard.json');let state={version:4,profiles:[]},migrated=false,original;
   try{
@@ -57,8 +62,8 @@ async function createLeaderboard({dataDir}){
       p.stages=normalizeStages(p.stages,legacy);
       if(state.version<3)p.worlds={nether:{},end:{}};
       else{
-        if(!p.worlds||typeof p.worlds!=='object'||Array.isArray(p.worlds)||Object.keys(p.worlds).length!==2)throw Error('Invalid stored worlds.');
-        p.worlds={nether:normalizeStages(p.worlds.nether),end:normalizeStages(p.worlds.end)};
+        if(!p.worlds||typeof p.worlds!=='object'||Array.isArray(p.worlds)||Object.keys(p.worlds).some(id=>!['nether','end','sift'].includes(id))||!Object.hasOwn(p.worlds,'nether')||!Object.hasOwn(p.worlds,'end'))throw Error('Invalid stored worlds.');
+        p.worlds={nether:normalizeStages(p.worlds.nether),end:normalizeStages(p.worlds.end),sift:normalizeStages(p.worlds.sift??{})};
       }
       if(migrated){
         p.legacyStages=previousStages;p.legacyWorlds=previousWorlds;
@@ -102,12 +107,12 @@ async function createLeaderboard({dataDir}){
   }
   return {
     worlds:WORLDS.map(world=>world.id),
-    scoreSeason:SCORE_SEASON,
-    list(world='overworld'){world=worldId(world);return state.profiles.map(p=>publicEntry(p,world)).filter(entry=>entry.completed===10).sort((a,b)=>a.totalTimeMs-b.totalTimeMs||a.id.localeCompare(b.id)).slice(0,100).map((entry,index)=>({rank:index+1,...entry}));},
+    rankings:RANKINGS.map(board=>board.id),scoreSeason:SCORE_SEASON,
+    list(world='overworld'){world=worldId(world,true);return state.profiles.map(p=>publicEntry(p,world)).filter(entry=>entry.completed===(world==='total'?40:10)).sort((a,b)=>a.totalTimeMs-b.totalTimeMs||a.id.localeCompare(b.id)).slice(0,100).map((entry,index)=>({rank:index+1,...entry}));},
     profile(token,world='overworld'){world=worldId(world);const id=authenticate(token),p=state.profiles.find(p=>p.id===id);return {profile:{id,nickname:p.nickname},stages:publicEntry(p,world).stages};},
     async create(body){
       fields(body,['nickname']);const name=nickname(body.nickname),token=crypto.randomBytes(32).toString('base64url'),id=crypto.randomBytes(16).toString('base64url');
-      return mutate(next=>{if(next.profiles.length>=10000)fail(503,'Player limit reached.');uniqueNickname(next,name);next.profiles.push({id,nickname:name,tokenHash:hash(token),stages:{},worlds:{nether:{},end:{}}});return {profile:{id,nickname:name},token};});
+      return mutate(next=>{if(next.profiles.length>=10000)fail(503,'Player limit reached.');uniqueNickname(next,name);next.profiles.push({id,nickname:name,tokenHash:hash(token),stages:{},worlds:{nether:{},end:{},sift:{}}});return {profile:{id,nickname:name},token};});
     },
     async update(token,body){
       const id=authenticate(token);fields(body,['nickname']);const name=nickname(body.nickname);
@@ -115,7 +120,7 @@ async function createLeaderboard({dataDir}){
     },
     async submit(token,body,world='overworld'){
       world=worldId(world);const id=authenticate(token),scores=results(body,SCORE_SEASON);
-      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);if(p.demo===true)return {entry:publicEntry(p,world)};const stored=stageMap(p,world);for(const score of scores){const old=stored[score.stage];if(!old||score.timeMs<old.timeMs)stored[score.stage]=score;}return {entry:publicEntry(p,world)};});
+      return mutate(next=>{const p=next.profiles.find(p=>p.id===id);if(p.demo===true)return {entry:publicEntry(p,world)};if(world!=='overworld')p.worlds[world]??={};const stored=stageMap(p,world);for(const score of scores){const old=stored[score.stage];if(!old||score.timeMs<old.timeMs)stored[score.stage]=score;}return {entry:publicEntry(p,world)};});
     },
   };
 }

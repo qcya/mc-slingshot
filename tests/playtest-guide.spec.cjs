@@ -10,11 +10,11 @@ async function boot(page){
 for(const [name,size] of [['desktop',{width:1280,height:800}],['phone-landscape',{width:844,height:390}],['phone-portrait',{width:390,height:844}]])test(`guide is readable, scrollable and returns correctly on ${name}`,async({page})=>{
  await page.setViewportSize(size);await boot(page);await page.locator('#guideBtn').focus();await page.keyboard.press('Enter');
  await expect(page.locator('#guideMenu')).toBeVisible();await expect(page.locator('#itemGuide article')).toHaveCount(9);
- await expect(page.locator('[data-item="snowball"]')).toContainText('完全停止移动和动作');
+ await expect(page.locator('[data-item="crystal"]')).toContainText('连锁爆炸');
  await expect(page.locator('#guideContent')).toContainText('下界十关全通 → 解锁末地');
  const initial=await page.locator('#guideContent').evaluate(el=>({scroll:el.scrollTop,height:el.clientHeight,total:el.scrollHeight,overflow:el.scrollWidth>el.clientWidth}));
  expect(initial.total).toBeGreaterThan(initial.height);expect(initial.overflow).toBe(false);
- await page.locator('[data-item="snowball"]').scrollIntoViewIfNeeded();await expect(page.locator('#guideBack')).toBeInViewport();
+ await page.locator('[data-item="crystal"]').scrollIntoViewIfNeeded();await expect(page.locator('#guideBack')).toBeInViewport();
  await page.screenshot({path:`${proof}/guide-${name}.png`});await page.keyboard.press('Escape');await expect(page.locator('#startScreen')).toBeVisible();
  await page.locator('#startScreen').click();await page.locator('#level-0').click();await page.keyboard.press('Escape');await page.locator('#settingsBtn').click();
  const before=await page.evaluate(()=>MCBlockLaunch.getStatus().time);await page.locator('#settingsGuide').click();await page.waitForTimeout(250);

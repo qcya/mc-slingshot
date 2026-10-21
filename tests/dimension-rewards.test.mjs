@@ -10,7 +10,7 @@ const source=fs.readFileSync(new URL('../src/app.mjs',import.meta.url),'utf8');
 const resultSource=source.slice(source.indexOf('function result(win){'),source.indexOf('function animateLauncher('));
 const iconSource=source.slice(source.indexOf('function iconUrl('),source.indexOf('function hud('));
 
-for(const [world,level,slot]of [['overworld',0,1],['overworld',1,2],['overworld',2,3],['nether',2,5],['nether',5,6],['end',2,8]]){
+for(const [world,level,slot]of [['overworld',0,1],['overworld',1,2],['overworld',2,3],['nether',2,5],['end',2,7]]){
  test(`${world} stage ${level+1} reward uses its real nine-slot icon and saves progress`,()=>{
   const nodes=new Map(),saved=[];
   const node=id=>{if(!nodes.has(id))nodes.set(id,{classList:{toggle(name,hidden){this[name]=hidden;}}});return nodes.get(id);};

@@ -1,16 +1,16 @@
 // Relative URLs also work beneath a reverse proxy prefix such as /mc-block-launch/.
 // Keep the returned profile token in local storage; never put it in a URL.
-import {dimension,SCORE_SEASON} from './dimensions.mjs';
+import {ranking,SCORE_SEASON} from './dimensions.mjs';
 export function createOnlineClient({fetchImpl=globalThis.fetch,baseUrl='',timeoutMs=8000,offline=globalThis.location?.protocol==='file:'}={}) {
   const prefix=baseUrl?`${baseUrl.replace(/\/+$/,'')}/`:'';
   let worldCapabilities=null;
   async function scoped(route,world){
-    const id=dimension(world).id;
+    const id=ranking(world).id;
     // Older servers ignore a world query. Check support before any read or
     // write, so a frontend-first update cannot mix new worlds into old scores.
     const supported=await (worldCapabilities??=request('health').then(reply=>{
       if(!Array.isArray(reply.worlds)||reply.scoreSeason!==SCORE_SEASON)throw Object.assign(Error('服务器尚未支持新赛季世界，成绩已保存在本机。'),{status:503});
-      return reply.worlds;
+      return [...reply.worlds,...(reply.rankings||[])];
     }).catch(error=>{worldCapabilities=null;throw error;}));
     if(!supported.includes(world))throw Object.assign(Error('服务器尚未支持这个世界，成绩已保存在本机。'),{status:503});
     return id==='overworld'?route:`${route}?world=${id}`;

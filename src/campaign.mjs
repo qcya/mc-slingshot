@@ -7,10 +7,9 @@ export function progressFromTimes(times){
  let firstMissing=0;while(firstMissing<10&&current[firstMissing]!==null)firstMissing++;
  return {unlocked:Math.min(10,firstMissing+1),completed};
 }
-export function worldUnlocked(id,overworldTimes,netherTimes){
- if(id==='overworld')return true;
- const overworldCleared=normalizeTimes(overworldTimes).every(time=>time!==null);
- return overworldCleared&&(id==='nether'||id==='end'&&normalizeTimes(netherTimes).every(time=>time!==null));
+export function worldUnlocked(id,overworldTimes,netherTimes,endTimes){
+ const index=['overworld','nether','end','sift'].indexOf(id);if(index<0)return false;
+ return [overworldTimes,netherTimes,endTimes].slice(0,index).every(times=>normalizeTimes(times).every(time=>time!==null));
 }
 // Slots: cobblestone, TNT, ender pearl, fire charge. Clear stages 1–3 to unlock each.
 export const LOADOUTS=[
@@ -21,17 +20,24 @@ export const LOADOUTS=[
 export const WORLD_LOADOUTS={
  nether:[
   [6,1,0,0,2,0,0,0,0], [9,1,0,0,2,0,0,0,0],
-  [7,1,1,0,1,0,0,0,0], [8,2,0,0,1,2,0,0,0],
-  [11,2,1,0,0,2,0,0,0], [8,3,1,0,1,1,0,0,0],
-  [8,2,1,0,0,1,2,0,0], [9,3,1,0,0,1,1,0,0],
-  [9,3,1,0,1,1,1,0,0], [10,4,2,0,0,1,1,0,0]
+  [7,1,1,0,2,0,0,0,0], [8,2,0,0,1,2,0,0,0],
+  [11,2,1,0,1,2,0,0,0], [8,3,1,0,2,1,0,0,0],
+  [8,2,1,0,2,2,0,0,0], [9,3,1,0,1,2,0,0,0],
+  [9,3,1,0,2,1,0,0,0], [10,4,2,0,2,2,0,0,0]
  ],
  end:[
-  [6,0,1,0,0,0,0,2,0], [7,1,1,0,0,0,0,2,0],
-  [8,1,1,0,0,1,0,1,0], [8,1,2,0,0,0,0,1,1],
-  [8,3,1,0,1,0,0,0,1], [9,2,1,0,0,0,0,1,1],
-  [9,2,2,0,0,1,0,1,0], [10,2,2,0,1,0,0,0,1],
-  [10,3,2,0,0,1,0,1,0], [11,3,2,0,1,1,0,0,1]
+  [6,0,1,0,2,0,2,0,0], [7,1,1,0,2,0,2,0,0],
+  [8,1,1,0,1,1,2,0,0], [8,1,2,0,1,1,1,2,0],
+  [8,3,1,0,1,1,1,2,0], [9,2,1,0,1,1,1,2,0],
+  [9,2,2,0,1,0,2,2,0], [10,2,2,0,1,1,1,2,0],
+  [10,3,2,0,1,0,2,2,0], [11,3,2,0,1,1,1,2,0]
+ ],
+ sift:[
+  [6,1,1,0,1,0,1,0,3],[7,1,1,0,1,0,1,2,3],
+  [7,2,1,0,1,1,1,2,3],[8,2,1,0,1,1,1,2,3],
+  [8,2,2,0,1,1,1,2,3],[8,2,2,0,1,1,1,2,4],
+  [9,2,2,0,1,1,1,2,3],[9,2,2,0,1,1,1,2,4],
+  [9,2,2,0,1,1,1,2,4],[9,2,2,0,1,1,1,2,5]
  ]
 };
 export function readProgress(raw,world='overworld'){
@@ -58,12 +64,13 @@ export function inventoryFor(level,world='overworld'){
  return [...table[level]];
 }
 // Permanent Minecraft-style positions; unlocks depend on campaign progress, not this level's supply.
-export function hotbarSlots(progress,world='overworld'){
- const count=world==='end'?(progress.unlocked>=4?9:8):world==='nether'?(progress.unlocked>=7?7:progress.unlocked>=4?6:5):Math.min(4,progress.unlocked);
+export function hotbarSlots(progress,world='overworld',allProgress={}){
+ const earned={...allProgress,[world]:progress};
+ const count=earned.sift?9:earned.end?(earned.end.unlocked>=4?8:7):earned.nether?(earned.nether.unlocked>=4?6:5):Math.min(4,progress.unlocked);
  return Array.from({length:9},(_,i)=>i<count?i:null);
 }
 export function totalAmmo(inventory){return inventory.reduce((n,count)=>n+count,0);}
 export function spendAmmo(inventory,slot){if(!Number.isInteger(slot)||!(inventory[slot]>0))return false;inventory[slot]--;return true;}
 export function rewardFor(level,world='overworld'){
- return world==='overworld'?(level===0?'TNT':level===1?'末影珍珠':level===2?'烈焰弹':null):world==='nether'?(level===2?'风弹':level===5?'喷溅型水瓶':null):world==='end'&&level===2?'铁砧':null;
+ return world==='overworld'?(level===0?'TNT':level===1?'末影珍珠':level===2?'烈焰弹':null):world==='nether'&&level===2?'铁砧':world==='end'&&level===2?'末地水晶':null;
 }

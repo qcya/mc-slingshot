@@ -10,7 +10,7 @@ import {inventoryFor,spendAmmo,totalAmmo,hotbarSlots} from '../src/campaign.mjs'
 import {updateOutcome} from '../src/outcome.mjs';
 const Matter=createRequire(import.meta.url)('../vendor/matter.min.js');
 
-for(const dimension of ['nether','end'])test(`${dimension}: every map wins through legal launcher input and its finite unlocked inventory`,()=>{
+for(const dimension of ['nether','end','sift'])test(`${dimension}: every map wins through legal launcher input and its finite unlocked inventory`,()=>{
  const plans=JSON.parse(fs.readFileSync(new URL(`../evidence/${dimension}-playability.json`,import.meta.url)));
  assert.deepEqual(plans.map(p=>p.level),[1,2,3,4,5,6,7,8,9,10]);
  for(const plan of plans){
@@ -28,7 +28,8 @@ for(const dimension of ['nether','end'])test(`${dimension}: every map wins throu
     const slot=AMMO.findIndex(ammo=>ammo.id===shot.kind);
     assert.ok(hotbarSlots({unlocked:plan.level},dimension).includes(slot),`${dimension} ${plan.level}: ammunition must be unlocked`);
     assert.ok(spendAmmo(remaining,slot),`${dimension} ${plan.level}: cannot exceed ${shot.kind} inventory`);
-    assert.deepEqual(shot.pointer,{x:Math.fround(shot.input.x),y:Math.fround(shot.input.y+118)-118});
+    const top=dimension==='sift'?70:118;
+    assert.deepEqual(shot.pointer,{x:Math.fround(shot.input.x),y:Math.fround(shot.input.y+top)-top});
     const actual=pullSling(shot.pointer);
     assert.ok(Math.hypot(actual.origin.x-shot.origin.x,actual.origin.y-shot.origin.y)<.001);
     assert.ok(Math.abs(actual.vx-shot.vx)<.00001&&Math.abs(actual.vy-shot.vy)<.00001);

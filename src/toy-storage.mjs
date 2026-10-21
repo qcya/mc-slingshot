@@ -4,12 +4,13 @@ import {WORLDS,worldSaveKey} from './dimensions.mjs';
 export const TOY_LEGACY_CLOUD_KEY='mcslingshot_save_v1';
 export const TOY_CLOUD_KEY='mcslingshot_save_v2';
 export const TOY_DIMENSIONS_CLOUD_KEY='mcslingshot_dimensions_v2';
+export const TOY_SIFT_CLOUD_KEY='mcslingshot_sift_v1';
 const PROFILE_KEY='mc-block-launch.profile.v1';
 const worldKeys=WORLDS.flatMap(world=>[{key:worldSaveKey(SAVE_KEY,world.id),world:world.id,type:'progress'},{key:worldSaveKey(TIME_SAVE_KEY,world.id),world:world.id,type:'times'}]);
-const OVERWORLD_KEYS=[SAVE_KEY,TIME_SAVE_KEY,PROFILE_KEY],DIMENSION_KEYS=worldKeys.filter(item=>item.world!=='overworld').map(item=>item.key),KEYS=[...OVERWORLD_KEYS,...DIMENSION_KEYS];
+const OVERWORLD_KEYS=[SAVE_KEY,TIME_SAVE_KEY,PROFILE_KEY],DIMENSION_KEYS=worldKeys.filter(item=>item.world!=='overworld'&&item.world!=='sift').map(item=>item.key),SIFT_KEYS=worldKeys.filter(item=>item.world==='sift').map(item=>item.key),KEYS=[...OVERWORLD_KEYS,...DIMENSION_KEYS,...SIFT_KEYS];
 // The old cloud envelope is read only for overworld progress. Current season
 // times and new worlds live in v2 keys, beyond the reach of old clients.
-const CLOUD_GROUPS=[{key:TOY_CLOUD_KEY,keys:OVERWORLD_KEYS},{key:TOY_DIMENSIONS_CLOUD_KEY,keys:DIMENSION_KEYS}];
+const CLOUD_GROUPS=[{key:TOY_CLOUD_KEY,keys:OVERWORLD_KEYS},{key:TOY_DIMENSIONS_CLOUD_KEY,keys:DIMENSION_KEYS},{key:TOY_SIFT_CLOUD_KEY,keys:SIFT_KEYS}];
 function parse(raw){try{return JSON.parse(raw);}catch{return null;}}
 function validProfile(p){return p&&typeof p.nickname==='string'&&p.nickname.length<=64&&(p.provider==='toy'?typeof p.id==='string'&&p.id.startsWith('toy:')&&p.token===p.id:/^[\w-]{22}$/.test(p.id)&&/^[\w-]{43}$/.test(p.token));}
 function limited(promise,ms){let timer;return Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error('Toy service timed out')),ms))]).finally(()=>clearTimeout(timer));}

@@ -96,12 +96,12 @@ export function damageEnemy(world,e,damage,{source=null,kind='environment'}={}){
   if(!e.teleportCount){world.hurt(e,100);teleportEnemy(world,e);return true;}
   world.hurt(e,e.hp);return true;
  }
- if(e.skin==='shulker'&&e.shellAmount>=.5&&['cobble','slimeball','anvil','ender'].includes(kind))damage=e.hp;
+ if(e.skin==='shulker'&&e.shellAmount>=.5&&['cobble','slimeball','anvil','ender','trident'].includes(kind))damage=e.hp;
  world.hurt(e,damage);return true;
 }
 export function projectileDamage(world,target,p,speed){
  const kind=p.ammo.id;
- if(['tnt','fire','snowball','wind','water'].includes(kind))return;
+ if(['tnt','fire','snowball','wind','water','crystal'].includes(kind))return;
  const velocity=world.before.get(p.body.id)||p.body.velocity;
  if(Math.hypot(velocity.x,velocity.y)*60<MIN_PROJECTILE_HIT_SPEED)return false;
  if(target.projectileHits.has(p.id))return;

@@ -2,7 +2,7 @@ import {BLOCK} from './config.mjs';
 
 import {heavyMob,damageEnemy,fireImmune,thawEnemy} from './combat.mjs';
 // Only wood products burn. Stone appliances, soil and decorative foliage do not.
-export const isCombustible=m=>[4,10,12,13,14,15,17,18,19,21,22,23].includes(m);
+export const isCombustible=m=>[4,10,12,13,14,15,17,18,19,21,22,23,45,46].includes(m);
 
 function woodPixels(world,tx,ty){
  const pixels=[];

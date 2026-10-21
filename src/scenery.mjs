@@ -38,7 +38,18 @@ export function dimensionLandscape(ctx,assets,dimension='overworld'){
   const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
   paint(c);c.globalCompositeOperation='source-atop';c.globalAlpha=alpha;c.fillStyle=tint;c.fillRect(0,0,WIDTH,HEIGHT);ctx.drawImage(canvas,0,0);
  };
- if(dimension==='nether'){
+ if(dimension==='sift'){
+  const sky=ctx.createLinearGradient(0,0,0,HEIGHT);sky.addColorStop(0,'#253c50');sky.addColorStop(.65,'#658d91');sky.addColorStop(1,'#263d48');ctx.fillStyle=sky;ctx.fillRect(0,0,WIDTH,HEIGHT);
+  layer(c=>{
+   for(const [start,profile]of [[-1,[9,8,7,7,8,10]],[11,[12,11,10,10,11,12]],[25,[10,9,8,8,7,7,8]]])for(let dx=0;dx<profile.length;dx++)for(let y=profile[dx];y<18;y++)c.drawImage(assets.images.sift_siftslate,(start+dx)*48,y*48,48,48);
+  },'#637c86',.78);
+  layer(c=>{
+   for(const [x,top]of [[70,320],[560,420],[1360,260]]){
+    for(let y=top+32;y<700;y+=32)c.drawImage(assets.images.sift_overgrown_willow_log,x,y,32,32);
+    for(const [dy,lo,hi]of [[0,-2,2],[1,-3,3],[2,-2,2]])for(let dx=lo;dx<=hi;dx++)c.drawImage(assets.images.sift_healthy_sculk,x+dx*32,top+dy*32,32,32);
+   }
+  },'#406b76',.7);
+ }else if(dimension==='nether'){
   const glow=ctx.createLinearGradient(0,280,0,HEIGHT);glow.addColorStop(0,'#260d1200');glow.addColorStop(1,'#9c391b88');ctx.fillStyle=glow;ctx.fillRect(0,0,WIDTH,HEIGHT);
   layer(c=>{
    const floor=[13,13,12,12,11,10,10,9,9,10,10,11,12,12,12,11,10,9,9,10,10,11,12,12,11,10,10,11,12,13,13,13];
@@ -62,7 +73,7 @@ export function dimensionLandscape(ctx,assets,dimension='overworld'){
   },'#41354e',.77);
  }
  // Cavities reveal a darker matching world material below the common horizon.
- const under=dimension==='nether'?'blackstone':'end_stone';
+ const under=dimension==='nether'?'blackstone':dimension==='sift'?'sift_siftslate':'end_stone';
  for(let x=0;x<32;x++)for(let y=14;y<18;y++)texture(under,x*48,y*48,48);
  ctx.fillStyle=dimension==='nether'?'#17090bd9':'#100b1cdd';ctx.fillRect(0,672,WIDTH,HEIGHT-672);
 }

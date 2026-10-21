@@ -40,17 +40,30 @@ export const MATERIALS={
   37:{name:'末地石砖',sprite:'end_stone_bricks',hard:46,density:3,sound:'stone'},
   38:{name:'紫珀块',sprite:'purpur_block',hard:36,density:2.4,sound:'stone'},
   39:{name:'紫珀柱',sprite:'purpur_pillar',hard:40,density:2.6,sound:'stone'},
-  40:{name:'黑曜石',sprite:'obsidian',hard:160,density:5,sound:'stone'}
+  40:{name:'黑曜石',sprite:'obsidian',hard:160,density:5,sound:'stone'},
+  41:{name:'筛板岩',sprite:'sift_siftslate',hard:48,density:3,sound:'deepslate'},
+  42:{name:'覆生筛板岩',sprite:'sift_siftslate_growth_side',hard:35,density:2.8,sound:'deepslate'},
+  43:{name:'筛板岩砖',sprite:'sift_siftslate_bricks',hard:48,density:3,sound:'deepslate'},
+  44:{name:'雕纹筛板岩',sprite:'sift_chiseled_siftslate',hard:52,density:3,sound:'deepslate'},
+  45:{name:'覆生柳木',sprite:'sift_overgrown_willow_log',hard:28,density:1.5,sound:'wood'},
+  46:{name:'覆生柳木板',sprite:'sift_overgrown_willow_planks',hard:22,density:1.1,sound:'wood'},
+  47:{name:'鲜活幽匿',sprite:'sift_healthy_sculk',hard:18,density:1.4,sound:'grass'}
 };
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:28,mass:4,detail:'高速撞击 · 熔岩点燃后附带灼烧'},
   {id:'tnt',label:'TNT',sprite:'tnt_side',size:28,mass:2.4,detail:'四秒引信 · 碰撞仅碎玻璃'},
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'无损穿两格墙 · 五秒后淡出，穿墙重新计时'},
   {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'},
-  {id:'snowball',label:'雪球',sprite:'snowball',size:28,mass:.7,detail:'整只冰封 · 有效攻击破冰，火与熔岩融冰'},
-  {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
-  {id:'water',label:'喷溅型水瓶',sprite:'splash_water',size:28,mass:1,detail:'范围灭火 · 冷却熔岩形成黑曜石'},
   {id:'slimeball',label:'黏液球',sprite:'slime_ball',size:28,mass:2.2,restitution:.88,detail:'高弹性反弹 · 每只生物只伤一次'},
-  {id:'anvil',label:'铁砧',sprite:'anvil',size:28,mass:9,gravityScale:1.7,shape:'box',detail:'沉重冲击 · 强力击碎挡板'}
+  {id:'anvil',label:'铁砧',sprite:'anvil',size:28,mass:9,gravityScale:1.7,shape:'box',detail:'沉重冲击 · 强力击碎挡板'},
+  {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
+  {id:'crystal',label:'末地水晶',sprite:'end_crystal',size:28,mass:2.4,shape:'box',detail:'落地布置 · 圆石触发，同 TNT 伤害的连锁爆炸'},
+  {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,detail:'贯穿生物 · 实体墙壁会挡住'}
+];
+// Retain old simulation IDs for imported replays and regression fixtures only.
+// These are no longer supplied or displayed in the nine-slot campaign.
+export const PROJECTILES=[...AMMO,
+ {id:'snowball',label:'雪球',sprite:'snowball',size:28,mass:.7},
+ {id:'water',label:'喷溅型水瓶',sprite:'splash_water',size:28,mass:1}
 ];
 export const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));

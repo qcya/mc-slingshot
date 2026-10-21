@@ -12,7 +12,7 @@ Base URL: https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5
 | --- | --- |
 | zombified_piglin.png | textures/entity/piglin/zombie_piglin.png |
 | hoglin.png | textures/entity/hoglin/hoglin.png |
-| shulker.png | textures/entity/shulker/shulker_purple.png |
+| shulker.png | textures/entity/shulker/shulker_undyed.png (default natural skin, not purple dye) |
 | enderman.tga and enderman.png | textures/entity/enderman/enderman.tga; PNG is a lossless format conversion |
 | snowball.png | textures/items/snowball.png |
 | slime_ball.png | textures/items/slimeball.png |
@@ -23,6 +23,8 @@ Base URL: https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5
 | lava_still.png | textures/blocks/lava_still.png |
 | lava_flow.png | textures/blocks/lava_flow.png |
 | ice.png | textures/blocks/ice.png |
+| end_crystal.png | textures/items/end_crystal.png |
+| trident.png | textures/items/trident.png |
 
 Entity cuboid dimensions and UVs follow official `models/entity/piglin.geo.json`,
 `hoglin.geo.json`, `shulker.geo.json` and `enderman.geo.json`. The game projects
@@ -45,12 +47,24 @@ https://piston-meta.mojang.com/mc/game/version_manifest_v2.json.
 Every file's SHA-1 was verified after download; exact source keys, hashes and
 URLs are in `combat-expansion-sounds.json`.
 
+Native per-species death clips are recorded separately in `native-death-sounds.json`.
+Lethal damage emits that creature's death clip once; nonlethal damage retains
+its hurt clip. The later death-poof animation does not replay the death sound.
+
 ## Gameplay and renderer interfaces
 
-Inventory order is stone, TNT, pearl, fire charge, snowball, wind charge,
-water bottle, slimeball, anvil. The Nether introduces snowball, wind charge
-and water bottle; the End adds slimeball and anvil. All nine positions remain
-finite level inventory slots.
+Inventory order is stone, TNT, pearl, fire charge, slimeball, anvil, wind charge,
+end crystal, trident. The Nether introduces slimeball then anvil; the End
+introduces wind charge then end crystal; the Sift adds trident. Snowball and
+water retain their legacy simulation IDs for regression/replay compatibility,
+but are no longer supplied or shown in the campaign. Ownership follows global
+completion; returning to an earlier world keeps unlocked icons with zero supply.
+
+End crystals have no fuse. Landing places them without direct contact damage;
+one fast projectile or nearby explosion detonates a connected group. All group
+positions are captured and removed before applying TNT-equivalent blasts, so
+the crystals do not scatter. Tridents sensor-pass creatures while colliding
+normally with solid terrain; one projectile can hit each creature only once.
 
 `enemy.frozen` fully immobilizes the enemy's rigid body and pauses its AI pose
 and Shulker shell cycle. It has no automatic timeout. A valid damaging hit

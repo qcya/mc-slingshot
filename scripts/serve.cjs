@@ -57,7 +57,7 @@ async function createGameServer(options={}){
           if(origin){let valid=corsAllowed;try{valid||=origin===allowedOrigin||new URL(origin).host===req.headers.host;}catch{}if(!valid)throw httpError(403,'Origin not allowed.');}
           if(req.headers['sec-fetch-site']==='cross-site'&&!corsAllowed)throw httpError(403,'Origin not allowed.');
         }
-        if(pathname==='/api/health')return send(res,200,{ok:true,version,...(leaderboard?{worlds:leaderboard.worlds,scoreSeason:leaderboard.scoreSeason}:{})});
+        if(pathname==='/api/health')return send(res,200,{ok:true,version,...(leaderboard?{worlds:leaderboard.worlds,rankings:leaderboard.rankings,scoreSeason:leaderboard.scoreSeason}:{})});
         if(!leaderboard)throw httpError(503,'Leaderboard unavailable in this portable copy.');
         const worldParams=new URL(req.url,'http://localhost').searchParams.getAll('world');
         if(worldParams.length>1)throw httpError(400,'Specify one world.');

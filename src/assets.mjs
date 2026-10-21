@@ -3,9 +3,10 @@ import {blockIcon} from './item-icons.mjs';
 import {makeAnvilIcon} from './combat-render.mjs';
 const ATLASES=['zombie','pillager','warden','fire_0','zombified_piglin','hoglin','shulker','enderman','lava_still','lava_flow','crimson_stem','warped_stem'];
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(n=>n&&n!=='anvil'),'ladder','tnt_top',
-  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby','ice'])];
+  'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'anvil_base','anvil_top','crossbow_standby','ice','snowball','splash_water','sift_healthy_sculk'])];
 const SOUNDS=['stone','grass','dirt','glass','deepslate','wood','explode','portal','zombie_hurt','pillager_hurt','fuse','bow','crossbow_pull','zombie_idle','pillager_idle','fire_launch','fire_burn','warden_hurt','warden_idle',
- 'zombified_piglin_hurt','zombified_piglin_idle','hoglin_hurt','hoglin_idle','shulker_hurt','shulker_idle','shulker_open','shulker_close','enderman_hurt','enderman_idle','wind_burst','water_splash','anvil_land'];
+ 'zombified_piglin_hurt','zombified_piglin_idle','hoglin_hurt','hoglin_idle','shulker_hurt','shulker_idle','shulker_open','shulker_close','enderman_hurt','enderman_idle','wind_burst','water_splash','anvil_land',
+ 'zombie_death','pillager_death','zombified_piglin_death','hoglin_death','warden_death','shulker_death','enderman_death'];
 // Toy may serve PNG files from a separate CDN. Embed the canvas sources in the
 // build so pixel sampling, skin conversion and inventory data URLs stay readable.
 const PACKAGED_IMAGES=typeof __MC_CANVAS_IMAGES__==='undefined'?null:__MC_CANVAS_IMAGES__;

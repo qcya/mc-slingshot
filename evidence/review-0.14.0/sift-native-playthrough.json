@@ -1,0 +1,175 @@
+{
+  "world": "sift",
+  "stages": [
+    {
+      "level": 1,
+      "shots": 1,
+      "remaining": [
+        6,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        2
+      ],
+      "timeMs": 2200
+    },
+    {
+      "level": 2,
+      "shots": 2,
+      "remaining": [
+        7,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        2,
+        3
+      ],
+      "timeMs": 9092
+    },
+    {
+      "level": 3,
+      "shots": 3,
+      "remaining": [
+        6,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "timeMs": 12067
+    },
+    {
+      "level": 4,
+      "shots": 3,
+      "remaining": [
+        8,
+        2,
+        1,
+        0,
+        0,
+        1,
+        1,
+        2,
+        1
+      ],
+      "timeMs": 9625
+    },
+    {
+      "level": 5,
+      "shots": 2,
+      "remaining": [
+        8,
+        1,
+        2,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "timeMs": 8042
+    },
+    {
+      "level": 6,
+      "shots": 4,
+      "remaining": [
+        8,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "timeMs": 16208
+    },
+    {
+      "level": 7,
+      "shots": 4,
+      "remaining": [
+        9,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        2,
+        1
+      ],
+      "timeMs": 15883
+    },
+    {
+      "level": 8,
+      "shots": 5,
+      "remaining": [
+        9,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        2,
+        4
+      ],
+      "timeMs": 21900
+    },
+    {
+      "level": 9,
+      "shots": 4,
+      "remaining": [
+        9,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "timeMs": 16150
+    },
+    {
+      "level": 10,
+      "shots": 7,
+      "remaining": [
+        9,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        2,
+        3
+      ],
+      "timeMs": 30492
+    }
+  ],
+  "submissions": [
+    {
+      "board": 5,
+      "score": 9985834
+    },
+    {
+      "board": 1,
+      "score": 9982834
+    }
+  ]
+}

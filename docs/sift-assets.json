@@ -1,0 +1,45 @@
+{
+  "project": "Mielon's The Sift",
+  "version": "1.1.1",
+  "source": "https://www.curseforge.com/minecraft/mc-mods/mielons-the-sift/files/9022781",
+  "jarSha256": "aca3d635f976bf7113a73c72f4b78c4f88c231bf2ac0972beecb9eb501eff4b1",
+  "license": "MIT; assets/licenses/Mielon-The-Sift-MIT.txt",
+  "assets": [
+    {
+      "local": "sift_siftslate.png",
+      "sha256": "c9965c69f30f47745b91d25e1e6b80eab5e94a313ee08561bc4702cffff8e0d4"
+    },
+    {
+      "local": "sift_siftslate_growth_side.png",
+      "sha256": "bc360d06ef61a69bf28d2687252d1bdb72749b2b6ba4e365d848ea67efeab84d"
+    },
+    {
+      "local": "sift_siftslate_growth_top.png",
+      "sha256": "b2d625b93f15a1bfb8215f2d9ac18af649ef57eb11bcb13390f48a9c9f010530"
+    },
+    {
+      "local": "sift_siftslate_bricks.png",
+      "sha256": "001da705dfd08821a71d755c11199355ef802ac2ff6f67618369b60574bd6810"
+    },
+    {
+      "local": "sift_chiseled_siftslate.png",
+      "sha256": "92dc01a3013d3224bef6933ffb19b4c635a668f396bca1c957c2d203b14c1000"
+    },
+    {
+      "local": "sift_cobbled_siftslate.png",
+      "sha256": "35cf9d7e48b74ec394e183ffa07d4b4cb31738d805873b64114bba79a209f5df"
+    },
+    {
+      "local": "sift_overgrown_willow_log.png",
+      "sha256": "476c48bda8a924722c128a9c5aea267b0dec0cd45556524397bb81f0b9871787"
+    },
+    {
+      "local": "sift_overgrown_willow_planks.png",
+      "sha256": "4995d84c4839b21114363e5c7bcafc38f230d563ae9254eb38e2739c2576bbb0"
+    },
+    {
+      "local": "sift_healthy_sculk.png",
+      "sha256": "a74c25eb6d27fc3a47c55bdc18595b2bed0e0878e64618bcc7ec4eacb38ae1ce"
+    }
+  ]
+}

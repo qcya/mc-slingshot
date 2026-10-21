@@ -10,6 +10,18 @@ import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
 const {createGameServer}=require('../scripts/serve.cjs');
 
+test('four-world total is derived from complete world records and survives a server restart',async t=>{
+ const f=await fixture(t),created=await f.request('/api/profile',{method:'POST',body:{nickname:'FourWorlds'}}),token=created.data.token;
+ for(const world of ['overworld','nether','end']){
+  const reply=await f.request(`/api/results?world=${world}`,{method:'POST',token,body:{season:SCORE_SEASON,stages:stages(1200)}});assert.equal(reply.status,200);
+ }
+ assert.deepEqual((await f.request('/api/leaderboard?world=total')).data.entries,[]);
+ assert.equal((await f.request('/api/results?world=sift',{method:'POST',token,body:{season:SCORE_SEASON,stages:stages(1500)}})).status,200);
+ await f.restart();const entries=(await f.request('/api/leaderboard?world=total')).data.entries;
+ assert.equal(entries[0].completed,40);assert.equal(entries[0].totalTimeMs,51000);
+ for(const world of ['overworld','nether','end'])assert.equal((await f.request(`/api/profile?world=${world}`,{token})).data.stages[0].timeMs,1200);
+});
+
 test('Toy CORS preflight and authenticated calls allow only configured exact origins',async t=>{
  const origin='https://www.bilibili.com',f=await fixture(t,{corsOrigins:[origin]});
  const headers={Origin:origin,'Sec-Fetch-Site':'cross-site'};
@@ -128,7 +140,7 @@ test('legacy clients can read identity but cannot submit old times into any curr
   assert.deepEqual((await f.request(`/api/leaderboard?world=${world}`)).data.entries,[]);
  }
  assert.equal((await f.request('/api/profile',{token:p.token})).status,200);
- const health=(await f.request('/api/health')).data;assert.equal(health.scoreSeason,SCORE_SEASON);assert.deepEqual(health.worlds,['overworld','nether','end']);
+ const health=(await f.request('/api/health')).data;assert.equal(health.scoreSeason,SCORE_SEASON);assert.deepEqual(health.worlds,['overworld','nether','end','sift']);assert.deepEqual(health.rankings,['overworld','nether','end','sift','total']);
 });
 
 test('anonymous identity and personal bests survive restart without exposing credentials',async t=>{

@@ -1,4 +1,4 @@
-import { AMMO, MATERIALS, TILE, clamp } from './config.mjs';
+import { PROJECTILES, MATERIALS, TILE, clamp } from './config.mjs';
 import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDamage } from './pixels.mjs';
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
@@ -23,6 +23,7 @@ export class SiegeWorld {
       for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
         const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null,wall=ammo===ea?b:a;
         if(ammo&&['cobble','tnt','anvil'].includes(ammo.ammo.id)&&wall.plugin.glass)pair.isSensor=true;
+        if(ammo?.ammo.id==='trident'&&wall.plugin.entity?.type==='enemy')pair.isSensor=true;
       }this.contacts.push(...event.pairs);
     });
     this.synchronize();
@@ -38,7 +39,7 @@ export class SiegeWorld {
   }}
   remove(entity){if(!entity||entity.dead)return;entity.dead=true;this.wakeBounds(entity.body.bounds);this.M.Composite.remove(this.engine.world,entity.body);}
   spawnProjectile(kind,x,y,vx,vy){
-    const ammo=AMMO.find(a=>a.id===kind);if(!ammo)throw new Error(`Unknown ammunition: ${kind}`);
+    const ammo=PROJECTILES.find(a=>a.id===kind);if(!ammo)throw new Error(`Unknown ammunition: ${kind}`);
     const options={friction:kind==='slimeball'?.04:.85,frictionStatic:1.2,frictionAir:.0015,restitution:ammo.restitution??(kind==='cobble'?.14:kind==='tnt'?.01:.07),slop:.025,sleepThreshold:75};
     const body=projectileBody(this.M,ammo,x,y,options);
     this.M.Body.setMass(body,ammo.mass);
@@ -174,10 +175,21 @@ export class SiegeWorld {
   }
   hurt(e,damage){
     if(!e.alive||!Number.isFinite(damage)||damage<3)return;thawEnemy(this,e);e.hp-=damage;if(Math.abs(e.hp)<1e-8)e.hp=0;e.hurtUntil=this.time+.3;this.stats.enemyDamage+=damage;
-    this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:`${e.skin}_hurt`});
+    this.events.push({type:'hurt',x:e.body.position.x,y:e.body.position.y,sound:`${e.skin}_${e.hp<=0?'death':'hurt'}`});
     if(e.hp<=0){e.alive=false;e.deathAt=this.time;this.M.Body.setAngularVelocity(e.body,0);}
   }
+  detonateCrystals(seeds){
+    const group=new Set(seeds.filter(c=>!c.dead)),queue=[...group];
+    for(let i=0;i<queue.length;i++)for(const c of this.projectiles){
+      if(c.dead||c.ammo.id!=='crystal'||group.has(c))continue;
+      if(Math.hypot(c.body.position.x-queue[i].body.position.x,c.body.position.y-queue[i].body.position.y)<=148){group.add(c);queue.push(c);}
+    }
+    // Snapshot and remove the entire group before any explosion impulse.
+    const centers=queue.map(c=>({...c.body.position}));for(const c of queue)this.remove(c);
+    for(const p of centers)this.blast(p.x,p.y);
+  }
   blast(x,y,radius=98,power=160){
+    this.detonateCrystals(this.projectiles.filter(c=>!c.dead&&c.ammo.id==='crystal'&&Math.hypot(c.body.position.x-x,c.body.position.y-y)<=radius+50));
     this.stats.explosions++;this.events.push({type:'explosion',x,y,radius});
     const damage={jagged:true,seed:this.stats.explosions};
     this.damageDisk(x,y,radius,power,damage);
@@ -207,6 +219,18 @@ export class SiegeWorld {
     const avx=va.x-omegaA*(point.y-a.position.y),avy=va.y+omegaA*(point.x-a.position.x);
     const bvx=vb.x-omegaB*(point.y-b.position.y),bvy=vb.y+omegaB*(point.x-b.position.x);
     const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
+    const crystal=ea?.ammo?.id==='crystal'?ea:eb?.ammo?.id==='crystal'?eb:null;
+    if(crystal){
+      const striker=crystal===ea?eb:ea,solid=crystal===ea?b:a;
+      if(striker?.type==='ammo'&&['cobble','anvil','slimeball','ender','trident'].includes(striker.ammo.id)){
+        const v=this.before.get(striker.body.id)||striker.body.velocity;
+        if(Math.hypot(v.x,v.y)*60>=180){this.detonateCrystals([crystal]);return;}
+      }
+      if(!crystal.placed&&solid.plugin.terrain&&point.y>crystal.body.position.y+3){
+        crystal.placed=true;this.M.Body.setVelocity(crystal.body,{x:0,y:0});this.M.Body.setAngularVelocity(crystal.body,0);this.M.Body.setStatic(crystal.body,true);
+      }
+      return;
+    }
     // TNT has no direct damage. Ender pearls hurt creatures, never materials.
     const contactDamage=(target,entity,mass,targetMass)=>{
       if(entity?.type==='ammo'){
@@ -299,7 +323,7 @@ export class SiegeWorld {
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
-      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&e.ammo.id!=='cobble'))this.remove(e);
+      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&!['cobble','crystal'].includes(e.ammo.id)))this.remove(e);
     }
     this.projectiles=this.projectiles.filter(e=>!e.dead);this.debris=this.debris.filter(e=>!e.dead);
     this.synchronize();

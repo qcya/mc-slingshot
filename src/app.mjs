@@ -1,6 +1,6 @@
 ﻿import {WIDTH,AMMO,clamp} from './config.mjs';
 import {Assets} from './assets.mjs';import {buildLevel,levelsFor} from './levels.mjs';import {SiegeWorld} from './world.mjs';import {Renderer} from './renderer.mjs';
-import {WORLDS,dimension,worldSaveKey} from './dimensions.mjs';
+import {WORLDS,RANKINGS,dimension,ranking,worldSaveKey} from './dimensions.mjs';
 import {SLING_HOME,pullSling} from './sling.mjs';import {DrawAudio} from './draw-audio.mjs';
 import {SAVE_KEY,readProgress,finishLevel,canEnter,inventoryFor,hotbarSlots,totalAmmo,spendAmmo,rewardFor,progressFromTimes,worldUnlocked} from './campaign.mjs';
 import {enterLandscape,exitLandscape} from './fullscreen.mjs';
@@ -25,7 +25,7 @@ function saveLocal(key,value){try{appStorage.setItem(key,JSON.stringify(value));
 function currentWorld(){return state.world||'overworld';}
 function readWorld(key,fallback,id=currentWorld()){return readLocal(worldSaveKey(key,id),fallback);}
 function saveWorld(key,value,id=currentWorld()){saveLocal(worldSaveKey(key,id),value);}
-function accessibleWorld(id){return worldUnlocked(id,readWorld(TIME_SAVE_KEY,[],'overworld'),readWorld(TIME_SAVE_KEY,[],'nether'));}
+function accessibleWorld(id){return worldUnlocked(id,...WORLDS.slice(0,-1).map(w=>readWorld(TIME_SAVE_KEY,[],w.id)));}
 function loadWorldProgress(){bestTimes=normalizeTimes(readWorld(TIME_SAVE_KEY,[]));progress=progressFromTimes(bestTimes);saveWorld(SAVE_KEY,progress);}
 function pendingResults(id=currentWorld()){const raw=readWorld(PENDING_KEY,[],id);return Array.isArray(raw)?raw.map(parseTimeBundle).filter(Boolean):[];}
 function queueBestTimes(){const bundle=timeBundle(bestTimes);if(bundle)saveWorld(PENDING_KEY,[bundle]);}
@@ -54,6 +54,7 @@ async function syncResults(){
   if(profile.token&&profile.dirty){try{const reply=await updateProfileInOrder(profile.token,profile.nickname);if(revision!==profileRevision)return;profile={...reply.profile,token:profile.token};}catch(error){if(revision!==profileRevision)return;if(error.status!==401)throw error;profile.token=null;}}
   if(!profile.token){await createProfileOnce(profile.nickname);if(revision!==profileRevision)return;}saveLocal(PROFILE_KEY,profile);profileLabel();await restoreTimes();if(revision!==profileRevision)return;
   for(const {id}of WORLDS)while(pendingResults(id).length){const score=pendingResults(id)[0];if(revision!==profileRevision)return;try{await online.submitResult(profile.token,score,id);}catch(error){if(revision!==profileRevision)return;if(error.status===401){profile.token=null;saveLocal(PROFILE_KEY,profile);}throw error;}if(revision!==profileRevision)return;const rest=pendingResults(id).filter(s=>JSON.stringify(s)!==JSON.stringify(score));saveWorld(PENDING_KEY,rest,id);}
+  if(revision===profileRevision)await online.submitTotal?.();
  }catch(error){if(error.status===409&&revision===profileRevision){showProfile();$('#profileStatus').textContent='用户名已占用';}else console.info('成绩保存在本机，联网后重试。',error.message);}finally{syncing=false;if(revision!==profileRevision&&state.screen!=='profile')queueMicrotask(syncResults);}
 }
 function showProfile(){profileRevision++;profileReturn=state.screen==='profile'?'levels':state.screen;cancelDrag();$('#saveProfile').disabled=false;$('#nickname').value=profile?.nickname||'';$('#nickname').readOnly=!!(nativeOnline&&appStorage.user()?.nickname);$('#profileStatus').textContent=$('#nickname').readOnly?'使用当前 B 站账号昵称，改名后刷新游戏同步。':'昵称 1—16 个字符；不需要密码。';$('#profileBack').classList.toggle('hidden',!profile);menus('profile');}
@@ -68,10 +69,11 @@ async function saveProfile(event){
  catch(error){if(revision!==profileRevision)return;if([400,403,409].includes(error.status)){$('#profileStatus').textContent=error.status===409?'用户名已占用':error.status===403?'这是测试记录，不能修改昵称':'这个昵称无法使用，请调整后再试。';$('#saveProfile').disabled=false;return;}nextProfile={...profile,nickname,dirty:true};if(error.status===401)nextProfile.token=null;}
  if(revision!==profileRevision)return;profile=nextProfile;$('#saveProfile').disabled=false;saveLocal(PROFILE_KEY,profile);profileLabel();if(state.screen==='profile')menus(returnTo);void syncResults();
 }
+let rankingWorld=null;
 async function showLeaderboard(){
- cancelDrag();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision,id=currentWorld();renderWorldTabs();$('#rankingTitle').textContent=`${dimension(id).label}排行榜`;
+ cancelDrag();if(state.screen!=='leaderboard')rankingWorld=currentWorld();menus('leaderboard');$('#rankingRows').replaceChildren();const revision=++leaderboardRevision,id=rankingWorld||currentWorld();renderWorldTabs();$('#rankingTitle').textContent=id==='total'?'四界总榜':`${ranking(id).label}排行榜`;
  $('#leaderboardStatus').textContent='正在读取排行榜…';
- try{const {entries}=await online.leaderboard(id);if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?(nativeOnline?'本世界十关个人最快时间之和，用时越短排名越高，精度 0.01 秒，仅显示前 100 名。':'本世界十关个人最快时间之和，用时越短排名越高，仅显示前 100 名。'):'还没有全通成绩，来成为第一位挑战者。';
+ try{const {entries}=await online.leaderboard(id);if(state.screen!=='leaderboard'||revision!==leaderboardRevision)return;$('#leaderboardStatus').textContent=entries.length?`${id==='total'?'四十关':'本世界十关'}个人最快时间之和，用时越短排名越高${nativeOnline?'，精度 0.01 秒':''}，仅显示前 100 名。`:'还没有全通成绩，来成为第一位挑战者。';
   for(const entry of entries.slice(0,100)){const row=document.createElement('tr');if(entry.id===profile?.id)row.className='self';for(const value of [entry.rank,entry.nickname,formatTime(entry.totalTimeMs)]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}$('#rankingRows').append(row);}
  }catch(error){if(state.screen==='leaderboard'&&revision===leaderboardRevision)$('#leaderboardStatus').textContent=nativeOnline?`Toy 排行榜暂不可用：${error.message||error.code||'连接失败'}。通关成绩已保存在本机。`:'暂时连接不上排行榜。仍可游玩，通关成绩会保存在本机。';}
 }
@@ -91,8 +93,9 @@ function renderGuide(){
 }
 function hud(){
  state.shots=totalAmmo(state.inventory);
+ const earned=Object.fromEntries(WORLDS.filter(w=>accessibleWorld(w.id)).map(w=>[w.id,progressFromTimes(readWorld(TIME_SAVE_KEY,[],w.id))]));
  for(const [i,b] of [...$('#ballbar').children].entries()){
-  const kind=hotbarSlots(progress,currentWorld())[i],count=kind===null?0:state.inventory[kind]||0;b.dataset.ammoIndex=kind===null?'':String(kind);b.classList.toggle('selected',i===state.selected);b.classList.toggle('empty',kind===null);b.classList.toggle('depleted',kind!==null&&!count);b.setAttribute('aria-pressed',String(i===state.selected));
+  const kind=hotbarSlots(progress,currentWorld(),earned)[i],count=kind===null?0:state.inventory[kind]||0;b.dataset.ammoIndex=kind===null?'':String(kind);b.classList.toggle('selected',i===state.selected);b.classList.toggle('empty',kind===null);b.classList.toggle('depleted',kind!==null&&!count);b.setAttribute('aria-pressed',String(i===state.selected));
   b.querySelector('.stack-count').textContent=kind!==null?String(count):'';b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);b.title=kind===null?'':`${AMMO[kind].label} · ${AMMO[kind].detail}`;if(kind!==null)b.querySelector('img').src=iconUrl(kind);
  }
 }
@@ -107,16 +110,18 @@ function menus(screen){
 }
 function renderWorldTabs(){
  for(const nav of document.querySelectorAll('[data-worlds]')){
-  if(!nav.children.length)for(const w of WORLDS){const b=document.createElement('button');b.textContent=w.label;b.dataset.world=w.id;b.setAttribute('role','tab');b.addEventListener('click',()=>switchWorld(w.id));nav.append(b);}
-  for(const b of nav.children){const active=b.dataset.world===currentWorld(),locked=!!nav.closest('#levelMenu')&&!accessibleWorld(b.dataset.world);b.textContent=dimension(b.dataset.world).label+(locked?'·锁定':'');b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.disabled=locked;b.title=locked?(b.dataset.world==='end'?'通关下界十关后解锁':'通关主世界十关后解锁'):'';}
+  const isRanking=!!nav.closest('#leaderboardMenu');
+  if(!nav.children.length)for(const w of isRanking?RANKINGS:WORLDS){const b=document.createElement('button');b.textContent=w.label;b.dataset.world=w.id;b.setAttribute('role','tab');b.addEventListener('click',()=>switchWorld(w.id));nav.append(b);}
+  for(const b of nav.children){const active=b.dataset.world===(isRanking?rankingWorld:currentWorld()),locked=!isRanking&&!accessibleWorld(b.dataset.world);b.textContent=ranking(b.dataset.world).label+(locked?'·锁定':'');b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.disabled=locked;const before=WORLDS[WORLDS.findIndex(w=>w.id===b.dataset.world)-1];b.title=locked?`通关${before?.label}十关后解锁`:'';}
  }
 }
 function switchWorld(id){
- dimension(id);if(id===currentWorld()||!['levels','leaderboard'].includes(state.screen))return false;
- const ranking=state.screen==='leaderboard';if(!ranking&&!accessibleWorld(id))return false;cancelDrag();assets?.stopAll();profileRevision++;leaderboardRevision++;
+ if(state.screen==='leaderboard'){ranking(id);rankingWorld=id;void showLeaderboard();return true;}
+ dimension(id);if(id===currentWorld()||state.screen!=='levels')return false;
+ if(!accessibleWorld(id))return false;cancelDrag();assets?.stopAll();profileRevision++;leaderboardRevision++;
  state.world=id;state.level=0;levelPage=0;
  loadWorldProgress();queueBestTimes();
- if(ranking)void showLeaderboard();else renderCards();void syncResults();return true;
+ renderCards();void syncResults();return true;
 }
 function renderCards(){
  const container=$('#levelCards');container.replaceChildren();renderWorldTabs();
@@ -150,7 +155,7 @@ function result(win){
  if(win){progress=finishLevel(progress,state.level);saveWorld(SAVE_KEY,progress);bestTimes=recordBestTime(bestTimes,state.level,Math.max(100,Math.round(world.time*1000)));saveWorld(TIME_SAVE_KEY,bestTimes);queueBestTimes();if(timeBundle(bestTimes))void syncResults();}
  $('#resultTiming').hidden=!win;if(win)$('#resultTiming').textContent=`本次用时 ${formatTime(world.time*1000)} · 个人最快 ${formatTime(bestTimes[state.level])}`;
  $('#resultFlag').textContent=win?'挑战成功':'再试一次';$('#resultTitle').textContent=reward?`已解锁 ${reward}`:win?(state.level===levelsFor(currentWorld()).length-1?`${dimension(currentWorld()).label}十关已通关`:'敌对生物已清除'):'弹药用完了';
- $('#resultMsg').textContent=reward?'下一关可以使用这件新物品。':win?(state.level===9?(currentWorld()==='overworld'?'下界已解锁，通关下界十关后再挑战末地。':currentWorld()==='nether'?'末地已解锁，返回选关继续挑战。':'三个世界挑战完成，可以重玩或返回选关。'):'可以继续下一关，也可以重玩当前关卡。'):'调整角度，合理使用每一件物品。';
+ $('#resultMsg').textContent=reward?'下一关可以使用这件新物品。':win?(state.level===9?({overworld:'下界已解锁，可以使用黏液球了。',nether:'末地已解锁，可以使用风弹了。',end:'筛界已解锁，可以使用三叉戟了。',sift:'四个世界挑战完成，可以重玩刷新总榜成绩。'}[currentWorld()]):'可以继续下一关，也可以重玩当前关卡。'):'调整角度，合理使用每一件物品。';
  $('#rewardIcon').classList.toggle('hidden',!reward);if(reward)$('#rewardIcon').src=iconUrl(AMMO.findIndex(a=>a.label===reward));
  $('#nextBtn').classList.toggle('hidden',!win||state.level===levelsFor(currentWorld()).length-1);$('#nextBtn').textContent='进入下一关';menus('result');
 }
@@ -239,7 +244,7 @@ async function start(){
   if(e.key>='1'&&e.key<='9')select(Number(e.key)-1);if(e.key.toLowerCase()==='r')loadLevel(state.level);if(e.code==='Space'){e.preventDefault();pause();}
  });
  window.addEventListener('blur',()=>{if(state.drag)cancelDrag();});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.screen==='play')pause();void appStorage.flush();}});window.addEventListener('online',()=>{void syncResults();void appStorage.flush();});
- window.MCBlockLaunch={getStatus:status,switchWorld,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:n=>loadLevel(n),select,
+ window.MCBlockLaunch={getStatus:status,switchWorld,restart:()=>loadLevel(state.level),next:()=>loadLevel(state.level+1),playLevel:n=>state.screen==='levels'&&loadLevel(n),select,
  getDiagnostics:()=>({assets:Object.keys(assets.images),...status(),enemies:world.enemies.map(e=>({skin:e.skin,hp:e.hp,alive:e.alive,dead:!!e.dead,stationary:!!e.stationary,frozen:!!e.frozen,burningUntil:e.burningUntil||0,appearance:mobAppearance(e,world.time),x:e.body.position.x,y:e.body.position.y,facing:e.facing,walkDistance:e.walkDistance,turns:e.turns,behavior:e.behavior,pose:e.pose})),whiteParticles:renderer.particles.filter(p=>p.poof).length,
  drawSound:drawAudio.diagnostics(),preview:state.drag?[...(renderer.arc||[])]:[],backgroundPixels:world.rear.grid.count(),movingBackgroundPixels:0,terrainPixels:world.grid.count(),debrisPixels:world.debris.reduce((n,e)=>n+(e.dead?0:e.count),0),
  music:music.diagnostics(),sound:{...assets.audioStats,enabled:assets.soundOn,volume:assets.soundVolume,played:{...assets.audioStats.played}},physicsParts:window.Matter.Composite.allBodies(world.engine.world).reduce((n,b)=>n+b.parts.length,0)})};

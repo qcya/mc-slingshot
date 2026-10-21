@@ -1,0 +1,44 @@
+[
+  {
+    "file": "assets/sfx/zombie_death.ogg",
+    "source": "minecraft/sounds/mob/zombie/death.ogg",
+    "sha1": "51deaef407de6444854e4da39b165faa0d41370d",
+    "url": "https://resources.download.minecraft.net/51/51deaef407de6444854e4da39b165faa0d41370d"
+  },
+  {
+    "file": "assets/sfx/pillager_death.ogg",
+    "source": "minecraft/sounds/mob/pillager/death1.ogg",
+    "sha1": "fccc80974524000a83635308c53a645d0d1a2a97",
+    "url": "https://resources.download.minecraft.net/fc/fccc80974524000a83635308c53a645d0d1a2a97"
+  },
+  {
+    "file": "assets/sfx/zombified_piglin_death.ogg",
+    "source": "minecraft/sounds/mob/zombified_piglin/zpigdeath.ogg",
+    "sha1": "6b82e81c0122b8edad442925a532f7574ce7c8d2",
+    "url": "https://resources.download.minecraft.net/6b/6b82e81c0122b8edad442925a532f7574ce7c8d2"
+  },
+  {
+    "file": "assets/sfx/hoglin_death.ogg",
+    "source": "minecraft/sounds/mob/hoglin/death1.ogg",
+    "sha1": "2c3628f6c930d4659dc70eff2210aab53e05bb8f",
+    "url": "https://resources.download.minecraft.net/2c/2c3628f6c930d4659dc70eff2210aab53e05bb8f"
+  },
+  {
+    "file": "assets/sfx/warden_death.ogg",
+    "source": "minecraft/sounds/mob/warden/death_1.ogg",
+    "sha1": "d32360539026017d28d644430b246c0db61145f5",
+    "url": "https://resources.download.minecraft.net/d3/d32360539026017d28d644430b246c0db61145f5"
+  },
+  {
+    "file": "assets/sfx/shulker_death.ogg",
+    "source": "minecraft/sounds/entity/shulker/death1.ogg",
+    "sha1": "5a2a953165cac17c014e9da4c202f1efde19ec46",
+    "url": "https://resources.download.minecraft.net/5a/5a2a953165cac17c014e9da4c202f1efde19ec46"
+  },
+  {
+    "file": "assets/sfx/enderman_death.ogg",
+    "source": "minecraft/sounds/mob/endermen/death.ogg",
+    "sha1": "85a616fdd30fb3782da596048a034fbbd8df30ab",
+    "url": "https://resources.download.minecraft.net/85/85a616fdd30fb3782da596048a034fbbd8df30ab"
+  }
+]

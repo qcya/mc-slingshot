@@ -1,6 +1,14 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createToyStorage,TOY_CLOUD_KEY,TOY_LEGACY_CLOUD_KEY,TOY_DIMENSIONS_CLOUD_KEY} from '../src/toy-storage.mjs';
+import {createToyStorage,TOY_CLOUD_KEY,TOY_LEGACY_CLOUD_KEY,TOY_DIMENSIONS_CLOUD_KEY,TOY_SIFT_CLOUD_KEY} from '../src/toy-storage.mjs';
 import {SAVE_KEY} from '../src/campaign.mjs';import {TIME_SAVE_KEY} from '../src/timing.mjs';
+
+test('Sift cloud data has an independent envelope that older three-world clients cannot overwrite',async()=>{
+ const {TOY_SIFT_CLOUD_KEY}=await import('../src/toy-storage.mjs');assert.equal(typeof TOY_SIFT_CLOUD_KEY,'string');
+ const f=fixture();await f.initialize();f.setItem(TIME_SAVE_KEY+'.sift','[1234]');await f.flush();
+ const write=f.calls.filter(c=>c[0]==='set').at(-1)[1];
+ assert.equal(JSON.parse(write[TOY_SIFT_CLOUD_KEY]).values[TIME_SAVE_KEY+'.sift'],'[1234]');
+ assert.equal(JSON.parse(write[TOY_DIMENSIONS_CLOUD_KEY]).values[TIME_SAVE_KEY+'.sift'],undefined);
+});
 test('a restored nickname never injects old times or unlocks into a fresh Toy',async()=>{
  const f=fixture();f.sdk.getUserProfile=async()=>({toyOpenId:'new-owner',nickname:'青春沿岸'});await f.initialize();
  assert.equal(f.getItem(TIME_SAVE_KEY),null);assert.equal(f.getItem(SAVE_KEY),null);
@@ -43,7 +51,7 @@ test('new dimensions use a separate cloud key that old overworld saves cannot er
  };
  const f=fixture();f.sdk.getCloudStorage=async keys=>{f.calls.push(['get',keys]);return {...remote};};f.sdk.setCloudStorage=async values=>Object.assign(remote,values);
  await f.initialize();assert.equal(JSON.parse(f.getItem(TIME_SAVE_KEY+'.nether'))[0],4000);assert.equal(JSON.parse(f.getItem(TIME_SAVE_KEY+'.end'))[0],5000);
- assert.deepEqual(f.calls.find(c=>c[0]==='get')[1],[TOY_CLOUD_KEY,dimensionKey,TOY_LEGACY_CLOUD_KEY]);
+ assert.deepEqual(f.calls.find(c=>c[0]==='get')[1],[TOY_CLOUD_KEY,dimensionKey,TOY_SIFT_CLOUD_KEY,TOY_LEGACY_CLOUD_KEY]);
  f.setItem(TIME_SAVE_KEY+'.nether','[2000]');await f.flush();
  const overworld=JSON.parse(remote[TOY_CLOUD_KEY]);assert.equal(JSON.parse(overworld.values[TIME_SAVE_KEY])[0],3000);assert.equal(overworld.values[TIME_SAVE_KEY+'.nether'],undefined);
  remote[TOY_CLOUD_KEY]=JSON.stringify({version:1,values:{[TIME_SAVE_KEY]:'[1500]'}});
