@@ -1,0 +1,14 @@
+
+Running 1 test using 1 worker
+
+node.exe : (node:55596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+所在位置 C:\Users\Administrator\AppData\Roaming\npm\npx.ps1:24 字符: 5
++     & "node$exe"  "$basedir/node_modules/npm/bin/npx-cli.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:55596) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 tests\playtest-build.spec.cjs:4:1 › review build opens forty maps and nine items without touching saves or online services (6.3s)
+
+  1 passed (7.7s)

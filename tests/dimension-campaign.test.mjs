@@ -8,7 +8,7 @@ test('each new world owns ten finite loadouts and begins at its first stage',()=
     assert.equal(readProgress(JSON.stringify({unlocked:5,completed:[0,1,2,3,4]}),world).unlocked,5);
     const bags=Array.from({length:10},(_,i)=>inventoryFor(i,world));
     assert.ok(bags.every(b=>b.length===9&&b.every(n=>Number.isInteger(n)&&n>=0)));
-    assert.ok(bags.every(b=>b[0]>=5&&b.reduce((a,b)=>a+b,0)<=24));
+    assert.ok(bags.every((b,i)=>(world==='sift'&&i===0?b.slice(0,8).every(n=>n===0)&&b[8]===3:b[0]>=5)&&b.reduce((a,b)=>a+b,0)<=24));
     assert.equal(hotbarSlots({unlocked:1},world).filter(v=>v!==null).length,world==='nether'?5:world==='end'?7:9);
     const a=inventoryFor(0,world);a[0]=999;assert.notEqual(inventoryFor(0,world)[0],999);
   }

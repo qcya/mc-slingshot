@@ -10,7 +10,7 @@ export const NETHER_LEVELS=[
  {title:'07 / 诡异货仓',desc:'错落屋顶留下投入口，清理货台两侧'},
  {title:'08 / 交错要塞',desc:'三段不同高度的砖廊构成连续防线'},
  {title:'09 / 黑石监牢',desc:'从开放缺口进入下沉牢室'},
- {title:'10 / 熔岩王座',desc:'上下三路守军，保留弹药清理最后的兽栏'}
+ {title:'10 / 凋灵祭坛',desc:'绕开玄武岩角楼；凋灵蓄势后会短暂悬停，抓住重击窗口'}
 ];
 
 export function buildNether(level){
@@ -69,12 +69,14 @@ export function buildNether(level){
   pig(20.5,8,true);pig(28.5,8,true);hog(22,16);pig(26,16);hog(28.5,16);pig(25,12);lava(16,14);
   prop(19,15,20);prop(24,15,21);
  }else{
-  clear(18,14,13,2);row(18,30,16,28);room(18,13,13,3,28);
-  row(18,21,7,28);column(18,8,15,29);column(21,8,11,29);clear(18,13,1,3);clear(21,8,1,3);
-  row(28,30,7,28);column(30,8,15,29);column(28,8,11,29);
-  row(23,27,11,26);row(23,27,7,25);room(23,8,5,3,26);row(19,21,12,25);row(28,30,12,25);
-  pig(19.5,7,true);pig(29,7,true);hog(25,11);pig(21,16);hog(24,16);pig(27.5,16);lava(15,14);lava(31,14);
-  prop(23,10,20);prop(26,10,19);prop(19,15,21);
+  // A single open summoning basin replaces the former stacked hoglin rooms.
+  clear(17,6,15,10);row(17,31,16,28);room(17,7,15,9,30);
+  row(18,20,9,28);column(18,10,15,29);row(29,31,8,28);column(31,9,15,29);
+  row(23,27,13,30);row(23,27,14,27);row(23,27,15,28);
+  pig(19,9,true);pig(30,8,true);hog(20.5,16);
+  enemy(25,13,'wither',{height:88,flightBounds:{left:1080,right:1300,top:270,bottom:540}});
+  lava(16,14);lava(31,14);prop(18,15,20);
+
  }
  return {...scene,...NETHER_LEVELS[level]};
 }

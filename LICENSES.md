@@ -59,3 +59,10 @@
 ## Toy SDK
 
 - `vendor/toy-sdk.min.js`：Bilibili 官方分发原文件，仅 Toy 构建加载。来源 `https://s1.hdslb.com/bfs/seed/toy/app/sdk/toy-sdk.js`，2026-10-17 获取，SHA-256 `b025be2dc7e526aa074b329d65c122f2dfbdc851203195dc3e53800aaae32de4`。适配使用实文件公开接口 `getUserProfile()`、`getCloudStorage(keys)`、`setCloudStorage(values)`、`getRankList`、`getMyRank` 和 `submitScore`；没有在包里嵌入发布会话或玩家令牌。
+
+## Native bosses and The Sift creatures
+
+- Wither, Ender Dragon, and placed End Crystal: original Mojang Bedrock models and entity atlases pinned to `46ba6ea985fb5a92d79a9419198f10dda14c199d`. Models/skins retain upstream rights, separate from game code.
+- Blub, Sifter, Singer, and Echo Golem: original model and texture files from Mielon's The Sift mod; MIT license preserved verbatim in [assets/licenses/Mielon-The-Sift-MIT.txt](assets/licenses/Mielon-The-Sift-MIT.txt).
+- Singer audio is original mod audio. Other added creature and Loyalty audio is original Mojang audio verified against the official asset-index SHA-1. Echo Golem uses an explicitly documented native iron-golem fallback for copper-golem hurt/death events.
+- Exact source paths, conversion details, hashes, and adaptation scope: [docs/native-entities.md](docs/native-entities.md), [entity manifest](docs/native-entity-assets.json), [sound manifest](docs/native-boss-sounds.json).

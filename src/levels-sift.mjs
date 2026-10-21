@@ -1,4 +1,4 @@
-import {createLevelBuilder,assignEndermanSpots} from './level-builder.mjs';
+import {createLevelBuilder} from './level-builder.mjs';
 
 // Community-inspired adaptation, not an assertion of unreleased vanilla rules.
 // Clear horizontal lanes teach trident penetration; high and low galleries then
@@ -13,13 +13,14 @@ export const SIFT_LEVELS=[
  {title:'07 / 古门前哨',desc:'半埋入台地的门廊留下侧面射界'},
  {title:'08 / 覆生双塔',desc:'两座塔楼、斜坡台地和相通的内院'},
  {title:'09 / 回声深庭',desc:'下沉庭院与外侧守军分层设防'},
- {title:'10 / 筛界遗城',desc:'古门、双层连廊和最后的深庭'}
+ {title:'10 / 回声圣环',desc:'社区模组回声傀儡改编首领；中央祭坛蓄势，脉冲后露出重击窗口'}
 ];
 
 export function buildSift(level){
  const b=createLevelBuilder('sift'),{scene,row,column,room,clear,enemy,roof,slab,prop}=b;
- const guard=(x,feet)=>enemy(x,feet,'pillager');
- const heavy=(x,feet)=>enemy(x,feet,'warden');
+ let ordinary=0;
+ const guard=(x,feet)=>{const skin=ordinary++%2?'sift_sifter':'sift_blub';enemy(x,feet,skin,{height:skin==='sift_blub'?48:46});};
+ const heavy=(x,feet)=>enemy(x,feet,'sift_singer',{height:146,stationary:true});
  if(level===0){
   row(18,30,13,43);column(19,9,12,44);column(30,9,12,44);row(19,30,8,43);
   clear(19,10,1,3);room(20,9,10,4,41);slab(18,31,8,44);
@@ -55,10 +56,15 @@ export function buildSift(level){
   row(18,23,8,43);row(27,31,8,43);row(20,23,12,46);row(27,29,12,46);clear(19,13,1,3);
   guard(21,8);guard(29,8);guard(21,12);guard(28,12);guard(22,16);guard(27,16);heavy(25,16);
  }else{
-  clear(18,14,13,2);row(18,30,16,43);room(18,12,13,4,41);
-  column(19,6,15,44);column(30,6,15,44);row(18,23,5,43);row(27,31,5,43);row(20,23,10,46);row(27,29,10,46);
-  row(24,26,8,43);column(24,6,7,44);column(26,6,7,44);row(24,26,5,43);clear(19,12,1,4);
-  guard(21,5);guard(29,5);guard(21,10);guard(28,10);guard(25.5,8);guard(22,16);guard(28,16);heavy(25,16);
+  // A circular shrine cross-section: low approach, side galleries and one crown.
+  clear(17,4,15,12);row(17,31,16,41);room(17,5,15,11,47);
+  row(18,21,8,43);row(29,31,8,43);column(18,9,15,44);column(31,9,15,44);
+  row(23,28,14,43);row(24,27,15,44);row(22,29,4,44);
+  // The broken arch is silhouette only; the whole horizontal arena stays open.
+  column(21,5,6,44);column(30,5,5,44);row(19,20,7,46);row(30,31,7,46);
+  guard(19.5,7);guard(30.5,7);guard(20,16);guard(29.5,16);
+  enemy(25.5,14,'sift_echo_golem',{height:114,stationary:true});
+
  }
- assignEndermanSpots(scene);return {...scene,...SIFT_LEVELS[level]};
+ return {...scene,...SIFT_LEVELS[level]};
 }

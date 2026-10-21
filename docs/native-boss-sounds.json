@@ -1,0 +1,92 @@
+[
+  {
+    "file": "assets/sfx/wither_hurt.ogg",
+    "source": "minecraft/sounds/mob/wither/hurt1.ogg",
+    "sha1": "befdf6ca94508a93e52b5324abb793aefef4066f",
+    "url": "https://resources.download.minecraft.net/be/befdf6ca94508a93e52b5324abb793aefef4066f"
+  },
+  {
+    "file": "assets/sfx/wither_death.ogg",
+    "source": "minecraft/sounds/mob/wither/death.ogg",
+    "sha1": "db84aad8831f937c3c4162766a8abcb49506c1e7",
+    "url": "https://resources.download.minecraft.net/db/db84aad8831f937c3c4162766a8abcb49506c1e7"
+  },
+  {
+    "file": "assets/sfx/wither_idle.ogg",
+    "source": "minecraft/sounds/mob/wither/idle1.ogg",
+    "sha1": "34dbc7532d14383742333147ca3adbda0350aa0e",
+    "url": "https://resources.download.minecraft.net/34/34dbc7532d14383742333147ca3adbda0350aa0e"
+  },
+  {
+    "file": "assets/sfx/ender_dragon_hurt.ogg",
+    "source": "minecraft/sounds/mob/enderdragon/hit1.ogg",
+    "sha1": "59cc1d9f09157d334c52db5b79da04f8d56c11bf",
+    "url": "https://resources.download.minecraft.net/59/59cc1d9f09157d334c52db5b79da04f8d56c11bf"
+  },
+  {
+    "file": "assets/sfx/ender_dragon_death.ogg",
+    "source": "minecraft/sounds/mob/enderdragon/end.ogg",
+    "sha1": "76dd4983249264ab1f4779145118bb162b0d884a",
+    "url": "https://resources.download.minecraft.net/76/76dd4983249264ab1f4779145118bb162b0d884a"
+  },
+  {
+    "file": "assets/sfx/ender_dragon_idle.ogg",
+    "source": "minecraft/sounds/mob/enderdragon/growl1.ogg",
+    "sha1": "b5f9d965c227474231582b52f14f8167b97bf476",
+    "url": "https://resources.download.minecraft.net/b5/b5f9d965c227474231582b52f14f8167b97bf476"
+  },
+  {
+    "file": "assets/sfx/trident_return.ogg",
+    "source": "minecraft/sounds/item/trident/return1.ogg",
+    "sha1": "d956f17b213d2f1cd188f2661660b8f21243dc4a",
+    "url": "https://resources.download.minecraft.net/d9/d956f17b213d2f1cd188f2661660b8f21243dc4a"
+  },
+  {
+    "file": "assets/sfx/sift_blub_hurt.ogg",
+    "source": "minecraft/sounds/mob/axolotl/hurt1.ogg",
+    "sha1": "b1d2dae87eb291e2f48417e767387014037b81f4",
+    "url": "https://resources.download.minecraft.net/b1/b1d2dae87eb291e2f48417e767387014037b81f4"
+  },
+  {
+    "file": "assets/sfx/sift_blub_death.ogg",
+    "source": "minecraft/sounds/mob/axolotl/death1.ogg",
+    "sha1": "fe5294afdbfe6561a361ecb560b331c7447ac63c",
+    "url": "https://resources.download.minecraft.net/fe/fe5294afdbfe6561a361ecb560b331c7447ac63c"
+  },
+  {
+    "file": "assets/sfx/sift_blub_idle.ogg",
+    "source": "minecraft/sounds/mob/axolotl/idle_air1.ogg",
+    "sha1": "89c8bd590966d3590a488567f376be501aa9d3be",
+    "url": "https://resources.download.minecraft.net/89/89c8bd590966d3590a488567f376be501aa9d3be"
+  },
+  {
+    "file": "assets/sfx/sift_sifter_hurt.ogg",
+    "source": "minecraft/sounds/mob/parrot/hurt1.ogg",
+    "sha1": "48acc0d591ef38aede99d77e9bbe82d939991139",
+    "url": "https://resources.download.minecraft.net/48/48acc0d591ef38aede99d77e9bbe82d939991139"
+  },
+  {
+    "file": "assets/sfx/sift_sifter_death.ogg",
+    "source": "minecraft/sounds/mob/parrot/death1.ogg",
+    "sha1": "0bfde0688dbbb5baae87be69c8863f1b8ff14c96",
+    "url": "https://resources.download.minecraft.net/0b/0bfde0688dbbb5baae87be69c8863f1b8ff14c96"
+  },
+  {
+    "file": "assets/sfx/sift_sifter_idle.ogg",
+    "source": "minecraft/sounds/mob/parrot/idle1.ogg",
+    "sha1": "7758bc210e0b8a5013cc8689ae0606d9bdbee4bf",
+    "url": "https://resources.download.minecraft.net/77/7758bc210e0b8a5013cc8689ae0606d9bdbee4bf"
+  },
+  {
+    "file": "assets/sfx/sift_echo_golem_hurt.ogg",
+    "source": "minecraft/sounds/mob/irongolem/damage1.ogg",
+    "sha1": "e96e03891c4c365dd2aef3491c032e5dbbd0f4fa",
+    "url": "https://resources.download.minecraft.net/e9/e96e03891c4c365dd2aef3491c032e5dbbd0f4fa"
+  },
+  {
+    "file": "assets/sfx/sift_echo_golem_death.ogg",
+    "source": "minecraft/sounds/mob/irongolem/death.ogg",
+    "sha1": "aa6c662548316c68591a63f568be1f997d162ef1",
+    "url": "https://resources.download.minecraft.net/aa/aa6c662548316c68591a63f568be1f997d162ef1"
+  }
+]

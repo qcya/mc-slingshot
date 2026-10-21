@@ -23,6 +23,10 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair;i
 .ball.empty img,.ball.empty .stack-count{visibility:hidden}
 .ball.depleted img{opacity:.75;filter:brightness(.7)}.ball.depleted .stack-count{color:#ccc}
 .stack-count{position:absolute;z-index:3;right:3%;bottom:0;font:700 clamp(10px,1.4cqw,22px)/1 monospace;text-shadow:2px 2px #111,-1px -1px #111}
+.durability{position:absolute;left:14%;right:14%;bottom:7%;height:7%;min-height:3px;background:#161616;box-shadow:0 1px #000;z-index:3}
+.durability:after{content:"";display:block;width:var(--remaining,100%);height:70%;background:#65e83f}
+.durability[data-remaining="1"]:after{background:#e94732}.durability[data-remaining="2"]:after{background:#ded13e}
+.ball.in-flight img{opacity:.5}.ball.durable:not(.depleted) img{filter:drop-shadow(1px 0 #ad79db88) drop-shadow(-1px 0 #8675c966)}
 .menu-screen,.result{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#0009}
 #levelMenu,#leaderboardMenu{background:linear-gradient(#000a,#000a),url('assets/textures/dirt.png') repeat;background-size:auto,64px 64px;image-rendering:pixelated}
 .campaign-panel{width:min(560px,92%);max-height:96%;overflow:auto;padding:8px 2px;text-align:center}

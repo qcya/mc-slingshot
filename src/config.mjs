@@ -55,10 +55,10 @@ export const AMMO=[
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'无损穿两格墙 · 五秒后淡出，穿墙重新计时'},
   {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'},
   {id:'slimeball',label:'黏液球',sprite:'slime_ball',size:28,mass:2.2,restitution:.88,detail:'高弹性反弹 · 每只生物只伤一次'},
-  {id:'anvil',label:'铁砧',sprite:'anvil',size:28,mass:9,gravityScale:1.7,shape:'box',detail:'沉重冲击 · 强力击碎挡板'},
+  {id:'anvil',label:'铁砧',sprite:'anvil',size:42,mass:9,gravityScale:1.7,rangeScale:1.55,liftScale:1.15,shape:'box',detail:'远投重砸 · 垂直贯穿至基岩，留在落点'},
   {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
-  {id:'crystal',label:'末地水晶',sprite:'end_crystal',size:28,mass:2.4,shape:'box',detail:'落地布置 · 圆石触发，同 TNT 伤害的连锁爆炸'},
-  {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,detail:'贯穿生物 · 实体墙壁会挡住'}
+  {id:'crystal',label:'末地水晶',sprite:'end_crystal',size:28,mass:2.4,shape:'box',detail:'只在地面安放 · 其他弹药或风弹触发连锁爆炸'},
+  {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,maxDurability:3,detail:'忠诚附魔 · 三次耐久，往返伤敌，回程不拆地形'}
 ];
 // Retain old simulation IDs for imported replays and regression fixtures only.
 // These are no longer supplied or displayed in the nine-slot campaign.

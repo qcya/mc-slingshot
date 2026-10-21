@@ -1,3 +1,4 @@
+import {ENCOUNTER_PROFILES,initEncounter,encounterDamageMultiplier} from './encounters.mjs';
 // Gameplay profiles are deliberately separate from atlas and animation data.
 export const MOB_PROFILES={
  zombie:{width:32,height:92,mass:1.2,hp:100},pillager:{width:32,height:92,mass:1.2,hp:100},
@@ -5,10 +6,10 @@ export const MOB_PROFILES={
  warden:{width:58,height:132,mass:3.6,hp:300,armored:true},
  hoglin:{width:90,height:84,mass:3.6,hp:300,armored:true},
  shulker:{width:48,height:48,mass:4,hp:300,armored:true},
- enderman:{width:32,height:132,mass:1.5,hp:200,armored:true}
+ enderman:{width:32,height:132,mass:1.5,hp:200,armored:true},...ENCOUNTER_PROFILES
 };
 export const profileFor=skin=>MOB_PROFILES[skin]||MOB_PROFILES.zombie;
-export const heavyMob=e=>e.skin==='warden'||e.skin==='hoglin';
+export const heavyMob=e=>e.skin==='warden'||e.skin==='hoglin'||!!profileFor(e.skin).heavy;
 export const armoredMob=e=>!!profileFor(e.skin).armored;
 export const fireImmune=e=>!!profileFor(e.skin).fireImmune;
 // Walking enemies must not turn a resting object into a fresh weapon.
@@ -27,6 +28,7 @@ export function projectileGravity(M,body,ammo,gravity){
 function random(e){e.combatSeed=(Math.imul(e.combatSeed,1664525)+1013904223)>>>0;return e.combatSeed/4294967296;}
 export function initCombat(e,time,options){
  e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.frozen=false;
+ initEncounter(e,time,options);
  if(e.skin==='shulker'){e.stationary=true;e.shellOpen=false;e.shellUntil=time+2.4+random(e)*1.8;e.shellAmount=0;}
  if(e.skin==='enderman'){e.teleportCount=0;e.teleportSpots=(options.teleportSpots||[]).map(p=>({...p}));}
 }
@@ -97,19 +99,22 @@ export function damageEnemy(world,e,damage,{source=null,kind='environment'}={}){
   world.hurt(e,e.hp);return true;
  }
  if(e.skin==='shulker'&&e.shellAmount>=.5&&['cobble','slimeball','anvil','ender','trident'].includes(kind))damage=e.hp;
- world.hurt(e,damage);return true;
+ world.hurt(e,damage*encounterDamageMultiplier(e,kind));return true;
 }
 export function projectileDamage(world,target,p,speed){
  const kind=p.ammo.id;
  if(['tnt','fire','snowball','wind','water','crystal'].includes(kind))return;
  const velocity=world.before.get(p.body.id)||p.body.velocity;
  if(Math.hypot(velocity.x,velocity.y)*60<MIN_PROJECTILE_HIT_SPEED)return false;
- if(target.projectileHits.has(p.id))return;
- target.projectileHits.add(p.id);
+ const hitId=kind==='trident'?`${p.id}:${p.returning?'return':'outbound'}`:p.id;
+ if(target.projectileHits.has(hitId))return;
+ target.projectileHits.add(hitId);
  const armored=armoredMob(target),damage=kind==='anvil'?150:armored?(kind==='ender'?75:100):250;
- return damageEnemy(world,target,damage,{source:`ammo:${p.id}`,kind});
+ return damageEnemy(world,target,damage,{source:`ammo:${hitId}`,kind});
 }
 export function gust(world,x,y,radius=125){
+ // The wind burst reaches through walls, including a crystal on the far side.
+ world.detonateCrystals(world.projectiles.filter(p=>!p.dead&&p.ammo.id==='crystal'&&Math.hypot(p.body.position.x-x,p.body.position.y-y)<=radius));
  for(const e of world.allMoving()){
   if(e.frozen)continue;
   const dx=e.body.position.x-x,dy=e.body.position.y-y,d=Math.hypot(dx,dy);if(d>radius)continue;

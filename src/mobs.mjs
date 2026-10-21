@@ -1,7 +1,9 @@
 // Orthographic cuboids with the original Java skin box UV layout. Physics stays 2D.
 // Every face is a different region of the skin, never a flat skin atlas billboard.
 import {mobAppearance} from './animation.mjs';
+import {nativeGeometry,geometryBounds,NATIVE_PROFILES} from './native-geometry.mjs';
 export function mobGeometry(skin,phase,direction,pose={}){
+ const native=nativeGeometry(skin,phase,direction,pose);if(native)return native;
  const ill=skin==='pillager',warden=skin==='warden',piglin=skin==='zombified_piglin',headH=ill?10:8,faces=[],yaw=-direction*1.08,cy=Math.cos(yaw),sy=Math.sin(yaw);
  const swing=Math.sin(phase)*(warden?.34:.64)*(pose.walkBlend??1);
  function box(part,x,y,z,w,h,d,u,v,rotation=0,pivotY=y,pivotZ=0){
@@ -98,7 +100,12 @@ export function mobGeometry(skin,phase,direction,pose={}){
  if(ill)box('nose',-1,-29,-6,2,4,2,24,0);
  return faces.sort((a,b)=>b.depth-a.depth);
 }
-const frameSize=skin=>skin==='warden'?[200,180]:skin==='hoglin'?[180,150]:skin==='enderman'?[108,180]:skin==='shulker'?[120,120]:[108,120];
+const frameSize=skin=>skin==='ender_dragon'?[380,210]:skin==='wither'?[180,140]:NATIVE_PROFILES[skin]?[210,210]:skin==='warden'?[200,180]:skin==='hoglin'?[180,150]:skin==='enderman'?[108,180]:skin==='shulker'?[120,120]:[108,120];
+const nativeAnchors=new Map();
+function anchor(skin){
+ if(!nativeAnchors.has(skin)){const b=geometryBounds(nativeGeometry(skin,0,1,{walkBlend:0}));nativeAnchors.set(skin,{x:(b.left+b.right)/2,y:b.bottom});}
+ return nativeAnchors.get(skin);
+}
 export class MobSprites{
  constructor(assets){this.assets=assets;this.cache=new Map();this.scratch=new WeakMap();this.opaqueSkins=new WeakMap();}
  skinImage(skin){
@@ -117,16 +124,17 @@ export class MobSprites{
   const image=this.skinImage(skin);
   for(const f of mobGeometry(skin,phase,direction,pose)){
    const [u,v,w,h]=f.uv,[a,b,,d]=f.vertices;c.save();
-   c.transform((b.x-a.x)/w,(b.y-a.y)/w,(d.x-a.x)/h,(d.y-a.y)/h,a.x,a.y);
-   c.drawImage(image,u,v,w,h,0,0,w,h);
-   if(f.face==='side'){c.fillStyle='#0002';c.fillRect(0,0,w,h);}c.restore();
+   c.transform((b.x-a.x)/Math.abs(w),(b.y-a.y)/Math.abs(w),(d.x-a.x)/Math.abs(h),(d.y-a.y)/Math.abs(h),a.x,a.y);
+   if(w<0||h<0){c.translate(w<0?-w:0,h<0?-h:0);c.scale(w<0?-1:1,h<0?-1:1);}
+   c.drawImage(image,Math.min(u,u+w),Math.min(v,v+h),Math.abs(w),Math.abs(h),0,0,Math.abs(w),Math.abs(h));
+   if(f.face==='side'){c.fillStyle='#0002';c.fillRect(0,0,Math.abs(w),Math.abs(h));}c.restore();
   }
  }
  frame(skin,phase,direction){
   const key=`${skin}:${phase.toFixed(4)}:${direction}`;
   if(this.cache.has(key))return this.cache.get(key);
   const canvas=document.createElement('canvas');[canvas.width,canvas.height]=frameSize(skin);
-  const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.translate(canvas.width/2,canvas.height-10);c.scale(2.7,2.7);
+  const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.translate(canvas.width/2,canvas.height-10);const s=NATIVE_PROFILES[skin]?.scale??2.7;c.scale(s,s);if(NATIVE_PROFILES[skin]){const a=anchor(skin);c.translate(-a.x*direction,-a.y);}
   this.paint(c,skin,phase,direction);
   if(this.cache.size>=64)this.cache.delete(this.cache.keys().next().value);
   this.cache.set(key,canvas);return canvas;
@@ -136,7 +144,7 @@ export class MobSprites{
   let frame=this.scratch.get(e);
   if(!frame){frame=document.createElement('canvas');[frame.width,frame.height]=frameSize(e.skin);this.scratch.set(e,frame);}
   const paint=frame.getContext('2d');paint.setTransform(1,0,0,1,0,0);paint.clearRect(0,0,frame.width,frame.height);paint.imageSmoothingEnabled=false;
-  paint.translate(frame.width/2,frame.height-10);paint.scale(2.7,2.7);this.paint(paint,e.skin,phase,e.facing||1,e.pose);
+  paint.translate(frame.width/2,frame.height-10);const s=NATIVE_PROFILES[e.skin]?.scale??2.7;paint.scale(s,s);if(NATIVE_PROFILES[e.skin]){const a=anchor(e.skin);paint.translate(-a.x*(e.facing||1),-a.y);}this.paint(paint,e.skin,phase,e.facing||1,e.pose);
   if(appearance.hurt){paint.setTransform(1,0,0,1,0,0);paint.globalCompositeOperation='source-atop';paint.fillStyle='#ff303080';paint.fillRect(0,0,frame.width,frame.height);paint.globalCompositeOperation='source-over';}
   c.save();c.translate(b.position.x,b.position.y+(e.feetOffset??46)-Math.sin(Math.abs(appearance.angle))*14);c.rotate(b.angle+appearance.angle);
   c.drawImage(frame,-frame.width/2,-frame.height+10);c.restore();

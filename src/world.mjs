@@ -6,6 +6,8 @@ import {DEATH_TOPPLE} from './animation.mjs';
 import {igniteWood,igniteImpact,advanceFire,burnEnemy,splashWater} from './fire.mjs';
 import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust,freezeEnemy,thawEnemy} from './combat.mjs';
 import {LavaField} from './lava.mjs';
+import {launchVelocity,speedLimit,advanceWeapon,recallTrident,crystalSupported} from './weapons.mjs';
+import {tickEncounter} from './encounters.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -38,13 +40,14 @@ export class SiegeWorld {
     if(b.max.x>=bounds.min.x-4&&b.min.x<=bounds.max.x+4&&b.max.y>=bounds.min.y-4&&b.min.y<=bounds.max.y+4)this.M.Sleeping.set(e.body,false);
   }}
   remove(entity){if(!entity||entity.dead)return;entity.dead=true;this.wakeBounds(entity.body.bounds);this.M.Composite.remove(this.engine.world,entity.body);}
-  spawnProjectile(kind,x,y,vx,vy){
+  spawnProjectile(kind,x,y,vx,vy,options={}){
     const ammo=PROJECTILES.find(a=>a.id===kind);if(!ammo)throw new Error(`Unknown ammunition: ${kind}`);
-    const options={friction:kind==='slimeball'?.04:.85,frictionStatic:1.2,frictionAir:.0015,restitution:ammo.restitution??(kind==='cobble'?.14:kind==='tnt'?.01:.07),slop:.025,sleepThreshold:75};
-    const body=projectileBody(this.M,ammo,x,y,options);
+    const physicsOptions={friction:kind==='slimeball'?.04:.85,frictionStatic:1.2,frictionAir:.0015,restitution:ammo.restitution??(kind==='cobble'?.14:kind==='tnt'?.01:.07),slop:.025,sleepThreshold:75};
+    const body=projectileBody(this.M,ammo,x,y,{...physicsOptions,...(kind==='crystal'?{inertia:Infinity}:{})});
     this.M.Body.setMass(body,ammo.mass);
-    this.M.Body.setVelocity(body,{x:vx/60,y:vy/60});
+    this.M.Body.setVelocity(body,launchVelocity(ammo,vx,vy));
     const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0,expiresAt:kind==='ender'?this.time+5:Infinity,ignited:false},body);
+    if(kind==='trident')p.returnHome={...(options.returnHome||{x,y})};
     if(kind==='tnt')this.events.push({type:'fuse',x,y});
     this.projectiles.push(p);return p;
   }
@@ -65,6 +68,7 @@ export class SiegeWorld {
       const half=e.dimensions.width/2,ground=this.sample(x-half*.65,feet+3)||this.sample(x+half*.65,feet+3);
       const grounded=!!ground&&Math.abs(b.velocity.y)<.65&&Math.abs(b.velocity.x)<2.2&&!influenced;
       const previous=e.behavior,walking=animateActor(e,this.time,dt,grounded)&&!e.stationary;
+      if(tickEncounter(this,e,dt))continue;
       advanceCombat(this,e,dt);
       if(previous==='walk'&&e.behavior==='idle'&&e.idleCount%3===1)this.events.push({type:'ambient',sound:`${e.skin}_idle`});
       if(!grounded)continue;
@@ -222,11 +226,15 @@ export class SiegeWorld {
     const crystal=ea?.ammo?.id==='crystal'?ea:eb?.ammo?.id==='crystal'?eb:null;
     if(crystal){
       const striker=crystal===ea?eb:ea,solid=crystal===ea?b:a;
-      if(striker?.type==='ammo'&&['cobble','anvil','slimeball','ender','trident'].includes(striker.ammo.id)){
+      if(striker?.type==='debris'||striker?.type==='ammo'&&striker.ammo.id!=='crystal'){
         const v=this.before.get(striker.body.id)||striker.body.velocity;
-        if(Math.hypot(v.x,v.y)*60>=180){this.detonateCrystals([crystal]);return;}
+        if(Math.hypot(v.x,v.y)*60>=180){
+          this.detonateCrystals([crystal]);
+          if(striker.ammo?.id==='wind'){this.remove(striker);gust(this,point.x,point.y);}
+          return;
+        }
       }
-      if(!crystal.placed&&solid.plugin.terrain&&point.y>crystal.body.position.y+3){
+      if(!crystal.placed&&(solid.plugin.terrain||striker?.planted)&&Math.abs(n.y)>.7&&point.y>crystal.body.position.y+crystal.ammo.size*.25&&crystalSupported(this,crystal)){
         crystal.placed=true;this.M.Body.setVelocity(crystal.body,{x:0,y:0});this.M.Body.setAngularVelocity(crystal.body,0);this.M.Body.setStatic(crystal.body,true);
       }
       return;
@@ -242,6 +250,8 @@ export class SiegeWorld {
     };
     if(ea?.type==='enemy')contactDamage(ea,eb,b.mass,a.mass);
     if(eb?.type==='enemy')contactDamage(eb,ea,a.mass,b.mass);
+    // Loyalty ignores every terrain/debris contact on the return leg.
+    if(ea?.ammo?.id==='trident'&&ea.returning||eb?.ammo?.id==='trident'&&eb.returning)return;
     // A fire charge must resolve its impact even when it hits an older projectile.
     const ammo=ea?.ammo?.id==='fire'?ea:eb?.ammo?.id==='fire'?eb:ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null;
     const other=ammo===ea?eb:ea,otherBody=ammo===ea?b:a;
@@ -262,6 +272,7 @@ export class SiegeWorld {
         }
         this.remove(ammo);if(other?.ammo?.id==='fire')this.remove(other);return;
       }
+      if(kind==='anvil'&&(otherBody.plugin.terrain||other?.type==='debris'))ammo.plunging=true;
       if(['cobble','tnt','anvil'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
       if(kind==='ender'&&ammo.uses===0&&Math.hypot((this.before.get(ammo.body.id)||ammo.body.velocity).x,(this.before.get(ammo.body.id)||ammo.body.velocity).y)*60>=180&&(otherBody.plugin.terrain||other?.type==='debris')){
@@ -282,6 +293,7 @@ export class SiegeWorld {
       this.damageDisk(point.x,point.y,radius,power);
       this.events.push({type:'impact',x:point.x,y:point.y,m:material,speed,sound:heavy?'anvil_land':striker.type==='ammo'&&striker.ammo.id==='cobble'?'stone':MATERIALS[material]?.sound});
     }
+    if(ammo?.ammo.id==='trident'&&(otherBody.plugin.terrain||other?.type==='debris'))recallTrident(this,ammo);
   }
   ignite(x,y,reach,sourceId){return igniteWood(this,x,y,reach,sourceId);}
   shatterGlass(body,point,speed){
@@ -293,19 +305,27 @@ export class SiegeWorld {
     this.time+=dt;advanceFire(this);this.lava.advance();this.synchronize();this.patrol(dt);
     this.before=new Map();
     for(const e of this.allMoving()){
-      const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y);
-      if(e.type==='ammo')projectileGravity(this.M,b,e.ammo,this.engine.gravity);
-      if(speed>26)this.M.Body.setVelocity(b,{x:b.velocity.x/speed*26,y:b.velocity.y/speed*26});
+      if(e.type==='ammo')advanceWeapon(this,e,dt);if(e.dead)continue;
+      const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y),limit=e.type==='ammo'?speedLimit(e.ammo):26;
+      if(e.type==='ammo'&&!b.isStatic)projectileGravity(this.M,b,e.ammo,this.engine.gravity);
+      if(speed>limit)this.M.Body.setVelocity(b,{x:b.velocity.x/speed*limit,y:b.velocity.y/speed*limit});
       if(Math.abs(b.angularVelocity)>.28)this.M.Body.setAngularVelocity(b,Math.sign(b.angularVelocity)*.28);
       this.before.set(b.id,{...b.velocity,omega:b.angularVelocity});
     }
-    this.contacts.length=0;this.M.Engine.update(this.engine,dt*1000);
+    this.synchronize();this.contacts.length=0;this.M.Engine.update(this.engine,dt*1000);
+    // Turning around can leave a trident inside an existing outbound sensor pair.
+    // Query live overlap on the return leg; per-leg hit sources prevent repeats.
+    for(const p of this.projectiles)if(!p.dead&&p.returning){
+      const hits=this.M.Query.collides(p.body,this.enemies.filter(e=>e.alive&&!e.dead).map(e=>e.body));
+      for(const hit of hits){const e=hit.bodyA.parent.plugin.entity?.type==='enemy'?hit.bodyA.parent.plugin.entity:hit.bodyB.parent.plugin.entity;if(e?.type==='enemy')projectileDamage(this,e,p,1500);}
+    }
     for(const p of this.projectiles)if(!p.dead&&p.ammo.id==='cobble'&&!p.ignited&&this.lava.touchesCircle(p.body.position.x,p.body.position.y,p.ammo.size/2)){
       p.ignited=true;this.events.push({type:'fire',x:p.body.position.x,y:p.body.position.y,sound:'fire_burn'});
     }
     for(const pair of this.contacts)this.processContact(pair);
     for(const p of this.projectiles){
       if(p.dead)continue;p.age+=dt;p.fuse-=dt;
+      if(p.ammo.id==='trident'&&!p.returning){const {x,y}=p.body.position,half=p.ammo.size/2;if(x<half||x>this.width-half||y<half||y>this.height-half)recallTrident(this,p);}
       if(p.ammo.id==='water'&&this.lava.touchesCircle(p.body.position.x,p.body.position.y,p.ammo.size/2)){
         const pos={...p.body.position};this.remove(p);splashWater(this,pos.x,pos.y);continue;
       }
@@ -319,11 +339,11 @@ export class SiegeWorld {
           if(e.alive)this.hurt(e,Math.max(3,e.hp+1));this.remove(e);continue;
         }
       }
-      if(y>this.height+200||x< -250||x>this.width+250){if(e.type==='enemy'&&e.alive)this.hurt(e,Math.max(3,e.hp+1));this.remove(e);}
+      if(y>this.height+200||x< -250||x>this.width+250){if(e.ammo?.id==='trident')recallTrident(this,e);else{if(e.type==='enemy'&&e.alive)this.hurt(e,Math.max(3,e.hp+1));this.remove(e);}}
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
-      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&!['cobble','crystal'].includes(e.ammo.id)))this.remove(e);
+      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&!['cobble','crystal','anvil'].includes(e.ammo.id)))this.remove(e);
     }
     this.projectiles=this.projectiles.filter(e=>!e.dead);this.debris=this.debris.filter(e=>!e.dead);
     this.synchronize();
@@ -333,6 +353,6 @@ export class SiegeWorld {
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,lava:this.lava.snapshot(),lavaCells:this.lava.cells.size,lavaCooled:this.stats.lavaCooled,
-    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses,ignited:p.ignited,opacity:projectileOpacity(p,this.time)})),
+    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses,ignited:p.ignited,returning:!!p.returning,planted:!!p.planted,placed:!!p.placed,opacity:projectileOpacity(p,this.time)})),
     particlesPending:this.events.length};}
 }

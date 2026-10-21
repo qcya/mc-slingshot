@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import {buildLevel} from '../src/levels.mjs';
 import {SiegeWorld} from '../src/world.mjs';
 import {AMMO} from '../src/config.mjs';
-import {pullSling} from '../src/sling.mjs';
+import {pullSling,SLING_HOME} from '../src/sling.mjs';
 import {inventoryFor,spendAmmo,totalAmmo,hotbarSlots} from '../src/campaign.mjs';
 import {updateOutcome} from '../src/outcome.mjs';
 const Matter=createRequire(import.meta.url)('../vendor/matter.min.js');
@@ -34,7 +34,7 @@ for(const dimension of ['nether','end','sift'])test(`${dimension}: every map win
     assert.ok(Math.hypot(actual.origin.x-shot.origin.x,actual.origin.y-shot.origin.y)<.001);
     assert.ok(Math.abs(actual.vx-shot.vx)<.00001&&Math.abs(actual.vy-shot.vy)<.00001);
     state.shots=totalAmmo(remaining);state.launch={age:0};
-    world.spawnProjectile(shot.kind,actual.origin.x,actual.origin.y,actual.vx,actual.vy);advance(shot.wait??6);
+    world.spawnProjectile(shot.kind,actual.origin.x,actual.origin.y,actual.vx,actual.vy,{returnHome:SLING_HOME});advance(shot.wait??6);
    }
    if(outcome===null&&world.enemies.every(e=>!e.alive))advance(1.5);
    assert.equal(outcome,true,`${dimension} ${plan.level}: finite route must win through the production outcome timer`);

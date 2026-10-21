@@ -98,7 +98,11 @@ function hud(){
  const earned=Object.fromEntries(WORLDS.filter(w=>accessibleWorld(w.id)).map(w=>[w.id,progressFromTimes(readWorld(TIME_SAVE_KEY,[],w.id))]));
  for(const [i,b] of [...$('#ballbar').children].entries()){
   const kind=hotbarSlots(progress,currentWorld(),earned)[i],count=kind===null?0:state.inventory[kind]||0;b.dataset.ammoIndex=kind===null?'':String(kind);b.classList.toggle('selected',i===state.selected);b.classList.toggle('empty',kind===null);b.classList.toggle('depleted',kind!==null&&!count);b.setAttribute('aria-pressed',String(i===state.selected));
-  b.querySelector('.stack-count').textContent=kind!==null?String(count):'';b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);b.title=kind===null?'':`${AMMO[kind].label} · ${AMMO[kind].detail}`;if(kind!==null)b.querySelector('img').src=iconUrl(kind);
+  const durable=kind!==null&&!!AMMO[kind].maxDurability,inFlight=durable&&world?.projectiles.some(p=>!p.dead&&p.ammo.id==='trident');
+  b.classList.toggle('durable',durable);b.classList.toggle('in-flight',!!inFlight);
+  b.querySelector('.stack-count').textContent=kind!==null&&!durable?String(count):'';
+  const bar=b.querySelector('.durability');if(bar){bar.hidden=!durable;bar.style.setProperty('--remaining',`${Math.max(0,count)/3*100}%`);bar.dataset.remaining=count;}
+  b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:durable?`${i+1}. 三叉戟 · 耐久 ${count}/3${inFlight?' · 正在返回':''}`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);b.title=kind===null?'':`${AMMO[kind].label} · ${AMMO[kind].detail}`;if(kind!==null)b.querySelector('img').src=iconUrl(kind);
  }
 }
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}
@@ -134,8 +138,8 @@ function renderCards(){
   const best=document.createElement('span');best.className='personal-best';best.textContent=PLAYTEST?'自由试玩':bestTimes?.[i]!=null?`最快 ${formatTime(bestTimes[i])}`:b.disabled?'未解锁':'尚未通关';
   const flag=document.createElement('small');flag.textContent=b.disabled?'未解锁':progress.completed.includes(i)?'已通关 · 可重玩':i===progress.unlocked-1?'开始挑战':'已解锁';
   const info=document.createElement('button');info.className='loadout-info';info.textContent=PLAYTEST?'原配给':'道具';info.dataset.loadoutLevel=i;info.setAttribute('aria-label',`查看第${i+1}关道具`);info.setAttribute('aria-expanded','false');info.setAttribute('aria-controls',`loadout-${i}`);
-  const tip=document.createElement('div');tip.id=`loadout-${i}`;tip.className='loadout-tooltip';tip.setAttribute('role','tooltip');for(const [kind,n]of inventoryFor(i,currentWorld()).entries())if(n){const row=document.createElement('div'),img=document.createElement('img'),label=document.createElement('span');img.src=iconUrl(kind);img.alt='';label.textContent=`${AMMO[kind].label} ×${n}`;row.append(img,label);tip.append(row);}
-  if(PLAYTEST){const note=document.createElement('small');note.textContent='正式版配给；试玩时每种 99 个';tip.prepend(note);}
+  const tip=document.createElement('div');tip.id=`loadout-${i}`;tip.className='loadout-tooltip';tip.setAttribute('role','tooltip');for(const [kind,n]of inventoryFor(i,currentWorld()).entries())if(n){const row=document.createElement('div'),img=document.createElement('img'),label=document.createElement('span');img.src=iconUrl(kind);img.alt='';label.textContent=AMMO[kind].maxDurability?`${AMMO[kind].label} · 一把，耐久 ${n}/3`:`${AMMO[kind].label} ×${n}`;row.append(img,label);tip.append(row);}
+  if(PLAYTEST){const note=document.createElement('small');note.textContent='正式版配给；试玩其余道具 99 个，三叉戟三次耐久';tip.prepend(note);}
   info.addEventListener('click',()=>{const open=!wrapper.classList.contains('show-loadout');for(const other of container.querySelectorAll('.show-loadout')){other.classList.remove('show-loadout');other.querySelector('.loadout-info').setAttribute('aria-expanded','false');}wrapper.classList.toggle('show-loadout',open);info.setAttribute('aria-expanded',String(open));});
   b.append(number,name,best,flag);b.addEventListener('click',()=>loadLevel(i));wrapper.append(b,info,tip);container.append(wrapper);
  });$('#prevPage').disabled=levelPage===0;$('#nextPage').disabled=(levelPage+1)*5>=levelsFor(currentWorld()).length;$('#pageLabel').textContent=`${levelPage+1} / ${Math.ceil(levelsFor(currentWorld()).length/5)}`;
@@ -145,7 +149,7 @@ function loadLevel(n,preview=false){
  if(!preview&&(!accessibleWorld(currentWorld())||!canEnter(progress,n)))return false;cancelDrag();assets?.stopAll();
  if(world){window.Matter.Events.off(world.engine);window.Matter.Composite.clear(world.engine.world,false);window.Matter.Engine.clear(world.engine);}
  scene=preview?buildTitleScene():buildLevel(n,currentWorld());world=new SiegeWorld(window.Matter,{grid:scene.grid,rear:scene.rear,lavaSources:scene.lavaSources||[]});for(const e of scene.enemies)world.addEnemy(e.x,e.feet,e.skin,e);
- const inventory=PLAYTEST?playtestInventory():inventoryFor(n,currentWorld());
+ const inventory=PLAYTEST?playtestInventory(currentWorld(),n):inventoryFor(n,currentWorld());
  Object.assign(state,{level:n,inventory,selected:inventory.findIndex(count=>count>0),ended:false,drag:false,angle:0,pouch:{...SLING_HOME},launch:null,quiet:0,winWait:0,power:0,launched:0});
  renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gamehint').classList.remove('faded');$('#gamehint').textContent=coarsePointer.matches?'拖住弹药，松手发射 · 另一指轻点取消':'拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();if(PLAYTEST)playtestHint();revealInventory(3200);return true;
 }
@@ -153,7 +157,7 @@ function showLevels(){cancelDrag();if(!accessibleWorld(currentWorld())){state.wo
 function showHome(){cancelDrag();loadLevel(0,true);menus('home');}
 function enterGame(){if(state.screen!=='home')return;showLevels();if(!profile)showProfile();}
 function pause(){if(state.screen==='play'){cancelDrag();menus('pause');}else if(state.screen==='pause'){menus('play');revealInventory();}}
-function launcher(){return {...state,ammo:AMMO[state.launch?.kind??state.selected]||AMMO[0],loaded:!!state.inventory[state.selected]&&!state.ended&&(!state.launch||!state.launch.released)};}
+function launcher(){return {...state,ammo:AMMO[state.launch?.kind??state.selected]||AMMO[0],loaded:!!state.inventory[state.selected]&&!state.ended&&(!state.launch||!state.launch.released)&&!(state.selected===8&&world.projectiles.some(p=>!p.dead&&p.ammo.id==='trident'))};}
 function result(win){
  state.ended=true;cancelDrag();const first=!progress.completed.includes(state.level),reward=win&&first&&!state.playtest?rewardFor(state.level,currentWorld()):null;
  if(win){progress=finishLevel(progress,state.level);saveWorld(SAVE_KEY,progress);bestTimes=recordBestTime(bestTimes,state.level,Math.max(100,Math.round(world.time*1000)));saveWorld(TIME_SAVE_KEY,bestTimes);queueBestTimes();if(timeBundle(bestTimes))void syncResults();}
@@ -169,7 +173,7 @@ function animateLauncher(dt){
  if(a.age>.5){state.launch=null;state.pouch={...SLING_HOME};state.angle=0;}
 }
 function update(dt){
- animateLauncher(dt);const start=performance.now();world.step(dt);const duration=performance.now()-start;stepMs=stepMs*.97+duration*.03;maxStepMs=Math.max(maxStepMs,duration);renderer.update(world,dt);
+ animateLauncher(dt);const returning=world.projectiles.some(p=>!p.dead&&p.ammo.id==='trident');const start=performance.now();world.step(dt);const duration=performance.now()-start;stepMs=stepMs*.97+duration*.03;maxStepMs=Math.max(maxStepMs,duration);if(returning&&!world.projectiles.some(p=>!p.dead&&p.ammo.id==='trident')){hud();revealInventory();}renderer.update(world,dt);
  if(!state.ended){const outcome=updateOutcome(state,world,dt);if(outcome!==null)result(outcome);}
 }
 function frame(now){
@@ -179,7 +183,7 @@ function frame(now){
 }
 function point(e){const r=canvas.getBoundingClientRect();return {x:(e.clientX-r.left)*WIDTH/r.width,y:(e.clientY-r.top)*864/r.height};}
 function beginDrag(e){
- if(e.button===2){cancelDrag();e.preventDefault();return;}if(e.button!==0||e.isPrimary===false||state.drag||state.screen!=='play'||state.ended||state.launch||!state.inventory[state.selected])return;
+ if(e.button===2){cancelDrag();e.preventDefault();return;}if(e.button!==0||e.isPrimary===false||state.drag||state.screen!=='play'||state.ended||state.launch||!state.inventory[state.selected]||state.selected===8&&world.projectiles.some(p=>!p.dead&&p.ammo.id==='trident'))return;
  const p=point(e),radius=e.pointerType==='touch'?Math.max(55,24*WIDTH/canvas.getBoundingClientRect().width):55;if(Math.hypot(p.x-state.pouch.x,p.y-state.pouch.y)>radius)return;
  state.drag=true;state.pointerId=e.pointerId;state.power=0;state.vx=state.vy=0;canvas.setPointerCapture(e.pointerId);e.preventDefault();if(assets.soundOn)drawAudio.begin();
 }
@@ -193,14 +197,14 @@ function endDrag(e){
  // A click is not a shot. Keep even very small deliberate pulls available.
  if(!state.vx&&!state.vy){cancelDrag();return;}
  state.drag=false;drawAudio.stop();const kind=state.selected;
- if(!spendAmmo(state.inventory,kind))return;world.spawnProjectile(AMMO[kind].id,state.pouch.x,state.pouch.y,state.vx,state.vy);
+ if(!spendAmmo(state.inventory,kind))return;world.spawnProjectile(AMMO[kind].id,state.pouch.x,state.pouch.y,state.vx,state.vy,{returnHome:SLING_HOME});
  state.launch={age:0,kind,dx:state.pouch.x-SLING_HOME.x,dy:state.pouch.y-SLING_HOME.y,released:true};state.launched++;
  assets.play(AMMO[kind].id==='fire'?'fire_launch':'bow',.2);hud();revealInventory(1600);$('#gamehint').classList.add('faded');
 }
 function playtestHint(){const ammo=AMMO[state.selected];$('#gamehint').textContent=`${ammo.label}：${ammo.detail}`;}
 function select(i){if(state.screen!=='play'||state.launch||state.drag||!Number.isInteger(i))return;state.selected=clamp(i,0,8);hud();if(PLAYTEST)playtestHint();revealInventory();}
 function status(){
- const s=world.snapshot();return {...s,ready:true,dimension:currentWorld(),titleScene:!!scene.titleScene,level:state.level+1,shots:state.shots,inventory:[...state.inventory],ammoCounts:Object.fromEntries(AMMO.map((a,i)=>[a.id,state.inventory[i]||0])),screen:state.screen,unlocked:progress.unlocked,
+ const s=world.snapshot();return {...s,ready:true,dimension:currentWorld(),titleScene:!!scene.titleScene,level:state.level+1,shots:state.shots,inventory:[...state.inventory],ammoCounts:Object.fromEntries(AMMO.map((a,i)=>[a.id,state.inventory[i]||0])),tridentDurability:state.inventory[8]||0,screen:state.screen,unlocked:progress.unlocked,
  launched:state.launched,selected:AMMO[state.selected]?.id||'empty',selectedSlot:state.selected,paused:state.paused,ended:state.ended,particles:renderer.particles.length,burning:world.fires.filter(f=>world.time>=f.startedAt).length,projectiles:s.projectiles.length,ammoBodies:s.projectiles,restingBlocks:s.projectiles.filter(p=>p.sleeping).length,
  fps:Math.round(fps),stepMs:+stepMs.toFixed(2),maxStepMs:+maxStepMs.toFixed(2),launcher:{x:state.pouch.x,y:state.pouch.y,vx:state.vx,vy:state.vy,angle:state.angle,phase:state.drag?'aim':state.launch?'recoil':'ready',type:'slingshot'}};
 }
@@ -211,7 +215,7 @@ async function start(){
  music=new BackgroundMusic();$('#musicToggle').textContent=music.enabled?'音乐：开':'音乐：关';drawAudio.setVolume(assets.soundVolume);drawAudio.setMuted(!assets.soundOn);audioLabels();
  if(globalThis.MC_PLATFORM?.toy)loadState.textContent='正在连接 Toy 云存档…';await appStorage.initialize();try{progress=readProgress(appStorage.getItem(SAVE_KEY));}catch{progress=readProgress(null);}
  for(let i=0;i<9;i++){
-  const b=document.createElement('button');b.className='ball';const img=document.createElement('img');img.alt='';const count=document.createElement('span');count.className='stack-count';b.append(img,count);
+  const b=document.createElement('button');b.className='ball';const img=document.createElement('img');img.alt='';const count=document.createElement('span');count.className='stack-count';const durability=document.createElement('span');durability.className='durability';durability.hidden=true;b.append(img,count,durability);
   b.addEventListener('click',()=>select(i));$('#ballbar').append(b);
  }
  profile=PLAYTEST?{nickname:'自由试玩'}:readLocal(PROFILE_KEY,null);if(typeof profile?.nickname!=='string'||!profile.nickname.trim()||[...profile.nickname].length>16)profile=null;if(nativeOnline&&appStorage.user()?.nickname){const linked=await online.createProfile();profile={...linked.profile,token:linked.token};saveLocal(PROFILE_KEY,profile);}profileLabel();

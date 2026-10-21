@@ -10,7 +10,7 @@ export const END_LEVELS=[
  {title:'07 / 折叠阶城',desc:'逐层升高的露台，考验不同力度的投射'},
  {title:'08 / 失落船坞',desc:'船形紫珀大厅和低处码头分层设防'},
  {title:'09 / 星门卫城',desc:'中央开口连通地下厅，侧塔控制高处'},
- {title:'10 / 终焉王庭',desc:'双塔与深厅中的最后守军，共同守住末地'}
+ {title:'10 / 末影龙归巢',desc:'末影龙将俯冲回中央基岩台；盘旋时蓄力，归巢时重击'}
 ];
 
 export function buildEnd(level){
@@ -59,11 +59,13 @@ export function buildEnd(level){
   row(24,25,6,40);column(23,7,10,40);column(26,7,10,40);clear(18,13,1,3);
   sh(19.5,8);sh(29,8);en(20.5,12);en(28.5,12);sh(22,16);en(26,16);prop(19,15,21);
  }else{
-  clear(18,14,13,2);row(18,30,16,37);room(18,13,13,3,37);
-  row(18,21,6,38);row(28,30,6,38);column(18,7,15,39);column(30,7,15,39);
-  row(19,21,11,38);row(28,29,11,38);row(23,26,12,38);row(23,26,7,38);room(23,8,4,4,38);
-  clear(18,12,1,4);sh(19.5,6);sh(29,6);en(20.5,11);en(28.5,11);sh(24,12);en(25.5,12);sh(21.5,16);en(27,16);
-  prop(23,11,21);prop(29,15,19);
+  // Open End island, obsidian pylons and a low central landing dais.
+  clear(17,3,15,13);row(17,31,16,36);room(17,5,15,11,36);
+  column(18,8,15,40);column(31,6,15,40);row(18,20,7,40);row(30,31,5,40);
+  row(22,28,14,37);row(22,28,15,36);row(23,27,13,7);
+  sh(19,7);sh(30.5,5);
+  enemy(25,13,'ender_dragon',{height:110,flightBounds:{left:1040,right:1300,top:210,bottom:569}});
+
  }
  assignEndermanSpots(scene);
  return {...scene,...END_LEVELS[level]};
