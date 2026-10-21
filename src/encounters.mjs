@@ -2,6 +2,7 @@
 // Their encounter roles and all boss phases below are adaptations for this game.
 export const ENCOUNTER_PROFILES={
  wither:{width:112,height:88,mass:5,hp:450,armored:true,heavy:true,fireImmune:true,flying:true,boss:true,label:'凋灵'},
+ wither_skeleton:{width:32,height:116,mass:1.3,hp:100,fireImmune:true,label:'凋灵骷髅'},
  ender_dragon:{width:214,height:110,mass:8,hp:600,armored:true,heavy:true,fireImmune:true,flying:true,boss:true,label:'末影龙'},
  sift_blub:{width:44,height:48,mass:1,hp:100,label:'布鲁布'},
  sift_sifter:{width:52,height:46,mass:1.3,hp:100,label:'筛行兽'},
@@ -52,9 +53,15 @@ export function tickEncounter(world,e,dt){
  if(e.encounterStart===undefined)initEncounter(e,world.time);
  if(!profile.flying&&!profile.elite&&e.skin!=='sift_echo_golem')return false;
  const elapsed=world.time-e.encounterStart;
+ if(e.skin==='wither'){
+  e.encounterPhase='hover';e.pose={...e.pose,attackCharge:0,gesture:0,jawOpen:0,walkBlend:0,wingFlap:0};
+  if(world.time<(e.externalUntil??0))return true;
+  const f=e.flightBounds;
+  flight(world,e,{x:e.encounterHome.x+Math.sin(elapsed*.65)*10,y:Math.min(e.encounterHome.y,f.bottom)-8+Math.sin(elapsed*.9)*5},dt);
+  return true;
+ }
  let cycle,length,charge,pulseAt,recoverEnd;
- if(e.skin==='wither'){length=8;charge=3.3;pulseAt=4.1;recoverEnd=6.2;}
- else if(e.skin==='ender_dragon'){length=11;charge=5.1;pulseAt=6;recoverEnd=9.1;}
+ if(e.skin==='ender_dragon'){length=11;charge=5.1;pulseAt=6;recoverEnd=9.1;}
  else if(e.skin==='sift_singer'){length=6;charge=3.3;pulseAt=4.1;recoverEnd=5.4;}
  else{length=7.5;charge=3.8;pulseAt=4.8;recoverEnd=6.4;}
  cycle=Math.floor(elapsed/length);const t=elapsed%length;
@@ -74,7 +81,6 @@ export function tickEncounter(world,e,dt){
   let target={x:cx+Math.sin(elapsed*.55)*(f.right-f.left)*.45,y:cy+Math.sin(elapsed*.8)*(f.bottom-f.top)*.23};
   // The dragon descends to a long, predictable perch window for heavy shots.
   if(e.skin==='ender_dragon'&&(charging||recovery||e.encounterPhase==='pulse'))target={x:cx,y:f.bottom};
-  else if(e.skin==='wither'&&(charging||recovery))target={x:cx,y:cy};
   flight(world,e,target,dt);return true;
  }
  // Hold the authored pedestal without replacing physics or this phase's pose.
@@ -82,5 +88,33 @@ export function tickEncounter(world,e,dt){
 }
 export function encounterDamageMultiplier(e,kind){
  // A clear recovery window rewards timing but never blocks an untimed hit.
- return ENCOUNTER_PROFILES[e.skin]?.boss&&e.encounterPhase==='recover'&&['cobble','anvil','trident','ender','slimeball'].includes(kind)?1.5:1;
+ return e.skin!=='wither'&&ENCOUNTER_PROFILES[e.skin]?.boss&&e.encounterPhase==='recover'&&['cobble','anvil','trident','ender','slimeball'].includes(kind)?1.5:1;
+}
+// Called by combat once after every deduplicated effective Wither hit, including
+// the killing hit. Damage ownership stays in combat; spawning never deals damage.
+export function summonWitherSkeleton(world,e){
+ const p=ENCOUNTER_PROFILES.wither_skeleton,s=world.s,half=p.width/2,origin=e.body.position,candidates=[];
+ for(let gx=Math.ceil((half+3)/s);gx<Math.floor((world.width-half-3)/s);gx++)for(let gy=Math.ceil((p.height+3)/s);gy<world.grid.height-1;gy++){
+  if(!world.grid.get(gx,gy)||world.grid.get(gx,gy-1))continue;
+  const x=(gx+.5)*s,feet=gy*s;
+  candidates.push({x,feet,distance:Math.hypot(x-origin.x,feet-origin.y)});
+ }
+ candidates.sort((a,b)=>a.distance-b.distance||a.x-b.x);
+ for(const spot of candidates){
+  const left=spot.x-half,right=spot.x+half,top=spot.feet-p.height,bottom=spot.feet;
+  let clear=true;
+  for(let x=left+1;x<right-1;x+=s)if(!world.sample(x,bottom+1)){clear=false;break;}
+  if(!clear)continue;
+  for(let y=top+1;y<bottom-1&&clear;y+=s)for(let x=left+1;x<right-1;x+=s)if(world.sample(x,y)){clear=false;break;}
+  if(!clear)continue;
+  for(const other of [...world.enemies,...(world.debris||[])]){
+   if(other.dead)continue;const b=other.body.bounds;
+   if(right>b.min.x-2&&left<b.max.x+2&&bottom>b.min.y-2&&top<b.max.y+2){clear=false;break;}
+  }
+  if(!clear)continue;
+  const add=world.addEnemy(spot.x,spot.feet,'wither_skeleton');
+  world.events.push({type:'summon',x:spot.x,y:spot.feet-p.height/2,sound:'wither_summon'});
+  return add;
+ }
+ return null;
 }

@@ -45,9 +45,9 @@ test('water turns contacted lava into blocking obsidian and extinguishes surface
 });
 
 test('anvil falls more steeply than stone and its aim dots follow actual flight',()=>{
- const w=fixture(),origin={x:100,y:100},stone=w.spawnProjectile('cobble',100,100,400,0),anvil=w.spawnProjectile('anvil',100,100,400,0),arc=predictArc(w,'anvil',origin,400,0);
- w.M.Body.setPosition(stone.body,{x:100,y:300});step(w,.5);
- assert.ok(anvil.body.position.y-100>stone.body.position.y-300+15);
+ const w=fixture(),normal=fixture(),origin={x:100,y:100},stone=normal.spawnProjectile('cobble',100,100,400,0),anvil=w.spawnProjectile('anvil',100,100,400,0),arc=predictArc(w,'anvil',origin,400,0);
+ step(w,.5);step(normal,.5);
+ assert.ok(anvil.body.position.y-100>stone.body.position.y-100+15);
  assert.ok(Math.abs(anvil.body.position.x-arc[4].x)<.01);assert.ok(Math.abs(anvil.body.position.y-arc[4].y)<.01);
 });
 

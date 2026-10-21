@@ -1,70 +1,89 @@
 import {createLevelBuilder} from './level-builder.mjs';
 
-// Community-inspired adaptation, not an assertion of unreleased vanilla rules.
-// Clear horizontal lanes teach trident penetration; high and low galleries then
-// require the player to combine it with the eight previously earned items.
+// Native MIT community-mod materials and species; encounter roles are adapted.
+// Landforms carry the composition. Ruins are fragments, with open sky between.
 export const SIFT_LEVELS=[
- {title:'01 / 覆生门廊',desc:'沿同一射线站立的守军，试试三叉戟'},
- {title:'02 / 回声石庭',desc:'破碎拱门围出两个高低射界'},
- {title:'03 / 柳木驿站',desc:'覆生柳木与筛板岩构成的双层驿站'},
- {title:'04 / 灵魂台阶',desc:'层叠台地通向古老的回声门'},
- {title:'05 / 峡谷连桥',desc:'两座断崖间的短桥与低处通道'},
- {title:'06 / 幽匿书厅',desc:'高处货台与底层守军共享一条长廊'},
- {title:'07 / 古门前哨',desc:'半埋入台地的门廊留下侧面射界'},
- {title:'08 / 覆生双塔',desc:'两座塔楼、斜坡台地和相通的内院'},
- {title:'09 / 回声深庭',desc:'下沉庭院与外侧守军分层设防'},
- {title:'10 / 回声圣环',desc:'社区模组回声傀儡改编首领；中央祭坛蓄势，脉冲后露出重击窗口'}
+ {title:'01 / 柳林初径',desc:'同一条林间空地上的三只原生生物；一把三叉戟有三次耐久'},
+ {title:'02 / 分岔幽谷',desc:'两岸与谷底形成三条射线，先观察谷地的高低差'},
+ {title:'03 / 覆生阶城',desc:'顺着破碎台阶逐层抬高准星，废墟之间留着开阔天光'},
+ {title:'04 / 断柳长桥',desc:'木桥上的低矮生物与谷底目标分开瞄准'},
+ {title:'05 / 回声落穴',desc:'塌陷的坡面通向深处，吟唱者站在最低的台地'},
+ {title:'06 / 失落书林',desc:'树根与残存书台交错，穿过开放的林间射界'},
+ {title:'07 / 天光竖井',desc:'两侧断崖与中央悬台围住深井，井口完全敞开'},
+ {title:'08 / 裂脊碑林',desc:'断裂石碑跨过低谷，高低目标各有自己的落点'},
+ {title:'09 / 沉降剧场',desc:'天然台阶围成下沉的回声场，侧翼与底部依次清理'},
+ {title:'10 / 破环圣地',desc:'覆生山丘托起破碎圣环；回声傀儡蓄势后露出重击窗口'}
 ];
 
 export function buildSift(level){
- const b=createLevelBuilder('sift'),{scene,row,column,room,clear,enemy,roof,slab,prop}=b;
+ const {scene,row,column,tile,surface,enemy}=createLevelBuilder('sift');
+ const land=(from,to,top)=>{for(let x=from;x<=to;x++)surface(x,top,42);};
  let ordinary=0;
  const guard=(x,feet)=>{const skin=ordinary++%2?'sift_sifter':'sift_blub';enemy(x,feet,skin,{height:skin==='sift_blub'?48:46});};
- const heavy=(x,feet)=>enemy(x,feet,'sift_singer',{height:146,stationary:true});
+ const singer=(x,feet)=>enemy(x,feet,'sift_singer',{height:146,stationary:true});
+ // Sparse rear trunks/roots create depth without large rectangular back walls.
+ const ghostWillow=(x,top,bottom)=>{
+  const rear=scene.rear.grid;
+  for(let y=top+1;y<=bottom;y++)rear.tile(x,y,45);
+  // Native willow foliage wraps the branches; uneven vines soften its edge.
+  rear.tile(x-1,top+1,45);rear.tile(x+1,top+1,45);
+  for(const [dy,radius]of [[-1,1],[0,2],[1,2],[2,1]])for(let dx=-radius;dx<=radius;dx++)rear.tile(x+dx,top+dy,48);
+  for(const [dx,length]of [[-2,2],[2,3]])for(let dy=0;dy<length&&top+2+dy<bottom;dy++)rear.tile(x+dx,top+2+dy,dy===length-1?50:49);
+ };
+ const root=(x,y)=>{tile(x,y,47);};
  if(level===0){
-  row(18,30,13,43);column(19,9,12,44);column(30,9,12,44);row(19,30,8,43);
-  clear(19,10,1,3);room(20,9,10,4,41);slab(18,31,8,44);
-  guard(22,13);guard(25,13);guard(28,13);prop(20,12,21);
+  land(18,29,13);land(30,31,14);land(16,17,14);
+  ghostWillow(18,7,12);ghostWillow(29,6,12);column(30,9,13,45);row(29,31,8,47);
+  root(19,13);root(28,13);guard(21,13);guard(24,13);guard(27,13);
  }else if(level===1){
-  row(18,30,13,43);column(20,9,12,44);column(29,9,12,44);row(20,29,7,43);clear(20,10,1,3);
-  row(24,29,10,43);room(21,8,8,5,41);guard(22,13);guard(26,13);guard(27,10);guard(29,7);
+  land(18,21,12);land(22,26,15);land(27,31,11);
+  row(19,20,12,43);row(28,29,11,43);column(27,9,10,44);tile(28,8,44);
+  ghostWillow(18,7,11);ghostWillow(31,5,10);root(23,15);
+  guard(20,12);guard(23.5,15);guard(25.5,15);guard(29.5,11);
  }else if(level===2){
-  row(18,30,13,43);column(20,8,12,45);column(29,8,12,45);row(20,29,10,46);roof(19,30,7,46,46);
-  room(21,8,8,5,46);clear(20,11,1,2);guard(22,13);guard(26,13);guard(23,10);guard(27,10);prop(25,12,21);
+  land(18,21,14);land(22,25,12);land(26,28,10);land(29,31,8);
+  row(22,24,12,43);row(26,28,10,43);row(29,31,8,43);column(31,4,7,44);tile(30,4,44);
+  ghostWillow(19,8,13);root(25,12);root(28,10);
+  guard(20,14);guard(23.5,12);guard(27,10);guard(30,8);
  }else if(level===3){
-  row(18,21,13,43);row(22,25,11,43);row(26,30,9,43);column(23,12,13,44);column(29,10,13,44);
-  column(26,5,8,44);column(30,5,8,44);row(26,30,4,43);clear(26,6,1,3);room(27,5,3,4,41);
-  guard(19,13);guard(23,11);guard(27,9);guard(29,9);heavy(17,14);
+  land(18,21,12);land(22,27,16);land(28,31,11);
+  row(21,28,10,46);column(23,11,15,45);column(28,11,14,45);row(23,27,16,47);
+  ghostWillow(18,6,11);ghostWillow(31,5,10);tile(21,9,45);tile(28,9,45);
+  guard(20,12);guard(23.5,10);guard(26,10);guard(25.5,16);singer(30,11);
  }else if(level===4){
-  clear(22,14,4,2);row(21,27,12,43);row(18,21,13,43);row(27,31,10,43);column(29,11,13,44);
-  room(18,10,4,3,41);column(18,9,12,44);row(18,21,9,43);clear(18,10,1,3);
-  guard(20,13);guard(23,12);guard(25,12);guard(28,10);heavy(30,10);
+  land(18,20,11);land(21,23,13);land(24,28,16);land(29,31,12);
+  row(24,28,16,47);row(21,22,13,43);column(31,7,11,44);tile(30,7,43);
+  ghostWillow(18,5,10);root(24,16);guard(19.5,11);guard(22,13);guard(25.5,16);guard(30,12);singer(28,16);
  }else if(level===5){
-  row(18,30,13,43);column(19,6,12,45);column(30,6,12,45);roof(18,31,5,46,46);
-  row(20,24,9,46);row(27,29,9,46);room(20,6,10,7,46);clear(19,10,1,3);
-  guard(21,13);guard(24,13);guard(28,13);guard(22,9);guard(28,9);heavy(26,13);prop(20,12,21);
+  land(18,22,14);land(23,26,13);land(27,31,14);
+  column(18,8,13,45);column(31,9,13,45);row(17,19,7,47);row(30,31,8,47);
+  row(21,23,9,46);column(23,10,12,45);row(27,29,10,46);column(29,11,13,45);
+  scene.rear.grid.tile(21,10,46);scene.rear.grid.tile(28,11,46);ghostWillow(26,5,12);
+  guard(20,14);guard(22,9);guard(28,10);guard(27.5,14);singer(25,13);
  }else if(level===6){
-  row(18,30,13,43);column(20,5,12,44);column(29,5,12,44);row(20,29,4,43);row(21,28,5,44);
-  row(24,28,9,43);room(21,6,8,7,41);clear(20,10,1,3);guard(22,13);guard(25,13);guard(28,13);guard(25,9);guard(28,9);heavy(23,13);
+  land(18,20,8);land(21,28,16);land(29,31,7);
+  row(22,23,12,43);column(23,13,15,44);row(27,28,10,43);column(27,11,15,44);
+  row(18,20,8,47);row(29,31,7,43);tile(20,6,44);tile(30,5,44);
+  guard(19,8);guard(30,7);guard(22.5,12);guard(27.5,10);singer(25,16);
  }else if(level===7){
-  row(18,30,13,43);column(19,6,12,44);column(23,6,12,44);column(27,6,12,44);column(30,6,12,44);
-  row(18,24,5,43);row(26,31,5,43);row(20,22,9,46);row(28,29,9,46);row(24,26,11,43);
-  room(20,6,3,7,41);room(28,6,2,7,41);for(const x of [19,23,27])clear(x,10,1,3);
-  guard(21,13);guard(25,11);guard(29,13);guard(21,9);guard(28.5,9);guard(21,5);heavy(29,5);
+  land(18,21,10);land(22,25,15);land(26,28,12);land(29,31,9);
+  column(20,5,9,44);tile(19,5,43);column(30,4,8,44);tile(31,4,43);
+  row(22,24,15,47);row(26,28,12,43);ghostWillow(27,6,11);
+  guard(19,10);guard(23.5,15);guard(27,12);guard(29.4,9);singer(25,15);
  }else if(level===8){
-  clear(18,14,13,2);row(18,30,16,43);room(18,12,13,4,41);column(19,9,15,44);column(30,9,15,44);
-  row(18,23,8,43);row(27,31,8,43);row(20,23,12,46);row(27,29,12,46);clear(19,13,1,3);
-  guard(21,8);guard(29,8);guard(21,12);guard(28,12);guard(22,16);guard(27,16);heavy(25,16);
+  land(18,20,9);land(21,23,12);land(24,28,16);land(29,31,10);
+  row(18,20,9,43);row(21,23,12,43);row(24,28,16,47);row(29,31,10,43);
+  column(18,5,8,44);column(31,6,9,44);ghostWillow(23,6,11);tile(29,8,44);
+  guard(19.5,9);guard(22,12);guard(25,16);guard(30,10);singer(28,16);
  }else{
-  // A circular shrine cross-section: low approach, side galleries and one crown.
-  clear(17,4,15,12);row(17,31,16,41);room(17,5,15,11,47);
-  row(18,21,8,43);row(29,31,8,43);column(18,9,15,44);column(31,9,15,44);
-  row(23,28,14,43);row(24,27,15,44);row(22,29,4,44);
-  // The broken arch is silhouette only; the whole horizontal arena stays open.
-  column(21,5,6,44);column(30,5,5,44);row(19,20,7,46);row(30,31,7,46);
-  guard(19.5,7);guard(30.5,7);guard(20,16);guard(29.5,16);
-  enemy(25.5,14,'sift_echo_golem',{height:114,stationary:true});
-
+  land(18,20,13);land(21,23,15);land(24,28,14);land(29,31,12);
+  // Broken circular arch, rooted in unequal hills, with a broad open middle.
+  column(21,8,10,44);column(22,6,7,43);row(23,24,5,44);
+  row(27,28,5,44);column(29,6,7,43);column(31,8,11,44);
+  row(25,27,14,43);row(25,27,15,44);tile(24,14,47);tile(28,14,47);
+  ghostWillow(18,7,12);ghostWillow(30,6,11);
+  guard(19.5,13);guard(22.5,15);guard(28,14);guard(30,12);
+  enemy(26,14,'sift_echo_golem',{height:114,stationary:true});
  }
  return {...scene,...SIFT_LEVELS[level]};
 }

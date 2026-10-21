@@ -26,10 +26,10 @@ test('a wind burst detonates a placed crystal instead of leaving phantom motion'
  const w=world(),c=w.spawnProjectile('crystal',300,350,0,0);advance(w,1);assert.equal(c.placed,true);
  gust(w,280,360);assert.equal(c.dead,true);assert.equal(w.stats.explosions,1);assert.equal(w.active(),false);
 });
-test('a flying trident passes multiple creatures and returns after hitting a solid wall',()=>{
+test('a flying trident passes multiple creatures, settles, then returns',()=>{
  const w=world();w.engine.gravity.y=0;
  const a=w.addEnemy(300,350,'pillager'),b=w.addEnemy(450,350,'pillager');M.Body.setStatic(a.body,true);M.Body.setStatic(b.body,true);
  w.grid.fill(200,0,16,128,7);w.synchronize();
  const p=w.spawnProjectile('trident',150,300,900,0);advance(w,1);
- assert.equal(a.alive,false);assert.equal(b.alive,false);assert.ok(p.body.position.x<600);advance(w,1);assert.equal(p.returned,true);assert.equal(p.dead,true);
+ assert.equal(a.alive,false);assert.equal(b.alive,false);assert.ok(p.body.position.x<600);assert.notEqual(p.returning,true);advance(w,20);assert.equal(p.returned,true);assert.equal(p.dead,true);
 });

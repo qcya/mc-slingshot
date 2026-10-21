@@ -10,7 +10,7 @@ export const END_LEVELS=[
  {title:'07 / 折叠阶城',desc:'逐层升高的露台，考验不同力度的投射'},
  {title:'08 / 失落船坞',desc:'船形紫珀大厅和低处码头分层设防'},
  {title:'09 / 星门卫城',desc:'中央开口连通地下厅，侧塔控制高处'},
- {title:'10 / 末影龙归巢',desc:'末影龙将俯冲回中央基岩台；盘旋时蓄力，归巢时重击'}
+ {title:'10 / 末影龙归巢',desc:'末影龙将在中央返回传送门喷泉上方归巢；盘旋时蓄力，归巢时重击'}
 ];
 
 export function buildEnd(level){
@@ -59,12 +59,17 @@ export function buildEnd(level){
   row(24,25,6,40);column(23,7,10,40);column(26,7,10,40);clear(18,13,1,3);
   sh(19.5,8);sh(29,8);en(20.5,12);en(28.5,12);sh(22,16);en(26,16);prop(19,15,21);
  }else{
-  // Open End island, obsidian pylons and a low central landing dais.
-  clear(17,3,15,13);row(17,31,16,36);room(17,5,15,11,36);
-  column(18,8,15,40);column(31,6,15,40);row(18,20,7,40);row(30,31,5,40);
-  row(22,28,14,37);row(22,28,15,36);row(23,27,13,7);
-  sh(19,7);sh(30.5,5);
-  enemy(25,13,'ender_dragon',{height:110,flightBounds:{left:1040,right:1300,top:210,bottom:569}});
+  // Open sky over an irregular Endstone island and the vanilla exit fountain.
+  clear(17,4,15,13);
+  for(let x=17;x<32;x++)surface(x,x<19?16:x<22?15:x<29?14:x<31?15:16,36);
+  // Seven-wide basin, one-block outer rim and a single three-high centre post.
+  // The open bowl avoids the two tall side walls of a castle silhouette.
+  row(22,28,15,7);clear(23,14,5,1);tile(22,14,7);tile(28,14,7);
+  column(25,12,14,7);
+  // Two isolated obsidian pylons frame the fountain without sealing the sky.
+  column(18,9,15,40);row(18,19,8,40);column(31,7,15,40);row(30,31,6,40);
+  sh(19,8);sh(30.5,6);
+  enemy(25.5,12,'ender_dragon',{height:110,flightBounds:{left:1100,right:1320,top:220,bottom:521}});
 
  }
  assignEndermanSpots(scene);

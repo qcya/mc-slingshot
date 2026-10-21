@@ -83,7 +83,7 @@ export function rearPixel(assets,m,x,y,world,visual){
   const average=assets.averages[MATERIALS[m].sprite];
   // Muted appliances stay legible against the darker, noncolliding back wall.
   // Neither layer brightens when foreground pixels disappear.
-  const shade=[19,20,21].includes(m)?.65:.42;
+ const shade=[19,20,21,48,49,50].includes(m)?.65:m===45?.5:.42;
   return [0,1,2].map(c=>(average[c]*.35+p[c]*.65)*shade).concat(p[3]);
 }
 

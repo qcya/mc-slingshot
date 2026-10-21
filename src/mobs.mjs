@@ -126,7 +126,7 @@ export class MobSprites{
    const [u,v,w,h]=f.uv,[a,b,,d]=f.vertices;c.save();
    c.transform((b.x-a.x)/Math.abs(w),(b.y-a.y)/Math.abs(w),(d.x-a.x)/Math.abs(h),(d.y-a.y)/Math.abs(h),a.x,a.y);
    if(w<0||h<0){c.translate(w<0?-w:0,h<0?-h:0);c.scale(w<0?-1:1,h<0?-1:1);}
-   c.drawImage(image,Math.min(u,u+w),Math.min(v,v+h),Math.abs(w),Math.abs(h),0,0,Math.abs(w),Math.abs(h));
+   c.drawImage(f.texture?this.assets.images[f.texture]:image,Math.min(u,u+w),Math.min(v,v+h),Math.abs(w),Math.abs(h),0,0,Math.abs(w),Math.abs(h));
    if(f.face==='side'){c.fillStyle='#0002';c.fillRect(0,0,Math.abs(w),Math.abs(h));}c.restore();
   }
  }

@@ -38,3 +38,13 @@ in the model. Daylight shading and a fuller canvas fit make the stepped shape
 legible. The trident retains the original item pixels with a masked animated
 enchantment sheen and velocity-directed flight/return presentation. The wooden
 sling artwork is unchanged.
+
+The beta 2 revision adds Mojang's original Wither Skeleton model and skin from
+the same pinned Bedrock commit, with the original stone-sword item pixels held
+at the skeleton's hand. Its two-pixel-wide bone limbs and tall proportions are
+retained. Native Wither Skeleton hurt/death/idle and Wither spawn OGG clips are
+verified in the sound manifest. The spawn clip plays quietly with small gray
+summon particles. The Wither has no pulse circle. Boss bars use a fixed top
+center 182-by-5 pixel bar layout. Dragon flight articulation counter-rotates
+hips, knees and ankles to keep broad toes level and separate from the belly;
+the underlying native cuboids and atlas UVs remain unchanged.

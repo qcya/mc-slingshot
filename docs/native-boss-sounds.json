@@ -88,5 +88,29 @@
     "source": "minecraft/sounds/mob/irongolem/death.ogg",
     "sha1": "aa6c662548316c68591a63f568be1f997d162ef1",
     "url": "https://resources.download.minecraft.net/aa/aa6c662548316c68591a63f568be1f997d162ef1"
+  },
+  {
+    "file": "assets/sfx/wither_skeleton_hurt.ogg",
+    "source": "minecraft/sounds/mob/wither_skeleton/hurt1.ogg",
+    "sha1": "aca61491c1ed4f91b2f97ad221ba279cb7629579",
+    "url": "https://resources.download.minecraft.net/ac/aca61491c1ed4f91b2f97ad221ba279cb7629579"
+  },
+  {
+    "file": "assets/sfx/wither_skeleton_death.ogg",
+    "source": "minecraft/sounds/mob/wither_skeleton/death1.ogg",
+    "sha1": "5c016e18ac7a942da00fa06522166b6210c8b3e6",
+    "url": "https://resources.download.minecraft.net/5c/5c016e18ac7a942da00fa06522166b6210c8b3e6"
+  },
+  {
+    "file": "assets/sfx/wither_skeleton_idle.ogg",
+    "source": "minecraft/sounds/mob/wither_skeleton/idle1.ogg",
+    "sha1": "54b9403fc2362a9fc28b67e7f34f7c3efdfe0dce",
+    "url": "https://resources.download.minecraft.net/54/54b9403fc2362a9fc28b67e7f34f7c3efdfe0dce"
+  },
+  {
+    "file": "assets/sfx/wither_summon.ogg",
+    "source": "minecraft/sounds/mob/wither/spawn.ogg",
+    "sha1": "52049ed59e074474287b5dfee00477ce571b3385",
+    "url": "https://resources.download.minecraft.net/52/52049ed59e074474287b5dfee00477ce571b3385"
   }
 ]

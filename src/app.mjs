@@ -102,7 +102,7 @@ function hud(){
   b.classList.toggle('durable',durable);b.classList.toggle('in-flight',!!inFlight);
   b.querySelector('.stack-count').textContent=kind!==null&&!durable?String(count):'';
   const bar=b.querySelector('.durability');if(bar){bar.hidden=!durable;bar.style.setProperty('--remaining',`${Math.max(0,count)/3*100}%`);bar.dataset.remaining=count;}
-  b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:durable?`${i+1}. 三叉戟 · 耐久 ${count}/3${inFlight?' · 正在返回':''}`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);b.title=kind===null?'':`${AMMO[kind].label} · ${AMMO[kind].detail}`;if(kind!==null)b.querySelector('img').src=iconUrl(kind);
+  b.setAttribute('aria-label',kind===null?`${i+1}. 空物品格`:durable?`${i+1}. 三叉戟 · 耐久 ${count}/3${inFlight?' · 飞行中':''}`:`${i+1}. ${AMMO[kind].label} · ${count} 个`);b.title=kind===null?'':`${AMMO[kind].label} · ${AMMO[kind].detail}`;if(kind!==null)b.querySelector('img').src=iconUrl(kind);
  }
 }
 function revealInventory(ms=2200){inventoryUntil=performance.now()+ms;$('#inventory').classList.remove('tucked');}
@@ -151,7 +151,7 @@ function loadLevel(n,preview=false){
  scene=preview?buildTitleScene():buildLevel(n,currentWorld());world=new SiegeWorld(window.Matter,{grid:scene.grid,rear:scene.rear,lavaSources:scene.lavaSources||[]});for(const e of scene.enemies)world.addEnemy(e.x,e.feet,e.skin,e);
  const inventory=PLAYTEST?playtestInventory(currentWorld(),n):inventoryFor(n,currentWorld());
  Object.assign(state,{level:n,inventory,selected:inventory.findIndex(count=>count>0),ended:false,drag:false,angle:0,pouch:{...SLING_HOME},launch:null,quiet:0,winWait:0,power:0,launched:0});
- renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gamehint').classList.remove('faded');$('#gamehint').textContent=coarsePointer.matches?'拖住弹药，松手发射 · 另一指轻点取消':'拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();if(PLAYTEST)playtestHint();revealInventory(3200);return true;
+ renderer.reset(scene);acc=0;maxStepMs=0;menus('play');$('#gameRoot').classList.toggle('has-boss',scene.enemies.some(e=>['wither','ender_dragon','sift_echo_golem'].includes(e.skin)));$('#gamehint').classList.remove('faded');$('#gamehint').textContent=coarsePointer.matches?'拖住弹药，松手发射 · 另一指轻点取消':'拖动瞄准 · 右键取消 · 滚轮换物品 · ESC 菜单';hud();if(PLAYTEST)playtestHint();revealInventory(3200);return true;
 }
 function showLevels(){cancelDrag();if(!accessibleWorld(currentWorld())){state.world='overworld';state.level=0;loadWorldProgress();}levelPage=Math.floor(state.level/5);renderCards();menus('levels');}
 function showHome(){cancelDrag();loadLevel(0,true);menus('home');}

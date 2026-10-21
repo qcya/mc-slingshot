@@ -10,7 +10,7 @@ export const NETHER_LEVELS=[
  {title:'07 / 诡异货仓',desc:'错落屋顶留下投入口，清理货台两侧'},
  {title:'08 / 交错要塞',desc:'三段不同高度的砖廊构成连续防线'},
  {title:'09 / 黑石监牢',desc:'从开放缺口进入下沉牢室'},
- {title:'10 / 凋灵祭坛',desc:'绕开玄武岩角楼；凋灵蓄势后会短暂悬停，抓住重击窗口'}
+ {title:'10 / 凋灵祭坛',desc:'凋灵悬停在祭坛上方；三次有效攻击击败本体，每次都会召来一只凋灵骷髅'}
 ];
 
 export function buildNether(level){

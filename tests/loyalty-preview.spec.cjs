@@ -14,12 +14,12 @@ test('one loyal trident uses durability, blocks duplicate throws in flight, and 
  await page.locator('#levelMenu [data-world="sift"]').click();await page.locator('#level-0').click();
  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([0,0,0,0,0,0,0,0,3]);
  const item=page.locator('#ballbar button').nth(8);await expect(item.locator('.stack-count')).toHaveText('');await expect(item.locator('.durability')).toBeVisible();await expect(item).toHaveAttribute('aria-label',/耐久 3\/3/);
- await aim(page,-120,45);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().tridentDurability)).toBe(2);
+ await aim(page,-10,80);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().tridentDurability)).toBe(2);
  await page.clock.runFor(550);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies.some(p=>p.id==='trident'))).toBe(true);
- await aim(page,-120,45);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(1);
+ await aim(page,-10,80);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(1);
  await page.clock.runFor(3000);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().ammoBodies.some(p=>p.id==='trident'))).toBe(false);
  await expect(item).toHaveAttribute('aria-label',/耐久 2\/3/);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().ended)).toBe(false);
- await aim(page,-120,45);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(2);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().tridentDurability)).toBe(1);
+ await aim(page,-10,80);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().launched)).toBe(2);expect(await page.evaluate(()=>MCBlockLaunch.getStatus().tridentDurability)).toBe(1);
  expect(errors).toEqual([]);
 });
 test('new native bosses and Sift species render in the actual browser without startup errors',async({page})=>{

@@ -82,7 +82,11 @@ export class Renderer {
       else if(event.type==='impact')this.assets.play(event.sound||MATERIALS[event.m]?.sound||'stone',clamp(event.speed/2200,.12,.4));
       else if(event.type==='hurt')this.assets.play(event.sound,.18);
       else if(event.type==='recall')this.assets.play(event.sound||'trident_return',.28);
-      else if(event.type==='encounterPulse')this.effects.push({...event,life:.65,total:.65});
+      else if(event.type==='encounterPulse'&&event.skin!=='wither')this.effects.push({...event,life:.65,total:.65});
+      else if(event.type==='summon'){
+        this.assets.play(event.sound||'wither_summon',.18);
+        for(let i=0;i<14;i++)this.particles.push({x:event.x+(Math.random()-.5)*22,y:event.y-12-Math.random()*65,vx:(Math.random()-.5)*26,vy:-20-Math.random()*30,color:i%2?'#4c4a4e':'#99909b',life:.5+Math.random()*.3,size:3,poof:true});
+      }
       else if(event.type==='ambient'&&navigator.userActivation?.hasBeenActive)this.assets.play(event.sound,.075);
       else if(['gust','splash','snow'].includes(event.type)){this.effects.push({...event,life:.4,total:.4});if(event.sound)this.assets.play(event.sound,.25);}
     }
@@ -128,14 +132,9 @@ export class Renderer {
   }
   mob(e,world){
     this.mobSprites.draw(this.ctx,e,world);
-    if(e.alive&&(e.pose?.attackCharge||0)>0){
+    if(e.alive&&e.skin!=='wither'&&(e.pose?.attackCharge||0)>0){
       const c=this.ctx,charge=e.pose.attackCharge,r=22+charge*30;c.save();c.translate(e.body.position.x,e.body.position.y);c.strokeStyle=e.skin==='wither'?'#cad2d3':'#76efee';c.globalAlpha=.3+charge*.6;c.lineWidth=3;
       for(let i=0;i<8;i++){const a=i*Math.PI/4+world.time*.8;c.fillStyle=c.strokeStyle;c.fillRect(Math.cos(a)*r-3,Math.sin(a)*r-3,6,6);}c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.stroke();c.restore();
-    }
-    const profile=ENCOUNTER_PROFILES[e.skin];
-    if(e.alive&&profile?.boss){
-      const c=this.ctx,w=Math.min(150,Math.max(100,e.dimensions.width)),x=e.body.position.x-w/2,y=e.body.position.y-e.dimensions.height/2-28;
-      c.save();c.fillStyle='#0b080dd9';c.fillRect(x-2,y-2,w+4,12);c.fillStyle='#37213e';c.fillRect(x,y,w,8);c.fillStyle=e.skin==='wither'?'#b784cf':e.skin==='ender_dragon'?'#df5dde':'#39c3c3';c.fillRect(x,y,w*clamp(e.hp/profile.hp,0,1),8);c.fillStyle='#fff';c.font='bold 15px system-ui';c.textAlign='center';c.fillText(profile.label,e.body.position.x,y-5);c.restore();
     }
     if(e.alive&&e.frozen){
       const c=this.ctx,w=e.skin==='warden'?144:e.skin==='hoglin'?148:e.dimensions.width+34;
@@ -151,6 +150,17 @@ export class Renderer {
     if(e.alive&&e.burningUntil>world.time){
       const w=e.dimensions.width+12,h=e.dimensions.height*.8,frame=Math.floor(world.time*12+e.id)%32,c=this.ctx;
       c.save();c.globalAlpha=.85;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
+    }
+  }
+  bossHud(world){
+    const bosses=world.enemies.filter(e=>e.alive&&!e.dead&&ENCOUNTER_PROFILES[e.skin]?.boss),c=this.ctx;
+    for(const [index,e] of bosses.entries()){
+      const profile=ENCOUNTER_PROFILES[e.skin],x=WIDTH/2-273,y=42+index*60,filled=Math.round(182*clamp(e.hp/profile.hp,0,1));
+      c.save();c.translate(x,y);c.scale(3,3);
+      // Vanilla's 182-by-5 pixel silhouette, dark outline and stepped pink fill.
+      c.fillStyle='#160b16';c.fillRect(0,0,182,5);c.fillStyle='#382035';c.fillRect(1,1,180,3);c.fillStyle='#68365f';c.fillRect(1,1,180,1);
+      if(filled>2){c.fillStyle='#960099';c.fillRect(1,1,Math.min(180,filled-1),3);c.fillStyle='#e75be8';c.fillRect(1,1,Math.min(180,filled-1),1);c.fillStyle='#be2bc2';c.fillRect(1,2,Math.min(180,filled-1),1);}
+      c.restore();c.save();c.font='bold 24px monospace';c.textAlign='center';c.fillStyle='#252025';c.fillText(profile.label,WIDTH/2+3,y-9+3);c.fillStyle='#fff';c.fillText(profile.label,WIDTH/2,y-9);c.restore();
     }
   }
   ball(x,y,ammo,size=ammo.size){
@@ -213,6 +223,7 @@ export class Renderer {
         for(let i=0;i<24;i++){const a=i*Math.PI/12;c.fillRect(Math.round((e.x+Math.cos(a)*radius)/3)*3,Math.round((e.y+Math.sin(a)*radius)/3)*3,6,6);}c.globalAlpha=1;
       }
     }
+    this.bossHud(world);
     if(paused){c.fillStyle='#15232da8';c.fillRect(0,0,WIDTH,HEIGHT);c.fillStyle='#fff';c.textAlign='center';c.font='bold 52px system-ui';c.fillText('已暂停',WIDTH/2,HEIGHT/2);c.textAlign='left';}
   }
 }

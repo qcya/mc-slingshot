@@ -1,4 +1,4 @@
-import {ENCOUNTER_PROFILES,initEncounter,encounterDamageMultiplier} from './encounters.mjs';
+import {ENCOUNTER_PROFILES,initEncounter,encounterDamageMultiplier,summonWitherSkeleton} from './encounters.mjs';
 // Gameplay profiles are deliberately separate from atlas and animation data.
 export const MOB_PROFILES={
  zombie:{width:32,height:92,mass:1.2,hp:100},pillager:{width:32,height:92,mass:1.2,hp:100},
@@ -14,7 +14,7 @@ export const armoredMob=e=>!!profileFor(e.skin).armored;
 export const fireImmune=e=>!!profileFor(e.skin).fireImmune;
 // Walking enemies must not turn a resting object into a fresh weapon.
 export const MIN_PROJECTILE_HIT_SPEED=180;
-export function projectileOpacity(p,time){return p.ammo.id==='ender'?Math.max(0,Math.min(1,1-(time-p.expiresAt)/.75)):1;}
+export function projectileOpacity(p,time){return p.ammo.id==='ender'?Math.max(0,Math.min(1,1-(time-p.expiresAt)/.75)):p.ammo.id==='anvil'&&p.expiresAt<Infinity?Math.max(0,Math.min(1,(p.expiresAt-time)/(p.fadeDuration||.8))):1;}
 export function projectileBody(M,ammo,x,y,options={}){
  const square=ammo.shape==='box'||['cobble','tnt'].includes(ammo.id);
  return square?M.Bodies.rectangle(x,y,ammo.size,ammo.size,options):M.Bodies.circle(x,y,ammo.size/2,options,16);
@@ -94,6 +94,11 @@ export function damageEnemy(world,e,damage,{source=null,kind='environment'}={}){
  if(fireImmune(e)&&['fire','lava'].includes(kind))return false;
  if(source&&e.hitSources.has(source))return false;
  if(source)e.hitSources.add(source);
+ if(e.skin==='wither'){
+  // Three distinct effective attacks, regardless of the selected weapon's
+  // damage scale. Summon synchronously even on the lethal third hit.
+  world.hurt(e,profileFor('wither').hp/3);summonWitherSkeleton(world,e);return true;
+ }
  if(e.skin==='enderman'&&!['environment','lava'].includes(kind)){
   if(!e.teleportCount){world.hurt(e,100);teleportEnemy(world,e);return true;}
   world.hurt(e,e.hp);return true;

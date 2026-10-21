@@ -85,5 +85,20 @@
     "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/dragon/dragon.tga",
     "sourceSha256": "097dd793c27d263fd6ef2804356a2f4ac15a7c3b520a5400a2359fdb459e78c9",
     "sha256": "7ca6c926415ea88c1cf85e42c12bba44ff6a458b60334ccb22b257cc7bcb0a09"
+  },
+  {
+    "file": "assets/textures/wither_skeleton.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/skeleton/wither_skeleton.png",
+    "sha256": "fdfae927fd8ad6e4fc991f756488d5ca00b83e8a894f4c28eceb33475ce8f9b1"
+  },
+  {
+    "file": "assets/textures/stone_sword.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/items/stone_sword.png",
+    "sha256": "675495afbe03f3c63a78e72b581743314f0ac02a12e43b24a5b2bd1267fce949"
+  },
+  {
+    "file": "assets/models/wither_skeleton.geo.json",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/models/entity/wither_skeleton.geo.json",
+    "sha256": "9a0a512aa7cc834852bcc44765c0fbd39993f44bc47b80e7d797cb867b9480f3"
   }
 ]

@@ -6,7 +6,7 @@ import {DEATH_TOPPLE} from './animation.mjs';
 import {igniteWood,igniteImpact,advanceFire,burnEnemy,splashWater} from './fire.mjs';
 import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust,freezeEnemy,thawEnemy} from './combat.mjs';
 import {LavaField} from './lava.mjs';
-import {launchVelocity,speedLimit,advanceWeapon,recallTrident,crystalSupported} from './weapons.mjs';
+import {launchVelocity,speedLimit,advanceWeapon,recallTrident,crystalSupported,restAnvilOnEnemy} from './weapons.mjs';
 import {tickEncounter} from './encounters.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
@@ -24,8 +24,9 @@ export class SiegeWorld {
     Matter.Events.on(this.engine,'collisionStart',event=>{
       for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
         const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null,wall=ammo===ea?b:a;
-        if(ammo&&['cobble','tnt','anvil'].includes(ammo.ammo.id)&&wall.plugin.glass)pair.isSensor=true;
+        if(ammo&&['cobble','tnt'].includes(ammo.ammo.id)&&wall.plugin.glass)pair.isSensor=true;
         if(ammo?.ammo.id==='trident'&&wall.plugin.entity?.type==='enemy')pair.isSensor=true;
+        if(ammo?.ammo.id==='anvil'&&wall.plugin.entity?.type==='enemy')pair.isSensor=true;
       }this.contacts.push(...event.pairs);
     });
     this.synchronize();
@@ -243,6 +244,7 @@ export class SiegeWorld {
     const contactDamage=(target,entity,mass,targetMass)=>{
       if(entity?.type==='ammo'){
         const hit=projectileDamage(this,target,entity,speed);
+        if(hit&&entity.ammo.id==='anvil'&&target.alive)restAnvilOnEnemy(this,entity,target);
         if(hit&&entity.ignited&&entity.ammo.id==='cobble')burnEnemy(this,target,`ammo:${entity.id}`,{totalDamage:50});
         return;
       }
@@ -272,8 +274,13 @@ export class SiegeWorld {
         }
         this.remove(ammo);if(other?.ammo?.id==='fire')this.remove(other);return;
       }
-      if(kind==='anvil'&&(otherBody.plugin.terrain||other?.type==='debris'))ammo.plunging=true;
-      if(['cobble','tnt','anvil'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
+      if(kind==='anvil'){
+        const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
+        if(!ammo.restingOnEnemy&&(otherBody.plugin.terrain||other?.type==='debris')&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>ammo.body.position.y+ammo.ammo.size*.15){ammo.plunging=true;ammo.body.isSensor=true;}
+        // Only the gradual downward drill removes blocks.
+        return;
+      }
+      if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
       if(kind==='tnt')return;
       if(kind==='ender'&&ammo.uses===0&&Math.hypot((this.before.get(ammo.body.id)||ammo.body.velocity).x,(this.before.get(ammo.body.id)||ammo.body.velocity).y)*60>=180&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
@@ -293,7 +300,6 @@ export class SiegeWorld {
       this.damageDisk(point.x,point.y,radius,power);
       this.events.push({type:'impact',x:point.x,y:point.y,m:material,speed,sound:heavy?'anvil_land':striker.type==='ammo'&&striker.ammo.id==='cobble'?'stone':MATERIALS[material]?.sound});
     }
-    if(ammo?.ammo.id==='trident'&&(otherBody.plugin.terrain||other?.type==='debris'))recallTrident(this,ammo);
   }
   ignite(x,y,reach,sourceId){return igniteWood(this,x,y,reach,sourceId);}
   shatterGlass(body,point,speed){
@@ -307,7 +313,7 @@ export class SiegeWorld {
     for(const e of this.allMoving()){
       if(e.type==='ammo')advanceWeapon(this,e,dt);if(e.dead)continue;
       const b=e.body,speed=Math.hypot(b.velocity.x,b.velocity.y),limit=e.type==='ammo'?speedLimit(e.ammo):26;
-      if(e.type==='ammo'&&!b.isStatic)projectileGravity(this.M,b,e.ammo,this.engine.gravity);
+      if(e.type==='ammo'&&!b.isStatic&&!e.plunging)projectileGravity(this.M,b,e.ammo,this.engine.gravity);
       if(speed>limit)this.M.Body.setVelocity(b,{x:b.velocity.x/speed*limit,y:b.velocity.y/speed*limit});
       if(Math.abs(b.angularVelocity)>.28)this.M.Body.setAngularVelocity(b,Math.sign(b.angularVelocity)*.28);
       this.before.set(b.id,{...b.velocity,omega:b.angularVelocity});
@@ -343,13 +349,13 @@ export class SiegeWorld {
       if(e.type==='enemy'&&!e.alive&&this.time-e.deathAt>=DEATH_TOPPLE){
         this.events.push({type:'death',x,y:y+22});this.remove(e);
       }
-      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&!['cobble','crystal','anvil'].includes(e.ammo.id)))this.remove(e);
+      if(e.type==='ammo'&&(e.ammo.id==='ender'?this.time>=e.expiresAt+.75:e.age>18&&!['cobble','crystal','anvil','trident'].includes(e.ammo.id)))this.remove(e);
     }
     this.projectiles=this.projectiles.filter(e=>!e.dead);this.debris=this.debris.filter(e=>!e.dead);
     this.synchronize();
     if(this.cooldowns.size>1000)for(const [key,t] of this.cooldowns)if(this.time-t>1)this.cooldowns.delete(key);
   }
-  active(){return this.lava.settling||this.fires.length>0||this.enemies.some(e=>e.alive&&(e.burnTicks.length>0||e.lavaDamageAt>this.time))||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
+  active(){return this.lava.settling||this.fires.length>0||this.enemies.some(e=>e.alive&&(e.burnTicks.length>0||e.lavaDamageAt>this.time))||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||p.ammo.id==='trident'||p.ammo.id==='anvil'&&p.expiresAt<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,lava:this.lava.snapshot(),lavaCells:this.lava.cells.size,lavaCooled:this.stats.lavaCooled,

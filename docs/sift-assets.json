@@ -40,6 +40,21 @@
     {
       "local": "sift_healthy_sculk.png",
       "sha256": "a74c25eb6d27fc3a47c55bdc18595b2bed0e0878e64618bcc7ec4eacb38ae1ce"
+    },
+    {
+      "local": "sift_overgrown_willow_foliage.png",
+      "source": "assets/the_sift/textures/block/overgrown_willow_foliage.png",
+      "sha256": "e2653397a399dd91bd6c292cfcbabd5adba74639eb7f9c0c3ef458aacd29829e"
+    },
+    {
+      "local": "sift_overgrown_willow_vines.png",
+      "source": "assets/the_sift/textures/block/overgrown_willow_vines.png",
+      "sha256": "ae0834fce69e65cc51f7db0a243a46680056ec60753f57006a03017cd54b180f"
+    },
+    {
+      "local": "sift_overgrown_willow_vines_bottom.png",
+      "source": "assets/the_sift/textures/block/overgrown_willow_vines_bottom.png",
+      "sha256": "47812b484d4408b177a43b7eac2f63a9638d3943dffab594e2250a1ebb026863"
     }
   ]
 }

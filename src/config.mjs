@@ -47,7 +47,10 @@ export const MATERIALS={
   44:{name:'雕纹筛板岩',sprite:'sift_chiseled_siftslate',hard:52,density:3,sound:'deepslate'},
   45:{name:'覆生柳木',sprite:'sift_overgrown_willow_log',hard:28,density:1.5,sound:'wood'},
   46:{name:'覆生柳木板',sprite:'sift_overgrown_willow_planks',hard:22,density:1.1,sound:'wood'},
-  47:{name:'鲜活幽匿',sprite:'sift_healthy_sculk',hard:18,density:1.4,sound:'grass'}
+  47:{name:'鲜活幽匿',sprite:'sift_healthy_sculk',hard:18,density:1.4,sound:'grass'},
+  48:{name:'覆生柳叶',sprite:'sift_overgrown_willow_foliage',hard:6,density:.2,sound:'grass'},
+  49:{name:'覆生柳藤',sprite:'sift_overgrown_willow_vines',hard:6,density:.2,sound:'grass'},
+  50:{name:'覆生柳藤梢',sprite:'sift_overgrown_willow_vines_bottom',hard:6,density:.2,sound:'grass'}
 };
 export const AMMO=[
   {id:'cobble',label:'圆石',sprite:'cobblestone',size:28,mass:4,detail:'高速撞击 · 熔岩点燃后附带灼烧'},
@@ -55,10 +58,10 @@ export const AMMO=[
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'无损穿两格墙 · 五秒后淡出，穿墙重新计时'},
   {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'},
   {id:'slimeball',label:'黏液球',sprite:'slime_ball',size:28,mass:2.2,restitution:.88,detail:'高弹性反弹 · 每只生物只伤一次'},
-  {id:'anvil',label:'铁砧',sprite:'anvil',size:42,mass:9,gravityScale:1.7,rangeScale:1.55,liftScale:1.15,shape:'box',detail:'远投重砸 · 垂直贯穿至基岩，留在落点'},
+  {id:'anvil',label:'铁砧',sprite:'anvil',size:42,mass:9,gravityScale:2.8,rangeScale:.82,liftScale:.62,shape:'box',detail:'短程重砸 · 逐层敲到基岩；硬目标头顶五秒后淡出'},
   {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
   {id:'crystal',label:'末地水晶',sprite:'end_crystal',size:28,mass:2.4,shape:'box',detail:'只在地面安放 · 其他弹药或风弹触发连锁爆炸'},
-  {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,maxDurability:3,detail:'忠诚附魔 · 三次耐久，往返伤敌，回程不拆地形'}
+  {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,maxDurability:3,detail:'三次耐久 · 停住或出界后回收，往返伤敌'}
 ];
 // Retain old simulation IDs for imported replays and regression fixtures only.
 // These are no longer supplied or displayed in the nine-slot campaign.
