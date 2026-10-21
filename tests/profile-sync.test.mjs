@@ -8,7 +8,7 @@ const functions=source.slice(source.indexOf('function readLocal('),source.indexO
 function fixture(){
  const storage=new Map(),nodes=new Map();const node=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',value:'新昵称',disabled:false,classList:{toggle(){}}});return nodes.get(id);};
  const context=vm.createContext({console,queueMicrotask,WORLDS,worldSaveKey,parseTimeBundle,normalizeTimes,recordBestTime,timeBundle,TIME_SAVE_KEY:'times',bestTimes:[],PROFILE_KEY:'profile',PENDING_KEY:'pending',profile:{id:'id',token:'token',nickname:'旧昵称'},profileRevision:0,profileReturn:'levels',syncing:false,state:{world:'overworld',screen:'levels'},online:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},$:node,renderCards(){},cancelDrag(){},menus(screen){context.state.screen=screen;}});
- Object.assign(context,{progressFromTimes,worldUnlocked,SAVE_KEY:'campaign'});vm.runInContext('const appStorage=localStorage;const nativeOnline=false;',context);vm.runInContext(functions,context);return {context,storage,node};
+ Object.assign(context,{PLAYTEST:false,progressFromTimes,worldUnlocked,SAVE_KEY:'campaign'});vm.runInContext('const appStorage=localStorage;const nativeOnline=false;',context);vm.runInContext(functions,context);return {context,storage,node};
 }
 const bundle=t=>({stages:Array.from({length:10},(_,stage)=>({stage,timeMs:t}))});
 
