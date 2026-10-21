@@ -1,4 +1,4 @@
-import { PROJECTILES, MATERIALS, TILE, clamp } from './config.mjs';
+import { PROJECTILES, MATERIALS, TILE, clamp,isIndestructible } from './config.mjs';
 import { PixelGrid, meshPixels, components, cropPixels, findSafeExit, impactDamage } from './pixels.mjs';
 import {RearLayer} from './rear.mjs';
 import {actorState,animateActor} from './behavior.mjs';
@@ -24,7 +24,8 @@ export class SiegeWorld {
     Matter.Events.on(this.engine,'collisionStart',event=>{
       for(const pair of event.pairs){const a=pair.bodyA.parent,b=pair.bodyB.parent,ea=a.plugin.entity,eb=b.plugin.entity;
         const ammo=ea?.type==='ammo'?ea:eb?.type==='ammo'?eb:null,wall=ammo===ea?b:a;
-        if(ammo&&['cobble','tnt'].includes(ammo.ammo.id)&&wall.plugin.glass)pair.isSensor=true;
+        const wallPart=ammo===ea?pair.bodyB:pair.bodyA;
+        if(ammo&&['cobble','tnt','trident'].includes(ammo.ammo.id)&&(wall.plugin.glass||wallPart.plugin.material===6)){pair.isSensor=true;pair.glassContact=true;}
         if(ammo?.ammo.id==='trident'&&wall.plugin.entity?.type==='enemy')pair.isSensor=true;
         if(ammo?.ammo.id==='anvil'&&wall.plugin.entity?.type==='enemy')pair.isSensor=true;
       }this.contacts.push(...event.pairs);
@@ -43,8 +44,8 @@ export class SiegeWorld {
   remove(entity){if(!entity||entity.dead)return;entity.dead=true;this.wakeBounds(entity.body.bounds);this.M.Composite.remove(this.engine.world,entity.body);}
   spawnProjectile(kind,x,y,vx,vy,options={}){
     const ammo=PROJECTILES.find(a=>a.id===kind);if(!ammo)throw new Error(`Unknown ammunition: ${kind}`);
-    const physicsOptions={friction:kind==='slimeball'?.04:.85,frictionStatic:1.2,frictionAir:.0015,restitution:ammo.restitution??(kind==='cobble'?.14:kind==='tnt'?.01:.07),slop:.025,sleepThreshold:75};
-    const body=projectileBody(this.M,ammo,x,y,{...physicsOptions,...(kind==='crystal'?{inertia:Infinity}:{})});
+    const physicsOptions={friction:kind==='slimeball'?.04:.85,frictionStatic:1.2,frictionAir:.0015,restitution:ammo.restitution??(kind==='cobble'?.14:kind==='tnt'?.01:kind==='trident'?0:.07),slop:.025,sleepThreshold:75};
+    const body=projectileBody(this.M,ammo,x,y,{...physicsOptions,...(['crystal','trident'].includes(kind)?{inertia:Infinity}:{})});
     this.M.Body.setMass(body,ammo.mass);
     this.M.Body.setVelocity(body,launchVelocity(ammo,vx,vy));
     const p=this.register({type:'ammo',ammo,age:0,fuse:kind==='tnt'?4:Infinity,uses:0,expiresAt:kind==='ender'?this.time+5:Infinity,ignited:false},body);
@@ -93,7 +94,7 @@ export class SiegeWorld {
       const mask=new Uint8Array(w*h);
       for(let y=0;y<h;y++)for(let x=0;x<w;x++)mask[y*w+x]=this.grid.get(tx+x,ty+y);
       const rects=meshPixels(mask,w,h);if(!rects.length)continue;
-      const parts=rects.map(r=>this.M.Bodies.rectangle((tx+r.x+r.w/2)*this.s,(ty+r.y+r.h/2)*this.s,r.w*this.s,r.h*this.s,{isStatic:true,friction:.8,frictionStatic:1.2,restitution:0,slop:.025}));
+      const parts=rects.map(r=>{const part=this.M.Bodies.rectangle((tx+r.x+r.w/2)*this.s,(ty+r.y+r.h/2)*this.s,r.w*this.s,r.h*this.s,{isStatic:true,friction:.8,frictionStatic:1.2,restitution:0,slop:.025});part.plugin.material=r.m;return part;});
       const body=parts.length===1?parts[0]:this.M.Body.create({parts,isStatic:true,friction:.8,frictionStatic:1.2,slop:.025});
       body.plugin.terrain=true;body.plugin.tileId=id;body.plugin.glass=mask.every(m=>!m||m===6);
       this.staticTiles.set(id,body);this.M.Composite.add(this.engine.world,body);
@@ -102,8 +103,8 @@ export class SiegeWorld {
   }
   addDebris(mask,w,h,origin,texture={x:0,y:0},angle=0,velocity={x:0,y:0},omega=0){
     const rects=meshPixels(mask,w,h);if(!rects.length)return null;
-    const parts=rects.map(r=>this.M.Bodies.rectangle(origin.x+(r.x+r.w/2)*this.s,origin.y+(r.y+r.h/2)*this.s,r.w*this.s,r.h*this.s,
-      {density:MATERIALS[r.m].density*.001,friction:.8,frictionStatic:1.1,restitution:.04,slop:.02}));
+    const parts=rects.map(r=>{const part=this.M.Bodies.rectangle(origin.x+(r.x+r.w/2)*this.s,origin.y+(r.y+r.h/2)*this.s,r.w*this.s,r.h*this.s,
+      {density:MATERIALS[r.m].density*.001,friction:.8,frictionStatic:1.1,restitution:.04,slop:.02});part.plugin.material=r.m;return part;});
     const body=parts.length===1?parts[0]:this.M.Body.create({parts,friction:.8,frictionStatic:1.1,restitution:.04,slop:.02,sleepThreshold:80});
     const offset={x:origin.x-body.position.x,y:origin.y-body.position.y};
     if(angle)this.M.Body.rotate(body,angle,origin);
@@ -122,10 +123,11 @@ export class SiegeWorld {
   }
   emitPixel(x,y,m,force=1){this.events.push({type:'pixel',x,y,m,force});}
   clearRearPixel(x,y){
-    if(!this.rear.grid.get(x,y))return;
+    const material=this.rear.grid.get(x,y);if(!material||isIndestructible(material))return;
     this.rear.grid.set(x,y,0);this.stats.backgroundRemoved++;
   }
   removeTerrainPixel(x,y){
+    if(isIndestructible(this.grid.get(x,y)))return;
     this.grid.set(x,y,0);this.clearRearPixel(x,y);
   }
   flushGridPixels(){
@@ -147,7 +149,7 @@ export class SiegeWorld {
   damageDebris(e,x,y,radius,power,{budget=Infinity,onlyMaterial=0}={}){
     const center=this.localPoint(e,x,y),r=radius/this.s;let n=0;
     for(let gy=Math.max(0,Math.floor(center.y-r));gy<Math.min(e.h,Math.ceil(center.y+r));gy++)for(let gx=Math.max(0,Math.floor(center.x-r));gx<Math.min(e.w,Math.ceil(center.x+r));gx++){
-      const k=gy*e.w+gx,m=e.mask[k];if(!m||m===7||(onlyMaterial&&m!==onlyMaterial))continue;
+      const k=gy*e.w+gx,m=e.mask[k];if(!m||isIndestructible(m)||(onlyMaterial&&m!==onlyMaterial))continue;
       const d=Math.hypot(gx+.5-center.x,gy+.5-center.y);if(d>r)continue;
       e.hp[k]-=power*(.45+.55*(1-d/r));if(e.hp[k]>0||n>=budget)continue;
       const point=this.worldPoint(e,gx+.5,gy+.5);e.mask[k]=0;n++;
@@ -161,7 +163,7 @@ export class SiegeWorld {
     const children=[];
     for(const indices of components(e.mask,e.w,e.h)){
       const piece=cropPixels(e.mask,e.w,indices),origin=this.worldPoint(e,piece.x,piece.y);
-      if(indices.length<6){for(const k of indices){const p=this.worldPoint(e,k%e.w,Math.floor(k/e.w));this.emitPixel(p.x,p.y,e.mask[k]);}continue;}
+      if(indices.length<6&&!indices.some(k=>isIndestructible(e.mask[k]))){for(const k of indices){const p=this.worldPoint(e,k%e.w,Math.floor(k/e.w));this.emitPixel(p.x,p.y,e.mask[k]);}continue;}
       const child=this.addDebris(piece.mask,piece.w,piece.h,origin,{x:e.texture.x+piece.x,y:e.texture.y+piece.y},angle,velocity,omega);
       children.push({child,piece});
       // Preserve local impact damage, not just transparent holes.
@@ -280,7 +282,9 @@ export class SiegeWorld {
         // Only the gradual downward drill removes blocks.
         return;
       }
-      if(['cobble','tnt'].includes(kind)&&otherBody.plugin.glass){this.shatterGlass(otherBody,point,speed);return;}
+      if(['cobble','tnt','trident'].includes(kind)&&(otherBody.plugin.glass||pair.glassContact)){this.shatterGlass(otherBody,point,speed);return;}
+      // A trident's point cuts glass only; creature damage is resolved above.
+      if(kind==='trident')return;
       if(kind==='tnt')return;
       if(kind==='ender'&&ammo.uses===0&&Math.hypot((this.before.get(ammo.body.id)||ammo.body.velocity).x,(this.before.get(ammo.body.id)||ammo.body.velocity).y)*60>=180&&(otherBody.plugin.terrain||other?.type==='debris')){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
@@ -303,6 +307,11 @@ export class SiegeWorld {
   }
   ignite(x,y,reach,sourceId){return igniteWood(this,x,y,reach,sourceId);}
   shatterGlass(body,point,speed){
+    const entity=body.plugin.entity;
+    if(entity?.type==='debris'){
+      const removed=this.damageDebris(entity,point.x,point.y,TILE,Infinity,{onlyMaterial:6});this.stats.removed+=removed;
+      if(removed)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});return;
+    }
     const id=body.plugin.tileId,cols=Math.ceil(this.grid.width/16),tx=id%cols*16,ty=Math.floor(id/cols)*16;let count=0;
     for(let y=ty;y<ty+16;y++)for(let x=tx;x<tx+16;x++)if(this.grid.get(x,y)===6){this.removeTerrainPixel(x,y);if(count%5===0)this.emitPixel((x+.5)*this.s,(y+.5)*this.s,6);count++;}
     this.stats.removed+=count;if(count)this.events.push({type:'impact',x:point.x,y:point.y,sound:'glass',speed:Math.max(300,speed)});

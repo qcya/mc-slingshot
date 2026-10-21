@@ -72,10 +72,12 @@ export function dimensionLandscape(ctx,assets,dimension='overworld'){
    }
   },'#41354e',.77);
  }
- // Cavities reveal a darker matching world material below the common horizon.
- const under=dimension==='nether'?'blackstone':dimension==='sift'?'sift_siftslate':'end_stone';
- for(let x=0;x<32;x++)for(let y=14;y<18;y++)texture(under,x*48,y*48,48);
- ctx.fillStyle=dimension==='nether'?'#17090bd9':'#100b1cdd';ctx.fillRect(0,672,WIDTH,HEIGHT-672);
+ // End cavities reveal the same void as the sky beneath floating islands.
+ if(dimension!=='end'){
+  const under=dimension==='nether'?'blackstone':'sift_siftslate';
+  for(let x=0;x<32;x++)for(let y=14;y<18;y++)texture(under,x*48,y*48,48);
+  ctx.fillStyle=dimension==='nether'?'#17090bd9':'#100b1cdd';ctx.fillRect(0,672,WIDTH,HEIGHT-672);
+ }
 }
 
 export function rearPixel(assets,m,x,y,world,visual){

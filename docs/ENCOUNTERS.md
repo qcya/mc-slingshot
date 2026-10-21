@@ -1,6 +1,6 @@
 # Dimension encounters
 
-The Nether final stage is an open Wither summoning basin with basalt side towers. The End final stage is an irregular Endstone island under open sky. Its exit fountain has a bedrock basin, raised side rims and a narrow central pedestal for the dragon's perch. The Sift final stage is a broken circular shrine rooted in unequal natural hills.
+The Nether final stage is an open Wither summoning basin with basalt side towers. Every End island ends above an empty bottom row, in both foreground and rear layers. Only the final exit fountain contains bedrock: a seven-block basin, one-high outer rim and a single three-high centre pedestal. Two straight obsidian pylons are two blocks wide and ten/twelve blocks tall; each supports a healing crystal and a clearly spaced Shulker. The Sift final stage is a broken circular shrine rooted in unequal natural hills. The other dimensions retain their bedrock basement.
 
 ## Native Sift source and adaptation
 

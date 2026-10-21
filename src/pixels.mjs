@@ -1,4 +1,4 @@
-import { MATERIALS } from './config.mjs';
+import { MATERIALS,isIndestructible } from './config.mjs';
 
 export class PixelGrid {
   constructor(width,height){
@@ -20,7 +20,7 @@ export class PixelGrid {
     let n=0;
     for(let y=Math.max(0,Math.floor(cy-radius));y<Math.min(this.height,Math.ceil(cy+radius));y++){
       for(let x=Math.max(0,Math.floor(cx-radius));x<Math.min(this.width,Math.ceil(cx+radius));x++){
-        const k=y*this.width+x,m=this.cells[k];if(!m||m===7||(onlyMaterial&&m!==onlyMaterial))continue;
+        const k=y*this.width+x,m=this.cells[k];if(!m||isIndestructible(m)||(onlyMaterial&&m!==onlyMaterial))continue;
         const d=Math.hypot(x+.5-cx,y+.5-cy);
         const rough=jagged?.92+((x*73856093^y*19349663^seed)>>>0)%100/1250:1;
         if(d>radius*rough||(canDamage&&!canDamage(x,y,m)))continue;

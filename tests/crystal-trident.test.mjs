@@ -30,6 +30,13 @@ test('a flying trident passes multiple creatures, settles, then returns',()=>{
  const w=world();w.engine.gravity.y=0;
  const a=w.addEnemy(300,350,'pillager'),b=w.addEnemy(450,350,'pillager');M.Body.setStatic(a.body,true);M.Body.setStatic(b.body,true);
  w.grid.fill(200,0,16,128,7);w.synchronize();
- const p=w.spawnProjectile('trident',150,300,900,0);advance(w,1);
- assert.equal(a.alive,false);assert.equal(b.alive,false);assert.ok(p.body.position.x<600);assert.notEqual(p.returning,true);advance(w,20);assert.equal(p.returned,true);assert.equal(p.dead,true);
+ const p=w.spawnProjectile('trident',150,300,900,0);
+ for(let i=0;i<120&&p.body.position.x<510;i++){w.step(1/120);assert.notEqual(p.returning,true);}
+ assert.equal(a.alive,false);assert.equal(b.alive,false);assert.ok(p.body.position.x>=510&&p.body.position.x<600);
+ let settled=false;
+ for(let i=0;i<600&&!p.returned;i++){
+  if(!p.returning&&(p.body.isSleeping||p.body.speed*60<12))settled=true;
+  w.step(1/120);if(p.returning)assert.equal(settled,true,'loyalty begins after the actual wall stop');
+ }
+ assert.equal(p.returned,true);assert.equal(p.dead,true);
 });

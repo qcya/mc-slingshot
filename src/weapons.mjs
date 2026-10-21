@@ -1,3 +1,4 @@
+import {isIndestructible} from './config.mjs';
 // Shared free-flight rules keep the aiming dots and the actual throw aligned.
 export function launchVelocity(ammo,vx,vy){
  return {x:vx*(ammo.rangeScale??1)/60,y:vy*(ammo.liftScale??1)/60};
@@ -53,9 +54,9 @@ export function advanceWeapon(world,p,dt){
  const velocity=210,half=p.ammo.size/2,left=Math.floor((b.position.x-half)/world.s),right=Math.ceil((b.position.x+half)/world.s);
  const top=Math.max(0,Math.floor((b.position.y-half)/world.s)),bottom=Math.min(world.grid.height,Math.ceil((b.position.y+half+velocity*dt)/world.s));
  let bedrock=Infinity,removed=0;
- for(let gy=top;gy<bottom;gy++)for(let gx=left;gx<right;gx++)if(world.grid.get(gx,gy)===7)bedrock=Math.min(bedrock,gy*world.s);
+ for(let gy=top;gy<bottom;gy++)for(let gx=left;gx<right;gx++)if(isIndestructible(world.sample((gx+.5)*world.s,(gy+.5)*world.s)))bedrock=Math.min(bedrock,gy*world.s);
  for(let gy=top;gy<bottom&&gy*world.s<bedrock;gy++)for(let gx=left;gx<right;gx++){
-  const material=world.grid.get(gx,gy);if(!material||material===7)continue;
+  const material=world.grid.get(gx,gy);if(!material||isIndestructible(material))continue;
   world.removeTerrainPixel(gx,gy);removed++;if(removed%24===0)world.emitPixel((gx+.5)*world.s,(gy+.5)*world.s,material);
  }
  world.stats.removed+=removed;
@@ -63,7 +64,7 @@ export function advanceWeapon(world,p,dt){
   world.events.push({type:'impact',x:b.position.x,y:b.position.y+half,sound:'anvil_land',speed:550});p.nextClink=world.time+.22;
  }
  if(bedrock<Infinity){
-  M.Body.setPosition(b,{x:b.position.x,y:bedrock-half});M.Body.setVelocity(b,{x:0,y:0});M.Body.setStatic(b,true);
+  M.Body.setVelocity(b,{x:0,y:0});M.Body.setPosition(b,{x:b.position.x,y:bedrock-half});M.Body.setStatic(b,true);
   p.planted=true;p.expiresAt=world.time+.65;p.fadeDuration=.65;
   world.events.push({type:'impact',x:b.position.x,y:bedrock,sound:'anvil_land',speed:700});return;
  }

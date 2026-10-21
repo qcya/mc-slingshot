@@ -1,6 +1,6 @@
 {
   "name": "stone-at-full-draw",
-  "version": "0.15.0-beta.3",
+  "version": "0.15.0-beta.4",
   "private": true,
   "description": "拉满的石 / Stone at Full Draw — Minecraft 风格的二维弹弓闯关游戏",
   "scripts": {

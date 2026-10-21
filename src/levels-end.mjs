@@ -66,10 +66,11 @@ export function buildEnd(level){
   // The open bowl avoids the two tall side walls of a castle silhouette.
   row(22,28,15,7);clear(23,14,5,1);tile(22,14,7);tile(28,14,7);
   column(25,12,14,7);
-  // Two isolated obsidian pylons frame the fountain without sealing the sky.
-  column(18,9,15,40);row(18,19,8,40);column(31,7,15,40);row(30,31,6,40);
-  sh(19.35,8);sh(30.5,6);
-  enemy(25.5,12,'ender_dragon',{height:110,flightBounds:{left:1100,right:1320,top:220,bottom:521},healingCrystals:[{x:18.25*48,feet:8*48},{x:31.5*48,feet:6*48}]});
+  // Straight two-block-wide pylons: ten and twelve full blocks, without caps.
+  for(const x of [18,19])column(x,6,15,40);
+  for(const x of [30,31])column(x,4,15,40);
+  sh(19.35,6);sh(30.5,4);
+  enemy(25.5,12,'ender_dragon',{height:110,flightBounds:{left:1100,right:1320,top:220,bottom:521},healingCrystals:[{x:18.375*48,feet:6*48},{x:31.5*48,feet:4*48}]});
 
  }
  assignEndermanSpots(scene);

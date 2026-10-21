@@ -13,7 +13,8 @@ export function createLevelBuilder(dimension='overworld'){
  const column=(x,y0,y1,m)=>{for(let y=y0;y<=y1;y++)tile(x,y,m);};
  const room=(x,y,w,h,m)=>{rear.room(x,y,w,h,m);visual.rooms.push({x:x*16,y:y*16,w:w*16,h:h*16});};
  const palette=dimension==='nether'?[24,24,27]:dimension==='end'?[36,36,37]:dimension==='sift'?[42,41,41]:[1,2,3];
- for(let x=0;x<32;x++)for(let y=14;y<18;y++){const m=y===17?7:palette[Math.min(y-14,2)];tile(x,y,m);rear.grid.tile(x,y,m===1?2:m);}
+ // End islands end above the void. The other dimensions retain their basement.
+ for(let x=0;x<32;x++)for(let y=14;y<18;y++){const m=y===17?(dimension==='end'?0:7):palette[Math.min(y-14,2)];tile(x,y,m);rear.grid.tile(x,y,m===1?2:m);}
  const surface=(x,top,material=palette[0])=>{
   for(let y=Math.min(top,14);y<17;y++){
    const m=y<top?0:y===top?material:y<top+2?palette[1]:palette[2];tile(x,y,m);rear.grid.tile(x,y,m===1?2:m);

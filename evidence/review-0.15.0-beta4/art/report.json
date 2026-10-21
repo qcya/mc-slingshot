@@ -1,0 +1,130 @@
+{
+  "source": "Production buildLevel, SiegeWorld and Renderer at time .2s; no mocked effects",
+  "errors": [],
+  "frames": [
+    {
+      "stage": 3,
+      "frontBedrock": 0,
+      "rearBedrock": 0,
+      "frontBottomRowCells": 0,
+      "rearBottomRowCells": 0,
+      "liveHealingCrystals": [],
+      "enemies": [
+        {
+          "skin": "shulker",
+          "x": 984,
+          "y": 216.01250000069444
+        },
+        {
+          "skin": "shulker",
+          "x": 1368,
+          "y": 216.01250000069444
+        },
+        {
+          "skin": "enderman",
+          "x": 988.2983999999989,
+          "y": 366.01250000069444
+        },
+        {
+          "skin": "enderman",
+          "x": 1339.7015999999985,
+          "y": 366.01250000069444
+        },
+        {
+          "skin": "shulker",
+          "x": 1152,
+          "y": 600.0125000006944
+        }
+      ]
+    },
+    {
+      "stage": 5,
+      "frontBedrock": 0,
+      "rearBedrock": 0,
+      "frontBottomRowCells": 0,
+      "rearBottomRowCells": 0,
+      "liveHealingCrystals": [],
+      "enemies": [
+        {
+          "skin": "shulker",
+          "x": 960,
+          "y": 600.0125000006944
+        },
+        {
+          "skin": "enderman",
+          "x": 1147.7015999999985,
+          "y": 558.0125000006944
+        },
+        {
+          "skin": "shulker",
+          "x": 1248,
+          "y": 408.01250000069444
+        },
+        {
+          "skin": "enderman",
+          "x": 1369.9701000000007,
+          "y": 558.0125000006944
+        },
+        {
+          "skin": "shulker",
+          "x": 1464,
+          "y": 600.0125000006944
+        }
+      ]
+    },
+    {
+      "stage": 10,
+      "frontBedrock": 3072,
+      "rearBedrock": 0,
+      "frontBottomRowCells": 0,
+      "rearBottomRowCells": 0,
+      "liveHealingCrystals": [
+        {
+          "x": 882,
+          "y": 274,
+          "placed": true,
+          "static": true,
+          "owner": 3
+        },
+        {
+          "x": 1512,
+          "y": 178,
+          "placed": true,
+          "static": true,
+          "owner": 3
+        }
+      ],
+      "enemies": [
+        {
+          "skin": "shulker",
+          "x": 928.8000000000001,
+          "y": 264.01250000069444
+        },
+        {
+          "skin": "shulker",
+          "x": 1464,
+          "y": 168.01250000069444
+        },
+        {
+          "skin": "ender_dragon",
+          "x": 1223.094836256972,
+          "y": 516.0840541607948
+        }
+      ]
+    }
+  ],
+  "terrainQA": {
+    "command": "node --test tests/terrain-weapon-rules.test.mjs",
+    "passed": 9,
+    "failed": 0,
+    "baselineRedLog": ".superpowers/beta4-terrain-expanded-red.log",
+    "baselineCases": 6,
+    "baselinePassed": 0,
+    "newCases": [
+      "mixed-glass static compound retains stone",
+      "mixed-glass debris retains wood HP and hits monster",
+      "anvil stops on indestructible debris platform"
+    ],
+    "sourceReview": "Shared Infinity protection is applied to grid, debris, rear clear and direct terrain removal; debris splitting retains tiny protected components; glass uses actual compound contact material; return trident exits damage processing."
+  }
+}

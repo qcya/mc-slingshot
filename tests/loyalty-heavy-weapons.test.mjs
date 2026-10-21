@@ -7,6 +7,7 @@ import {PROJECTILES,MATERIALS,TILE} from '../src/config.mjs';
 import {gust,projectileOpacity} from '../src/combat.mjs';
 import {predictArc} from '../src/aim.mjs';
 import {updateOutcome} from '../src/outcome.mjs';
+import {pullSling,SLING_HOME} from '../src/sling.mjs';
 
 const M=createRequire(import.meta.url)('../vendor/matter.min.js');
 const DT=1/120;
@@ -104,8 +105,10 @@ test('the nearly block-wide anvil launches a shorter distance than an ordinary s
  assert.ok(anvil.body.position.x-200<stone.body.position.x-200);
 });
 
-test('a full-strength anvil stays within the horizontal viewport throughout a natural throw',()=>{
- const w=world(512,1200),p=w.spawnProjectile('anvil',160,545,1430,-1100);
+test('a legal strong anvil throw lands on ordinary ground within the horizontal viewport',()=>{
+ const w=world(512,288);w.grid.fill(0,224,w.grid.width,64,7);w.synchronize();
+ const launch=pullSling({x:SLING_HOME.x-135*Math.cos(.4),y:SLING_HOME.y+135*Math.sin(.4)});
+ const p=w.spawnProjectile('anvil',launch.origin.x,launch.origin.y,launch.vx,launch.vy);
  for(let i=0;i<480&&!p.dead;i++){
   w.step(DT);assert.ok(p.body.position.x>=p.ammo.size/2&&p.body.position.x<=w.width-p.ammo.size/2);
  }
@@ -127,7 +130,7 @@ test('an anvil striking a side obstacle while rising does not start a downward d
 test('an anvil drills progressively with repeated clinks, preserves the shaft sides, and fades at bedrock',()=>{
  const w=world(),cx=300,gx=cx/w.s,bedrockY=600;
  w.grid.fill(40,100,140,100,3);
- Object.keys(MATERIALS).map(Number).filter(m=>m!==7).forEach((m,i)=>w.grid.fill(40,100+i,140,1,m));
+ Object.keys(MATERIALS).map(Number).filter(m=>Number.isFinite(MATERIALS[m].hard)).forEach((m,i)=>w.grid.fill(40,100+i,140,1,m));
  w.grid.fill(40,200,140,8,7);w.grid.fill(40,208,140,12,40);w.synchronize();
  const neighbor=w.grid.get(gx-8,120),p=w.spawnProjectile('anvil',cx,180,0,350);
  until(w,()=>p.plunging,3);advance(w,.35);
