@@ -1,4 +1,4 @@
-import {ENCOUNTER_PROFILES,initEncounter,encounterDamageMultiplier,summonWitherSkeleton} from './encounters.mjs';
+import {ENCOUNTER_PROFILES,initEncounter,encounterDamageMultiplier,summonWitherSkeleton,reflectEncounterProjectile} from './encounters.mjs';
 // Gameplay profiles are deliberately separate from atlas and animation data.
 export const MOB_PROFILES={
  zombie:{width:32,height:92,mass:1.2,hp:100},pillager:{width:32,height:92,mass:1.2,hp:100},
@@ -111,6 +111,7 @@ export function projectileDamage(world,target,p,speed){
  if(['tnt','fire','snowball','wind','water','crystal'].includes(kind))return;
  const velocity=world.before.get(p.body.id)||p.body.velocity;
  if(Math.hypot(velocity.x,velocity.y)*60<MIN_PROJECTILE_HIT_SPEED)return false;
+ if(reflectEncounterProjectile(world,target,p))return false;
  const hitId=kind==='trident'?`${p.id}:${p.returning?'return':'outbound'}`:p.id;
  if(target.projectileHits.has(hitId))return;
  target.projectileHits.add(hitId);

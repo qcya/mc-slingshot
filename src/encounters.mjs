@@ -14,12 +14,51 @@ export function initEncounter(e,time,options={}){
  const profile=ENCOUNTER_PROFILES[e.skin];if(!profile)return;
  e.encounterStart=time;e.encounterPhase='patrol';e.encounterPulseCycle=-1;
  e.encounterHome={x:e.body.position.x,y:e.body.position.y};
+ if(e.skin==='ender_dragon')e.healingCrystalSpots=(options.healingCrystals||[]).map(p=>({...p}));
+ if(e.skin==='sift_echo_golem'){
+  e.facing=-1;e.encounterPhase='telegraph';e.echoPhaseUntil=time+1.1;
+  e.echoShieldActive=false;e.echoRecoveryUntil=0;
+ }
  if(profile.flying){
   e.flying=true;
   // Bounds describe the body's centre. Authored maps leave the entire box clear.
   e.flightBounds={left:e.body.position.x-110,right:e.body.position.x+110,top:Math.max(120,e.body.position.y-230),bottom:e.body.position.y,...options.flightBounds};
  }
  if(profile.elite||e.skin==='sift_echo_golem')e.stationary=true;
+}
+// Called after addEnemy registers and appends the actor. These use the exact
+// player crystal bodies and destruction rules, never a separate invulnerable prop.
+export function setupEncounter(world,e){
+ if(e.skin!=='ender_dragon'||e.encounterSetup)return;
+ e.encounterSetup=true;
+ for(const spot of e.healingCrystalSpots||[]){
+  if(!Number.isFinite(spot.x)||!Number.isFinite(spot.feet))continue;
+  if(![-7.7,0,7.7].every(dx=>world.sample(spot.x+dx,spot.feet+1)))continue;
+  const p=world.spawnProjectile('crystal',spot.x,spot.feet-14,0,0);
+  p.healingOwner=e.id;p.placed=true;p.planted=true;p.expiresAt=Infinity;
+  world.M.Body.setStatic(p.body,true);
+ }
+ e.healingCount=world.projectiles.filter(p=>!p.dead&&p.healingOwner===e.id).length;
+ e.healingActive=e.healingCount>0;
+}
+function echoRecovery(e,time){
+ e.echoShieldActive=false;e.echoRecoveryUntil=time+2.4;e.echoPhaseUntil=e.echoRecoveryUntil;e.encounterPhase='recover';
+}
+// Before projectile damage deduplication. Return true when this contact was
+// reflected (or is the same reflected body's stale contact within 150 ms).
+export function reflectEncounterProjectile(world,e,p){
+ if(e.skin!=='sift_echo_golem'||!e.alive||e.dead||e.frozen||p.dead||p.returning)return false;
+ if(p.echoReflectedBy===e.id&&world.time-p.echoReflectedAt<.15)return true;
+ if(!e.echoShieldActive||!['cobble','anvil','ender','slimeball','trident'].includes(p.ammo?.id))return false;
+ const velocity=world.before?.get(p.body.id)||p.body.velocity,front=e.facing||-1;
+ if(Math.hypot(velocity.x,velocity.y)*60<180||(p.body.position.x-e.body.position.x)*front<=0||velocity.x*front>=-.25)return false;
+ world.M.Sleeping.set(p.body,false);
+ world.M.Body.setPosition(p.body,{x:e.body.position.x+front*(e.dimensions.width/2+(p.ammo.size||28)/2+3),y:p.body.position.y});
+ world.M.Body.setVelocity(p.body,{x:front*Math.max(3.2,Math.abs(velocity.x)*.85),y:velocity.y*.7-.4});
+ p.echoReflectedBy=e.id;p.echoReflectedAt=world.time;
+ echoRecovery(e,world.time);
+ world.events.push({type:'echoReflect',x:e.body.position.x+front*e.dimensions.width/2,y:e.body.position.y,skin:e.skin});
+ return true;
 }
 function pulse(world,e,radius,strength){
  const centre=e.body.position;
@@ -46,7 +85,7 @@ function flight(world,e,target,dt){
 /** Called once per live, unfrozen actor before normal patrol. Return true when
  * this hook owns movement. Uses only Matter Body/Sleeping, world.sample,
  * world.events, world.projectiles, world.time and world.engine.gravity.
- * No invisible projectiles, terrain damage, healing or invulnerability. */
+ * Healing is limited to live, destructible owned crystals. No invulnerability. */
 export function tickEncounter(world,e,dt){
  const profile=ENCOUNTER_PROFILES[e.skin];
  if(!profile||!e.alive||e.dead||e.frozen)return false;
@@ -60,35 +99,45 @@ export function tickEncounter(world,e,dt){
   flight(world,e,{x:e.encounterHome.x+Math.sin(elapsed*.65)*10,y:Math.min(e.encounterHome.y,f.bottom)-8+Math.sin(elapsed*.9)*5},dt);
   return true;
  }
+ if(e.skin==='ender_dragon'){
+  e.healingCount=world.projectiles.filter(p=>!p.dead&&p.healingOwner===e.id).length;
+  e.healingActive=e.healingCount>0;
+  e.hp=Math.min(profile.hp,e.hp+e.healingCount*6*dt);
+  const perch=elapsed%11>=5.1;e.encounterPhase=perch?'perch':'patrol';
+  e.pose={...e.pose,attackCharge:0,gesture:0,wingFlap:(Math.sin(elapsed*(perch?2:5))+1)/2,jawOpen:perch?.2:0,walkBlend:1};
+  if(world.time<(e.externalUntil??0))return true;
+  const f=e.flightBounds,cx=(f.left+f.right)/2,cy=(f.top+f.bottom)/2;
+  const target=perch?{x:cx,y:f.bottom}:{x:cx+Math.sin(elapsed*.55)*(f.right-f.left)*.45,y:cy+Math.sin(elapsed*.8)*(f.bottom-f.top)*.23};
+  flight(world,e,target,dt);return true;
+ }
+ if(e.skin==='sift_echo_golem'){
+  if(world.time>=e.echoPhaseUntil){
+   if(e.encounterPhase==='telegraph'){e.encounterPhase='shield';e.echoShieldActive=true;e.echoPhaseUntil=world.time+2.8;}
+   else if(e.encounterPhase==='shield')echoRecovery(e,world.time);
+   else{e.encounterPhase='telegraph';e.echoShieldActive=false;e.echoPhaseUntil=world.time+1.1;}
+  }
+  e.pose={...e.pose,attackCharge:e.encounterPhase==='telegraph'?bound(1-(e.echoPhaseUntil-world.time)/1.1,0,1):0,gesture:e.echoShieldActive?1:0,braceAmount:e.echoShieldActive?1:0,walkBlend:0};
+  return true;
+ }
  let cycle,length,charge,pulseAt,recoverEnd;
- if(e.skin==='ender_dragon'){length=11;charge=5.1;pulseAt=6;recoverEnd=9.1;}
- else if(e.skin==='sift_singer'){length=6;charge=3.3;pulseAt=4.1;recoverEnd=5.4;}
- else{length=7.5;charge=3.8;pulseAt=4.8;recoverEnd=6.4;}
+ length=6;charge=3.3;pulseAt=4.1;recoverEnd=5.4;
  cycle=Math.floor(elapsed/length);const t=elapsed%length;
  e.encounterPhase=t<charge?'patrol':t<pulseAt?'charge':t<pulseAt+.35?'pulse':t<recoverEnd?'recover':'patrol';
  const charging=e.encounterPhase==='charge',recovery=e.encounterPhase==='recover';
- e.pose={...e.pose,attackCharge:charging?(t-charge)/(pulseAt-charge):0,gesture:charging?1:recovery?.15:0,braceAmount:e.skin==='sift_echo_golem'&&charging?1:0,
-  wingFlap:(Math.sin(elapsed*(recovery?2:5))+1)/2,jawOpen:charging||e.encounterPhase==='pulse'?1:0,walkBlend:profile.flying?1:0};
+ e.pose={...e.pose,attackCharge:charging?(t-charge)/(pulseAt-charge):0,gesture:charging?1:recovery?.15:0,walkBlend:0};
  // Weapon impulses win over AI steering, so a well-placed shot stays physical.
  if(world.time<(e.externalUntil??0))return true;
  if(t>=pulseAt&&e.encounterPulseCycle!==cycle){
   e.encounterPulseCycle=cycle;
   // Long warning, short range, once per cycle; an ordinary hit is always valid.
-  pulse(world,e,e.skin==='sift_singer'?155:e.skin==='sift_echo_golem'?190:180,e.skin==='sift_singer'?1.5:2.2);
+  pulse(world,e,155,1.5);
  }
- if(profile.flying){
-  const f=e.flightBounds,cx=(f.left+f.right)/2,cy=(f.top+f.bottom)/2;
-  let target={x:cx+Math.sin(elapsed*.55)*(f.right-f.left)*.45,y:cy+Math.sin(elapsed*.8)*(f.bottom-f.top)*.23};
-  // The dragon descends to a long, predictable perch window for heavy shots.
-  if(e.skin==='ender_dragon'&&(charging||recovery||e.encounterPhase==='pulse'))target={x:cx,y:f.bottom};
-  flight(world,e,target,dt);return true;
- }
- // Hold the authored pedestal without replacing physics or this phase's pose.
+ // Singer alone retains the local song pulse, holding its physical pedestal.
  return true;
 }
 export function encounterDamageMultiplier(e,kind){
  // A clear recovery window rewards timing but never blocks an untimed hit.
- return e.skin!=='wither'&&ENCOUNTER_PROFILES[e.skin]?.boss&&e.encounterPhase==='recover'&&['cobble','anvil','trident','ender','slimeball'].includes(kind)?1.5:1;
+ return ((e.skin==='ender_dragon'&&e.encounterPhase==='perch')||(e.skin==='sift_echo_golem'&&e.encounterPhase==='recover'))&&['cobble','anvil','trident','ender','slimeball'].includes(kind)?1.5:1;
 }
 // Called by combat once after every deduplicated effective Wither hit, including
 // the killing hit. Damage ownership stays in combat; spawning never deals damage.

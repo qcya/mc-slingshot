@@ -1,6 +1,6 @@
 import { WIDTH,HEIGHT,PIXEL,TILE,AMMO,MATERIALS,clamp } from './config.mjs';
 import {predictArc,arcRevision} from './aim.mjs';
-import {MobSprites} from './mobs.mjs';
+import {MobSprites,mobPartFaces,mobPartCenter} from './mobs.mjs';
 import {tntFlash,DEATH_POOF} from './animation.mjs';
 import {SLING_HOME,SLING_FRAME,pocketGeometry} from './sling.mjs';
 import {projectileOpacity} from './combat.mjs';
@@ -82,7 +82,11 @@ export class Renderer {
       else if(event.type==='impact')this.assets.play(event.sound||MATERIALS[event.m]?.sound||'stone',clamp(event.speed/2200,.12,.4));
       else if(event.type==='hurt')this.assets.play(event.sound,.18);
       else if(event.type==='recall')this.assets.play(event.sound||'trident_return',.28);
-      else if(event.type==='encounterPulse'&&event.skin!=='wither')this.effects.push({...event,life:.65,total:.65});
+      else if(event.type==='encounterPulse'&&event.skin==='sift_singer')this.effects.push({...event,life:.65,total:.65});
+      else if(event.type==='echoReflect'){
+        this.assets.play('glass',.18);
+        for(let i=0;i<18;i++)this.particles.push({x:event.x+(Math.random()-.5)*12,y:event.y+(Math.random()-.5)*70,vx:(Math.random()-.5)*160,vy:-25-Math.random()*80,color:i%3?'#6cf7eb':'#e4ffff',life:.5+Math.random()*.35,size:i%2?3:6,poof:true});
+      }
       else if(event.type==='summon'){
         this.assets.play(event.sound||'wither_summon',.18);
         for(let i=0;i<14;i++)this.particles.push({x:event.x+(Math.random()-.5)*22,y:event.y-12-Math.random()*65,vx:(Math.random()-.5)*26,vy:-20-Math.random()*30,color:i%2?'#4c4a4e':'#99909b',life:.5+Math.random()*.3,size:3,poof:true});
@@ -132,10 +136,11 @@ export class Renderer {
   }
   mob(e,world){
     this.mobSprites.draw(this.ctx,e,world);
-    if(e.alive&&e.skin!=='wither'&&(e.pose?.attackCharge||0)>0){
+    if(e.alive&&e.skin==='sift_singer'&&(e.pose?.attackCharge||0)>0){
       const c=this.ctx,charge=e.pose.attackCharge,r=22+charge*30;c.save();c.translate(e.body.position.x,e.body.position.y);c.strokeStyle=e.skin==='wither'?'#cad2d3':'#76efee';c.globalAlpha=.3+charge*.6;c.lineWidth=3;
       for(let i=0;i<8;i++){const a=i*Math.PI/4+world.time*.8;c.fillStyle=c.strokeStyle;c.fillRect(Math.cos(a)*r-3,Math.sin(a)*r-3,6,6);}c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.stroke();c.restore();
     }
+    if(e.alive&&e.skin==='sift_echo_golem')this.echoGuard(e,world);
     if(e.alive&&e.frozen){
       const c=this.ctx,w=e.skin==='warden'?144:e.skin==='hoglin'?148:e.dimensions.width+34;
       const h=e.skin==='warden'?172:e.skin==='hoglin'?110:e.skin==='shulker'?70+e.shellAmount*26:e.dimensions.height+20;
@@ -152,6 +157,33 @@ export class Renderer {
       c.save();c.globalAlpha=.85;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
     }
   }
+  echoGuard(e,world){
+    const c=this.ctx,exposed=world.time<(e.echoRecoveryUntil??0),charge=e.pose?.attackCharge||0;
+    if(exposed){
+      c.save();c.globalAlpha=.3+Math.sin(world.time*18)*.08;
+      for(const f of mobPartFaces(e,'soul_block')){const [a,...rest]=f.vertices;c.beginPath();c.moveTo(a.x,a.y);for(const p of rest)c.lineTo(p.x,p.y);c.closePath();c.fillStyle='#8affdf';c.fill();c.globalAlpha=.9;c.strokeStyle='#d6ffe8';c.lineWidth=2;c.stroke();c.globalAlpha=.3;}
+      const p=mobPartCenter(e,'soul_block');c.globalAlpha=.85;c.fillStyle='#dcfff3';for(let i=0;i<5;i++){const x=p.x-22+i*11,y=p.y-32-Math.floor((world.time*20+i*7)%16);c.fillRect(Math.round(x/3)*3,Math.round(y/3)*3,3,3);}c.restore();
+    }else if(e.echoShieldActive||charge>0){
+      const facing=e.facing||-1,x=Math.round((e.body.position.x+facing*(e.dimensions.width/2+12))/3)*3,y=Math.round((e.body.position.y-45)/3)*3;
+      c.save();c.globalAlpha=e.echoShieldActive?.9:.2+charge*.55;
+      // A narrow, front-facing voxel plane makes the one-sided guard explicit.
+      c.fillStyle='#092d37';c.fillRect(x-12,y+9,24,78);c.fillRect(x-6,y,12,96);
+      c.fillStyle='#5cebdc';c.fillRect(x-9,y+9,3,78);c.fillRect(x+6,y+9,3,78);c.fillRect(x-6,y+3,12,3);c.fillRect(x-6,y+90,12,3);
+      c.fillStyle='#238e9c';c.fillRect(x-6,y+9,12,78);
+      for(let row=0;row<6;row++){c.fillStyle=row%2?'#6ee9dc':'#3dc1c4';c.fillRect(x-3,y+15+row*12,6,6);}
+      c.fillStyle='#dbffef';c.fillRect(x-3,y+42,6,12);c.restore();
+      if(charge>0){c.save();c.globalAlpha=.08+charge*.18;c.fillStyle='#77fff1';for(const f of mobPartFaces(e,'soul_block')){const [a,...rest]=f.vertices;c.beginPath();c.moveTo(a.x,a.y);for(const p of rest)c.lineTo(p.x,p.y);c.closePath();c.fill();}c.restore();}
+    }
+  }
+  healingBeams(world,time){
+    const c=this.ctx;
+    for(const p of world.projectiles){
+      if(p.dead||p.healingOwner===undefined)continue;
+      const dragon=world.enemies.find(e=>e.id===p.healingOwner&&e.alive&&!e.dead);if(!dragon)continue;
+      const from={x:p.body.position.x,y:p.body.position.y+p.ammo.size/2-20-1.25*(9+Math.sin(time*.8)*1.5)},to=mobPartCenter(dragon,'body'),length=Math.hypot(to.x-from.x,to.y-from.y),dx=(to.x-from.x)/(length||1),dy=(to.y-from.y)/(length||1);
+      c.save();c.translate(from.x,from.y);c.rotate(Math.atan2(dy,dx));c.fillStyle='#9b43ba77';c.fillRect(0,-5,length,10);c.fillStyle='#eeb0ffb0';c.fillRect(0,-2,length,4);c.fillStyle='#fff4ff';for(let d=(time*70)%24;d<length;d+=24)c.fillRect(d,-2,6,4);c.restore();
+    }
+  }
   bossHud(world){
     const bosses=world.enemies.filter(e=>e.alive&&!e.dead&&ENCOUNTER_PROFILES[e.skin]?.boss),c=this.ctx;
     for(const [index,e] of bosses.entries()){
@@ -161,6 +193,12 @@ export class Renderer {
       c.fillStyle='#160b16';c.fillRect(0,0,182,5);c.fillStyle='#382035';c.fillRect(1,1,180,3);c.fillStyle='#68365f';c.fillRect(1,1,180,1);
       if(filled>2){c.fillStyle='#960099';c.fillRect(1,1,Math.min(180,filled-1),3);c.fillStyle='#e75be8';c.fillRect(1,1,Math.min(180,filled-1),1);c.fillStyle='#be2bc2';c.fillRect(1,2,Math.min(180,filled-1),1);}
       c.restore();c.save();c.font='bold 24px monospace';c.textAlign='center';c.fillStyle='#252025';c.fillText(profile.label,WIDTH/2+3,y-9+3);c.fillStyle='#fff';c.fillText(profile.label,WIDTH/2,y-9);c.restore();
+      let subtitle='';
+      if(e.skin==='ender_dragon'){
+        const healers=world.projectiles?.filter(p=>!p.dead&&p.healingOwner===e.id).length||0;
+        subtitle=healers?`水晶治疗中 · ${healers} 座水晶`:`水晶已摧毁 · ${e.encounterPhase==='perch'?'停栖破绽':'自由飞行'}`;
+      }else if(e.skin==='sift_echo_golem')subtitle=world.time<(e.echoRecoveryUntil??0)?'护盾破碎 · 核心暴露':e.echoShieldActive?'正面护盾 · 反弹一次':(e.pose?.attackCharge||0)>0?'正在展开护盾':'护盾尚未展开';
+      if(subtitle){c.save();c.font='bold 19px system-ui';c.textAlign='center';c.fillStyle='#0e1015';c.fillText(subtitle,WIDTH/2+2,y+40+2);c.fillStyle='#e8f8ff';c.fillText(subtitle,WIDTH/2,y+40);c.restore();}
     }
   }
   ball(x,y,ammo,size=ammo.size){
@@ -202,6 +240,7 @@ export class Renderer {
     }
     contactShadows(c,world,SLING_HOME);
     for(const e of world.debris){if(e.dead)continue;c.save();c.translate(e.body.position.x,e.body.position.y);c.rotate(e.body.angle);c.drawImage(this.cachePiece(e),e.offset.x,e.offset.y,e.w*PIXEL,e.h*PIXEL);c.restore();}
+    this.healingBeams(world,visualTime);
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
     for(const fire of world.fires||[]){
       if(world.time<fire.startedAt)continue;const atlas=this.assets.images.fire_0,frame=Math.floor((world.time-fire.startedAt)*12+fire.tx*3+fire.ty)%32;

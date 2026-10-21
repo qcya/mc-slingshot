@@ -106,6 +106,16 @@ function anchor(skin){
  if(!nativeAnchors.has(skin)){const b=geometryBounds(nativeGeometry(skin,0,1,{walkBlend:0}));nativeAnchors.set(skin,{x:(b.left+b.right)/2,y:b.bottom});}
  return nativeAnchors.get(skin);
 }
+// Attach encounter effects to the rendered model rather than its physics box.
+export function mobPartFaces(e,part){
+ if(!NATIVE_PROFILES[e.skin])return [];
+ const direction=e.facing||1,a=anchor(e.skin),s=NATIVE_PROFILES[e.skin].scale,angle=e.body.angle||0,cy=Math.cos(angle),sy=Math.sin(angle);
+ return mobGeometry(e.skin,e.walkDistance/14,direction,e.pose).filter(f=>f.part===part).map(f=>({...f,vertices:f.vertices.map(v=>{const x=(v.x-a.x*direction)*s,y=(v.y-a.y)*s;return {x:e.body.position.x+x*cy-y*sy,y:e.body.position.y+(e.feetOffset??46)+x*sy+y*cy};})}));
+}
+export function mobPartCenter(e,part){
+ const faces=mobPartFaces(e,part);if(!faces.length)return {...e.body.position};
+ const b=geometryBounds(faces);return {x:(b.left+b.right)/2,y:(b.top+b.bottom)/2};
+}
 export class MobSprites{
  constructor(assets){this.assets=assets;this.cache=new Map();this.scratch=new WeakMap();this.opaqueSkins=new WeakMap();}
  skinImage(skin){

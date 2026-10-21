@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {nativeGeometry,geometryBounds} from '../src/native-geometry.mjs';
 import {NATIVE_MODELS} from '../src/native-model-data.mjs';
+import {Renderer} from '../src/renderer.mjs';
 
 test('native mob geometry retains each original model and texture file',()=>{
  const records=JSON.parse(fs.readFileSync(new URL('../docs/native-entity-assets.json',import.meta.url)));
@@ -60,10 +61,43 @@ test('Wither Skeleton uses native narrow bone limbs and carries its original sto
  assert.ok(!faces.some(f=>f.part==='hat'));
 });
 
+test('sword brown grip texel stays inside the animated right hand in both facings',()=>{
+ for(const direction of [-1,1])for(const phase of [0,.7,1.4,2.1,3.2])for(const walkBlend of [0,1]){
+  const faces=nativeGeometry('wither_skeleton',phase,direction,{walkBlend,headYaw:.3}),sword=faces.find(f=>f.part==='stoneSword'),arm=faces.find(f=>f.part==='rightArm'&&f.face==='front'),[a,b,,d]=sword.vertices;
+  // Interpolate the real brown handle texel from the returned textured plane.
+  const u=3.5/16,v=12.5/16,grip={x:a.x+(b.x-a.x)*u+(d.x-a.x)*v,y:a.y+(b.y-a.y)*u+(d.y-a.y)*v};
+  assert.ok(Math.hypot(grip.x-sword.hand.x,grip.y-sword.hand.y)<1e-9,'the handle must coincide with the transformed hand centre');
+  // The hand must also be the lower endpoint of the returned original arm
+  // geometry, independently of the attachment metadata (2px-wide native bone).
+  const edge={x:(arm.vertices[2].x+arm.vertices[3].x)/2,y:(arm.vertices[2].y+arm.vertices[3].y)/2};
+  assert.ok(Math.hypot(grip.x-edge.x,grip.y-edge.y)<1.1,'handle must be enclosed by the right-arm endpoint');
+  const tip={x:a.x+(b.x-a.x)*13.5/16+(d.x-a.x)*2.5/16,y:a.y+(b.y-a.y)*13.5/16+(d.y-a.y)*2.5/16};
+  assert.ok(tip.y<grip.y-8,'blade points up from grip');
+  assert.ok((tip.x-grip.x)*direction>3,'blade leans forward clear of the torso');
+ }
+});
+
 test('end crystal has independent transparent glass, core and grounded pedestal geometry',()=>{
  const a=nativeGeometry('end_crystal_entity',0),b=nativeGeometry('end_crystal_entity',1);
  for(const part of ['outerglass','innerglass','crystal','base'])assert.ok(a.some(f=>f.part===part));
  assert.deepEqual(a.filter(f=>f.part==='base'),b.filter(f=>f.part==='base'));
  assert.notDeepEqual(a.filter(f=>f.part==='crystal'),b.filter(f=>f.part==='crystal'));
  assert.equal(geometryBounds(a.filter(f=>f.part==='base')).bottom,17.92);
+});
+
+test('Dragon crystal beam vanishes with its owner crystal and HUD reports actual healers',()=>{
+ const moves=[],labels=[],ctx={save(){},restore(){},translate(...a){moves.push(a);},rotate(){},scale(){},fillRect(){},fillText(t){labels.push(t);}};
+ const dragon={id:2,skin:'ender_dragon',alive:true,hp:300,body:{position:{x:800,y:300},angle:0},walkDistance:0,facing:1,feetOffset:55,pose:{},encounterPhase:'perch'},crystal={healingOwner:2,body:{position:{x:700,y:500}},ammo:{id:'crystal',size:28}},world={time:1,enemies:[dragon],projectiles:[crystal]},renderer={ctx};
+ Renderer.prototype.healingBeams.call(renderer,world,1);assert.equal(moves.length,1);assert.equal(moves[0][0],700);assert.ok(moves[0][1]<500,'beam starts at floating core');
+ Renderer.prototype.bossHud.call(renderer,world);assert.ok(labels.some(s=>s.includes('1 座水晶')));
+ crystal.dead=true;moves.length=0;labels.length=0;Renderer.prototype.healingBeams.call(renderer,world,1);assert.equal(moves.length,0);
+ Renderer.prototype.bossHud.call(renderer,world);assert.ok(labels.some(s=>s.includes('水晶已摧毁')&&s.includes('停栖')));
+});
+
+test('Echo shield is a front plane, reflection makes shards, and HUD changes to exposed core',()=>{
+ const rectangles=[],labels=[],ctx={save(){},restore(){},fillRect(...a){rectangles.push(a);},translate(){},scale(){},fillText(t){labels.push(t);}},e={skin:'sift_echo_golem',alive:true,hp:200,facing:-1,body:{position:{x:1000,y:400}},dimensions:{width:96},echoShieldActive:true,echoRecoveryUntil:0,pose:{}},world={time:1,enemies:[e]},renderer={ctx};
+ Renderer.prototype.echoGuard.call(renderer,e,world);assert.ok(rectangles.length>0);assert.ok(rectangles.every(r=>r[0]+r[2]<1000),'all shield pixels must be in front, to the left');
+ Renderer.prototype.bossHud.call(renderer,world);assert.ok(labels.some(s=>s.includes('反弹一次')));
+ labels.length=0;e.echoShieldActive=false;e.echoRecoveryUntil=3;Renderer.prototype.bossHud.call(renderer,world);assert.ok(labels.some(s=>s.includes('核心暴露')));
+ const effects={particles:[],effects:[],assets:{play(){}}};Renderer.prototype.consume.call(effects,{events:[{type:'echoReflect',x:940,y:400}]});assert.equal(effects.particles.length,18);assert.equal(effects.effects.length,0,'no generic pulse ring');
 });

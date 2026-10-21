@@ -6,7 +6,7 @@ The Nether final stage is an open Wither summoning basin with basalt side towers
 
 The four Sift species use the community mod's actual entity names, original PNG skin atlases and GeckoLib cuboid geometry from the cached MIT-licensed Mielon Sift release. The cached JAR was inspected as a ZIP archive only, never executed. Source and license provenance are recorded with the assets. Blub is the small eared quadruped; Sifter is the broad low quadruped; Singer is the tall antlered creature; Echo Golem is the crowned construct. They are not reskinned vanilla Pillagers or Wardens.
 
-The two ordinary encounter roles (Blub/Sifter), Singer elite role and Echo Golem final-boss role are adaptations for Stone at Full Draw. In particular this project does not claim that Echo Golem is an official vanilla or upstream mod boss. Its combat timing, health and projectile pulse are original game rules.
+The two ordinary encounter roles (Blub/Sifter), Singer elite role and Echo Golem final-boss role are adaptations for Stone at Full Draw. In particular this project does not claim that Echo Golem is an official vanilla or upstream mod boss. Its combat timing, health and reflective shield are original game rules.
 
 ## Readable behavior
 
@@ -15,12 +15,16 @@ The two ordinary encounter roles (Blub/Sifter), Singer elite role and Echo Golem
 | Blub | 100 | Ordinary supported patrol; short body and ears |
 | Sifter | 100 | Ordinary supported patrol; low broad body |
 | Singer | 200 | Holds its pedestal; charges a song before a short-range airborne-ammo pulse |
-| Echo Golem | 450 | Braces its crown, pulses, then exposes a recovery window |
+| Echo Golem | 450 | Telegraphs a front shield, reflects one incoming projectile, then exposes its core |
 | Wither | 450 | Calm, subtle hover; each of three effective hits summons a grounded Wither Skeleton |
 | Wither Skeleton | 100 | Ground walker spawned on the nearest supported clear horizontal surface |
-| Ender Dragon | 600 | Circles the island, then descends to a predictable central perch |
+| Ender Dragon | 600 | Two destructible pylon crystals heal 6 HP/s each; it circles then returns to the fountain |
 
-Dragon and Echo Golem recovery multiplies direct stone, slime, pearl, trident and anvil damage by 1.5. Other phases never introduce invulnerability, healing or an automatic terrain explosion. Singer, dragon and golem pulses occur once per cycle after a visible charge; they only nudge nearby airborne ammunition. Placed crystals, resting projectiles, actors and terrain are unaffected. The Wither never charges or pulses. Every distinct effective attack removes exactly one third of its initial health; each confirmed hit, including the killing hit, summons one Wither Skeleton. The summon scans real terrain for the nearest level surface with full floor support, viewport bounds, empty body space and no creature overlap. Summoned actors join the ordinary remaining-enemy victory condition.
+The dragon's two pylon crystals use ordinary placed-crystal bodies and destruction triggers. Each live owned crystal heals 6 HP/s, capped at 600 health; destroying it immediately removes that beam and healing contribution. The dragon stays vulnerable and never resurrects. Its fountain perch rewards direct stone, slime, pearl, trident and anvil damage by 1.5.
+
+Echo Golem faces the launcher. It telegraphs for 1.1 seconds, raises its shield for up to 2.8 seconds, then exposes its core for 2.4 seconds. One incoming front projectile is physically reflected away and immediately breaks the shield into that recovery window. The reflection leaves its damage source available for a later legitimate hit. Rear shots, returning tridents and explosions bypass the shield. Direct attacks against the exposed core deal 1.5 damage. No dragon or golem gust pulse remains; the Singer alone retains its small telegraphed song pulse.
+
+The Wither never charges or pulses. Every distinct effective attack removes exactly one third of its initial health; each confirmed hit, including the killing hit, summons one Wither Skeleton. The summon scans real terrain for the nearest level surface with full floor support, viewport bounds, empty body space and no creature overlap. Summoned actors join the ordinary remaining-enemy victory condition.
 
 Weapon knockback temporarily takes priority over flight steering. The Wither and dragon retain Matter bodies, collisions and gravity compensation while flying.
 

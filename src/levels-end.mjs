@@ -10,7 +10,7 @@ export const END_LEVELS=[
  {title:'07 / 折叠阶城',desc:'逐层升高的露台，考验不同力度的投射'},
  {title:'08 / 失落船坞',desc:'船形紫珀大厅和低处码头分层设防'},
  {title:'09 / 星门卫城',desc:'中央开口连通地下厅，侧塔控制高处'},
- {title:'10 / 末影龙归巢',desc:'末影龙将在中央返回传送门喷泉上方归巢；盘旋时蓄力，归巢时重击'}
+ {title:'10 / 末影龙归巢',desc:'先击碎两座黑曜石柱上的治疗水晶，再抓住中央喷泉上方的归巢窗口'}
 ];
 
 export function buildEnd(level){
@@ -68,8 +68,8 @@ export function buildEnd(level){
   column(25,12,14,7);
   // Two isolated obsidian pylons frame the fountain without sealing the sky.
   column(18,9,15,40);row(18,19,8,40);column(31,7,15,40);row(30,31,6,40);
-  sh(19,8);sh(30.5,6);
-  enemy(25.5,12,'ender_dragon',{height:110,flightBounds:{left:1100,right:1320,top:220,bottom:521}});
+  sh(19.35,8);sh(30.5,6);
+  enemy(25.5,12,'ender_dragon',{height:110,flightBounds:{left:1100,right:1320,top:220,bottom:521},healingCrystals:[{x:18.25*48,feet:8*48},{x:31.5*48,feet:6*48}]});
 
  }
  assignEndermanSpots(scene);

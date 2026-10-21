@@ -7,7 +7,7 @@ import {igniteWood,igniteImpact,advanceFire,burnEnemy,splashWater} from './fire.
 import {profileFor,heavyMob,armoredMob,projectileBody,projectileGravity,initCombat,advanceCombat,damageEnemy,projectileDamage,projectileOpacity,gust,freezeEnemy,thawEnemy} from './combat.mjs';
 import {LavaField} from './lava.mjs';
 import {launchVelocity,speedLimit,advanceWeapon,recallTrident,crystalSupported,restAnvilOnEnemy} from './weapons.mjs';
-import {tickEncounter} from './encounters.mjs';
+import {tickEncounter,setupEncounter} from './encounters.mjs';
 
 // Pixels own material state; Matter owns ALL rigid-body motion and contacts.
 // No fallback integrator and no permanent invisible plane beneath damaged soil.
@@ -58,7 +58,7 @@ export class SiegeWorld {
     this.M.Body.setMass(body,profile.mass);
     const e=this.register({type:'enemy',skin,hp:profile.hp,dimensions,feetOffset,projectileHits:new Set(),alive:true,deathAt:0,facing:this.enemies.length%2?-1:1,walkDistance:0,turns:0,turnAt:0,lastX:x},body);
     Object.assign(e,actorState(e.id,this.time));e.stationary=!!options.stationary;
-    initCombat(e,this.time,options);e.burnSources=new Set();e.burnTicks=[];e.burningUntil=0;this.enemies.push(e);return e;
+    initCombat(e,this.time,options);e.burnSources=new Set();e.burnTicks=[];e.burningUntil=0;this.enemies.push(e);setupEncounter(this,e);return e;
   }
   patrol(dt){
     for(const e of this.enemies){
@@ -359,6 +359,6 @@ export class SiegeWorld {
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,lava:this.lava.snapshot(),lavaCells:this.lava.cells.size,lavaCooled:this.stats.lavaCooled,
-    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses,ignited:p.ignited,returning:!!p.returning,planted:!!p.planted,placed:!!p.placed,opacity:projectileOpacity(p,this.time)})),
+    projectiles:this.projectiles.map(p=>({id:p.ammo.id,x:p.body.position.x,y:p.body.position.y,angle:p.body.angle,speed:p.body.speed*60,sleeping:p.body.isSleeping,uses:p.uses,ignited:p.ignited,returning:!!p.returning,planted:!!p.planted,placed:!!p.placed,healingOwner:p.healingOwner??null,echoReflectedBy:p.echoReflectedBy??null,opacity:projectileOpacity(p,this.time)})),
     particlesPending:this.events.length};}
 }

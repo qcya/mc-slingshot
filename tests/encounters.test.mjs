@@ -39,7 +39,7 @@ test('dragon remains inside a bounded arena through a full cycle of live Matter 
   for(let i=0;i<3600;i++){world.time+=1/120;assert.equal(tickEncounter(world,e,1/120),true);M.Engine.update(world.engine,1000/120);positions.push({...e.body.position});phases.add(e.encounterPhase);}
   assert.ok(positions.every(p=>p.x>900&&p.x<1350&&p.y>240&&p.y<620));
   assert.ok(Math.max(...positions.map(p=>p.x))-Math.min(...positions.map(p=>p.x))>100);
-  assert.ok(phases.size>=3);assert.equal(e.hp,ENCOUNTER_PROFILES[skin].hp);assert.ok(e.pose.wingFlap>=0&&e.pose.wingFlap<=1);
+  assert.deepEqual([...phases].sort(),['patrol','perch']);assert.equal(e.hp,ENCOUNTER_PROFILES[skin].hp);assert.ok(e.pose.wingFlap>=0&&e.pose.wingFlap<=1);
   M.Engine.clear(world.engine);
  }
 });

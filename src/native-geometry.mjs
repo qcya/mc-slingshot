@@ -55,7 +55,7 @@ export function nativeGeometry(skin,phase=0,direction=1,pose={}){
   }
   if(skin==='wither_skeleton'){
    if(n.endsWith('Leg'))r[0]+=swing*(n.startsWith('left')?1:-1);
-   if(n.endsWith('Arm'))r[0]+=n.startsWith('right')?-12:swing*.55;
+   if(n.endsWith('Arm'))r[0]+=n.startsWith('right')?28+swing*.14:swing*.55;
    if(n==='head'){r[1]+=(pose.headYaw||0)*25;r[0]+=(pose.headPitch||0)*25;}
   }
   if(skin==='wither'&&n.toLowerCase().includes('head'))r[1]+=Math.sin(phase*.7)*7;
@@ -98,9 +98,15 @@ export function nativeGeometry(skin,phase=0,direction=1,pose={}){
   add('down',[p(x,y,z),p(x+w,y,z),p(x+w,y,z+d),p(x,y,z+d)],[u+d+w,v,w,d]);
  }
  if(skin==='wither_skeleton'){
-  const b=byName.get('rightArm'),p=(x,y,z)=>transform([x,y,z],b,{}),vertices=[p(-5,26,3),p(-5,26,-13),p(-5,10,-13),p(-5,10,3)];
-  if(direction<0)[vertices[0],vertices[1],vertices[2],vertices[3]]=[vertices[1],vertices[0],vertices[3],vertices[2]];
-  faces.push({part:'stoneSword',face:'front',texture:'stone_sword',vertices,uv:[0,0,16,16],depth:vertices.reduce((n,v)=>n+v.depth,0)/4});
+  const b=byName.get('rightArm'),hand=[-5,12,0],gripUV=[3.5,12.5],lean=55*RAD,size=.9;
+  // The brown grip is at texel (3,12), not at the centre of the 16px atlas.
+  // Build an affine item plane around that grip, at the arm's actual endpoint.
+  // Its diagonal blade becomes an upright, forward-leaning held sword. Both
+  // the plane and the hand go through the complete animated parent hierarchy.
+  const axis=[Math.cos(lean),-Math.sin(lean)],cross=[Math.sin(lean),Math.cos(lean)],root=Math.SQRT1_2;
+  const point=(u,v)=>{const du=(u-gripUV[0])*size,dv=(v-gripUV[1])*size;return transform([hand[0],hand[1]+root*((axis[0]+cross[0])*du+(cross[0]-axis[0])*dv),hand[2]+root*((axis[1]+cross[1])*du+(cross[1]-axis[1])*dv)],b,{});};
+  const vertices=[point(0,0),point(16,0),point(16,16),point(0,16)];
+  faces.push({part:'stoneSword',face:'front',texture:'stone_sword',vertices,uv:[0,0,16,16],gripUV,grip:point(...gripUV),hand:transform(hand,b,{}),depth:vertices.reduce((n,v)=>n+v.depth,0)/4});
  }
  return faces.sort((a,b)=>b.depth-a.depth);
 }

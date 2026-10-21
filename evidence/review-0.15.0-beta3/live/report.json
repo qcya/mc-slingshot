@@ -1,0 +1,43 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta3/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "dragonHealingCrystals": 2,
+      "reflection": {
+        "count": 1,
+        "golemHp": 450,
+        "coreExposed": true
+      },
+      "anvilDrilledAndDisappeared": true,
+      "anvilRemovedPixels": 720,
+      "summoning": {
+        "bossHp": 300,
+        "skeletons": 1
+      },
+      "tridentThrows": 1,
+      "remainingDurability": 2,
+      "won": "result"
+    },
+    {
+      "name": "phone",
+      "dragonHealingCrystals": 2,
+      "reflection": {
+        "count": 1,
+        "golemHp": 450,
+        "coreExposed": true
+      },
+      "anvilDrilledAndDisappeared": true,
+      "anvilRemovedPixels": 720,
+      "summoning": {
+        "bossHp": 300,
+        "skeletons": 1
+      },
+      "tridentThrows": 1,
+      "remainingDurability": 2,
+      "won": "result"
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}

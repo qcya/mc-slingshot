@@ -30,13 +30,13 @@ for(let level=0;level<10;level++){
  if(verify){const s=setup(level,result[level]?.history||[]);s.advance(2);console.log(JSON.stringify({dimension,level:level+1,won:s.outcome===true,hp:s.hp,alive:s.w.enemies.filter(e=>e.alive).map(e=>({skin:e.skin,hp:e.hp,x:e.body.position.x,y:e.body.position.y}))}));if(s.outcome!==true)process.exitCode=1;s.dispose();continue;}
  const history=process.argv.includes('--extend')?[...(result[level]?.history||[])]:[];let won=false;
  for(let i=history.length;i<buildLevel(level,dimension).shots;i++){
-  const baseline=setup(level,history),before=baseline.hp;
+  const baseline=setup(level,history),before=baseline.hp,beforeCrystals=baseline.w.projectiles.filter(p=>!p.dead&&p.healingOwner).length;
   if(baseline.w.enemies.every(e=>!e.alive)){baseline.advance(2);won=baseline.outcome===true;baseline.dispose();break;}
   const bag=baseline.bag;baseline.dispose();let best=null;
   for(const move of candidates){
    if(!bag[AMMO.findIndex(a=>a.id===move.kind)])continue;
    const s=setup(level,history);s.fire(move);
-   const hp=s.hp,alive=s.w.enemies.filter(e=>e.alive).length,score=(before-hp)*10000+s.w.stats.removed*.01;
+   const hp=s.hp,alive=s.w.enemies.filter(e=>e.alive).length,crystals=s.w.projectiles.filter(p=>!p.dead&&p.healingOwner).length,score=(before-hp)*10000+(beforeCrystals-crystals)*1200000+s.w.stats.removed*.01;
    if(!best||score>best.score)best={move,score,hp,alive};s.dispose();if(hp===0)break;
   }
   if(!best||best.score<=0)break;history.push(best.move);
