@@ -157,6 +157,27 @@ export class SiegeWorld {
     }
     if(n){e.count-=n;this.splitDebris(e);}return n;
   }
+  drillDebrisStrip(left,top,right,bottom,probe=false){
+    let total=0;
+    for(const e of [...this.debris]){
+      if(e.dead)continue;const b=e.body.bounds;
+      if(b.max.x<=left||b.min.x>=right||b.max.y<=top||b.min.y>=bottom)continue;
+      const corners=[[left,top],[right,top],[left,bottom],[right,bottom]].map(([x,y])=>this.localPoint(e,x,y));
+      const x0=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x)))),x1=Math.min(e.w,Math.ceil(Math.max(...corners.map(p=>p.x))));
+      const y0=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y)))),y1=Math.min(e.h,Math.ceil(Math.max(...corners.map(p=>p.y))));
+      let removed=0;
+      for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
+        const k=y*e.w+x,material=e.mask[k];if(!material||!probe&&isIndestructible(material))continue;
+        const point=this.worldPoint(e,x+.5,y+.5);
+        if(point.x<left||point.x>=right||point.y<top||point.y>=bottom)continue;
+        if(probe)return 1;
+        e.mask[k]=0;removed++;
+        if(removed%24===0)this.emitPixel(point.x,point.y,material);
+      }
+      if(removed){e.count-=removed;total+=removed;this.splitDebris(e);}
+    }
+    return total;
+  }
   splitDebris(e){
     const pose={x:e.body.position.x,y:e.body.position.y},velocity={...e.body.velocity},omega=e.body.angularVelocity,angle=e.body.angle;
     this.remove(e);
@@ -245,8 +266,14 @@ export class SiegeWorld {
     // TNT has no direct damage. Ender pearls hurt creatures, never materials.
     const contactDamage=(target,entity,mass,targetMass)=>{
       if(entity?.type==='ammo'){
+        const targetX=target.body.position.x,targetY=target.body.position.y;
         const hit=projectileDamage(this,target,entity,speed);
-        if(hit&&entity.ammo.id==='anvil'&&target.alive)restAnvilOnEnemy(this,entity,target);
+        if(hit&&entity.ammo.id==='anvil'&&target.alive){
+          const velocity=this.before.get(entity.body.id)||entity.body.velocity;
+          const stillAtContact=target.body.position.x===targetX&&target.body.position.y===targetY;
+          const topLanding=stillAtContact&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>entity.body.position.y+entity.ammo.size*.15&&point.y<target.body.position.y;
+          if(topLanding)restAnvilOnEnemy(this,entity,target);
+        }
         if(hit&&entity.ignited&&entity.ammo.id==='cobble')burnEnemy(this,target,`ammo:${entity.id}`,{totalDamage:50});
         return;
       }
@@ -278,7 +305,12 @@ export class SiegeWorld {
       }
       if(kind==='anvil'){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
-        if(!ammo.restingOnEnemy&&(otherBody.plugin.terrain||other?.type==='debris')&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>ammo.body.position.y+ammo.ammo.size*.15){ammo.plunging=true;ammo.body.isSensor=true;}
+        if(!ammo.restingOnEnemy&&(otherBody.plugin.terrain||other?.type==='debris')&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>ammo.body.position.y+ammo.ammo.size*.15){
+          ammo.plunging=true;ammo.body.isSensor=true;
+          // Matter caches sensor state on existing pairs; changing the body alone
+          // leaves the first debris contact physically blocking the new drill.
+          for(const contact of this.engine.pairs.list)if(contact.bodyA.parent===ammo.body||contact.bodyB.parent===ammo.body)contact.isSensor=true;
+        }
         // Only the gradual downward drill removes blocks.
         return;
       }

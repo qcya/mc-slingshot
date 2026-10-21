@@ -8,6 +8,7 @@ import {skyAndLandscape,dimensionLandscape,driftingClouds,rearPixel,foregroundPi
 import {makeSlingArt} from './sling-art.mjs';
 import {drawTrident,drawEndCrystal} from './combat-render.mjs';
 import {ENCOUNTER_PROFILES} from './encounters.mjs';
+import {refreshPixelRaster} from './pixel-raster.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -19,16 +20,14 @@ export class Renderer {
     this.background=document.createElement('canvas');this.background.width=WIDTH;this.background.height=HEIGHT;this.backgroundReady=false;
     this.slingPicture=makeSlingArt(assets.colors.oak_log);
   }
-  reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.arcKey='';this.backgroundReady=false;this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
+  reset(scene){this.scene=scene;this.version=-1;this.rearVersion=-1;this.terrainRaster=null;this.rearRaster=null;this.arcKey='';this.backgroundReady=false;this.pictures=new WeakMap();this.rearPictures=new WeakMap();this.particles=[];this.effects=[];}
   drawRear(world){
     const g=world.rear.grid;
     const revision=g.version;
     if(revision!==this.rearVersion){
-      const c=this.rearCanvas.getContext('2d'),im=c.createImageData(g.width,g.height);
-      for(let y=0;y<g.height;y++)for(let x=0;x<g.width;x++){
-        const m=g.get(x,y);if(!m)continue;const k=(y*g.width+x)*4;
-        im.data.set(rearPixel(this.assets,m,x,y,world,this.scene.visual),k);
-      }c.putImageData(im,0,0);this.rearVersion=revision;
+      const c=this.rearCanvas.getContext('2d'),result=refreshPixelRaster(this.rearRaster,g,(w,h)=>c.createImageData(w,h),(m,x,y)=>rearPixel(this.assets,m,x,y,world,this.scene.visual));
+      this.rearRaster=result.cache;
+      if(result.dirty){const r=result.dirty;c.putImageData(result.cache.image,0,0,r.x,r.y,r.width,r.height);}this.rearVersion=revision;
     }
     this.ctx.drawImage(this.rearCanvas,0,0,WIDTH,HEIGHT);
     for(const e of world.debris){if(e.dead||!e.backPixels.length)continue;
@@ -48,12 +47,9 @@ export class Renderer {
   image(name,x,y,w=TILE,h=TILE){this.ctx.drawImage(this.assets.images[name],Math.round(x),Math.round(y),w,h);}
   cacheGrid(grid){
     if(this.version===grid.version)return;
-    const image=this.tctx.createImageData(grid.width,grid.height),d=image.data;
-    for(let y=0;y<grid.height;y++)for(let x=0;x<grid.width;x++){
-      const m=grid.get(x,y);if(!m)continue;const k=(y*grid.width+x)*4,p=foregroundPixel(this.assets,m,x,y,grid,this.scene.visual);
-      d[k]=p[0];d[k+1]=p[1];d[k+2]=p[2];d[k+3]=p[3];
-    }
-    this.tctx.putImageData(image,0,0);this.version=grid.version;
+    const result=refreshPixelRaster(this.terrainRaster,grid,(w,h)=>this.tctx.createImageData(w,h),(m,x,y)=>foregroundPixel(this.assets,m,x,y,grid,this.scene.visual),1);
+    this.terrainRaster=result.cache;
+    if(result.dirty){const r=result.dirty;this.tctx.putImageData(result.cache.image,0,0,r.x,r.y,r.width,r.height);}this.version=grid.version;
   }
   cachePiece(e){
     let pic=this.pictures.get(e);if(pic)return pic;

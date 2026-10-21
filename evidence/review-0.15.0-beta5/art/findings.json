@@ -1,0 +1,68 @@
+{
+  "method": "Built the current Beta4 source before Beta5 production edits; real playtest UI, real pointer drags, seven cross-world shots plus two deterministic paused-clock replays. No injected projectile/actor state. Screenshots inspected manually.",
+  "buildSnapshot": "C:/Users/Administrator/AppData/Local/Temp/mc-beta5-anvil-pTpiDm/site",
+  "productionEdits": false,
+  "cases": 9,
+  "findings": [
+    {
+      "priority": "high",
+      "title": "Flank impact teleports anvil onto enemy head",
+      "repro": {
+        "world": "end",
+        "level": 5,
+        "ammo": "anvil",
+        "drag": [
+          -132,
+          28
+        ]
+      },
+      "evidence": [
+        "end5-side-0.6.png",
+        "end5-side-0.65.png",
+        "contact-report.json"
+      ],
+      "observed": "At t=.60 anvil centre is (889.39,593.23) moving right at 1270px/s, at target body height. By .65 it snaps to (960,555) and speed zero, remaining static for five seconds. This was a side impact, not a landing from above.",
+      "sourceCause": "restAnvilOnEnemy is called after any damaging enemy contact without a downward/top contact check."
+    },
+    {
+      "priority": "high",
+      "title": "Ground drilling state persists through empty air",
+      "repro": {
+        "world": "sift",
+        "level": 10,
+        "ammo": "anvil",
+        "drag": [
+          -80,
+          105
+        ]
+      },
+      "evidence": [
+        "sift10-high-1.8.png",
+        "sift10-high-2.5.png",
+        "play-report.json"
+      ],
+      "observed": "After drilling overhead red masonry, x remains1079.17 while the anvil floats down an open room. Speed stays209.84px/s and removed count stays480 between y427.89 and585.27.",
+      "sourceCause": "plunging is retained after the drill leaves material, so constant downward drill velocity overrides normal gravity in air."
+    },
+    {
+      "priority": "medium",
+      "title": "Anvil intersects the opening Shulker lid",
+      "repro": {
+        "world": "end",
+        "level": 5,
+        "ammo": "anvil",
+        "drag": [
+          -132,
+          28
+        ]
+      },
+      "evidence": [
+        "end5-side-3.5.png",
+        "end5-wall-3.5.png"
+      ],
+      "observed": "The anvil remains fixed at the closed48px physics-box head height. Shulker lid opens through it, leaving the anvil embedded in the lid.",
+      "sourceCause": "Head placement uses enemy dimensions.height only, while native animated shell lid extends above that physics box."
+    }
+  ],
+  "otherObservations": "Ordinary Nether/Sift ground drilling was visible and gradual; no broad icon-quality issue or invisible anvil was observed. End10 obsidian pylon ricochet was physically plausible. No console startup errors occurred."
+}

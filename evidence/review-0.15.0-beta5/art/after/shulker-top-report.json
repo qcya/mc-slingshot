@@ -1,0 +1,28 @@
+{
+  "method": "Production End5 map, SiegeWorld and Renderer fixture, one vertically descending real anvil; shell animation is natural, not injected",
+  "errors": [],
+  "frames": [
+    {
+      "kind": "closed",
+      "time": 0.24999999999999997,
+      "shellAmount": 0,
+      "restingOnEnemy": 1,
+      "anvilX": 960,
+      "anvilY": 555.0125455111115,
+      "anvilBottom": 576.0125455111115,
+      "support": 576.0125455111115,
+      "targetHp": 150
+    },
+    {
+      "kind": "open",
+      "time": 3.224999999999991,
+      "shellAmount": 0.9519583216286928,
+      "restingOnEnemy": 1,
+      "anvilX": 960,
+      "anvilY": 531.8799127851172,
+      "anvilBottom": 552.8799127851172,
+      "support": 552.8799127851172,
+      "targetHp": 150
+    }
+  ]
+}

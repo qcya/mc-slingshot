@@ -1,0 +1,71 @@
+{
+  "status": "verified",
+  "beforeEvidencePreserved": true,
+  "productionEdits": false,
+  "method": {
+    "normalUI": "Fresh local compiled playtest build. Selected ammo through hotbar and dragged real pointers. Browser clock paused after boot; only explicit runFor advanced shots.",
+    "phone": "844x390 mobile/hasTouch browser emulation using the same pointer replay; not a physical phone.",
+    "shulkerTop": "Private fixture after the normal UI repro: production End5 map + real SiegeWorld projectile + production Renderer; naturally animated shell, no injected shell/attachment state."
+  },
+  "consoleErrors": [],
+  "results": [
+    {
+      "case": "End5 flank impact, drag(-132,+28)",
+      "desktop": "t.65 centre(919.647,608.259), continues into ground; no upward teleport to head(960,555).",
+      "phone": "Same result in 844x390 mobile emulation.",
+      "screens": [
+        "end5-side-0.6.png",
+        "end5-side-0.65.png",
+        "end5-side-0.9.png",
+        "phone-end5-side-0.65.png"
+      ]
+    },
+    {
+      "case": "Sift10 ceiling drill then air gap, drag(-80,+105)",
+      "result": "Clear-air speed rises259?483?721px/s at1.8/2.0/2.2s with removed count held480. At2.4s next floor contact returns to210px/s and removed rises525.",
+      "screens": [
+        "sift10-high-airgap-1.8.png",
+        "sift10-high-airgap-2.png",
+        "sift10-high-airgap-2.2.png",
+        "sift10-high-airgap-2.4.png"
+      ]
+    },
+    {
+      "case": "Proper downward landing on naturally opening Shulker",
+      "result": "Anvil remains attached to rising lid without intersection. Its bottom equals production support surface at both closed/open states.",
+      "states": [
+        {
+          "kind": "closed",
+          "time": 0.24999999999999997,
+          "shellAmount": 0,
+          "restingOnEnemy": 1,
+          "anvilX": 960,
+          "anvilY": 555.0125455111115,
+          "anvilBottom": 576.0125455111115,
+          "support": 576.0125455111115,
+          "targetHp": 150
+        },
+        {
+          "kind": "open",
+          "time": 3.224999999999991,
+          "shellAmount": 0.9519583216286928,
+          "restingOnEnemy": 1,
+          "anvilX": 960,
+          "anvilY": 531.8799127851172,
+          "anvilBottom": 552.8799127851172,
+          "support": 552.8799127851172,
+          "targetHp": 150
+        }
+      ],
+      "screens": [
+        "shulker-top-closed-closeup.png",
+        "shulker-top-open-closeup.png"
+      ]
+    }
+  ],
+  "rawReports": [
+    "after-play-report.json",
+    "airgap-report.json",
+    "shulker-top-report.json"
+  ]
+}

@@ -20,8 +20,12 @@ export function restAnvilOnEnemy(world,p,e){
  if(p.dead||p.restingOnEnemy||!e.alive)return;
  p.restingOnEnemy=e.id;p.plunging=false;p.expiresAt=world.time+5;p.fadeDuration=.8;
  p.body.isSensor=true;world.M.Body.setStatic(p.body,true);
- world.M.Body.setPosition(p.body,{x:e.body.position.x,y:e.body.position.y-e.dimensions.height/2-p.ammo.size/2});
+ world.M.Body.setPosition(p.body,{x:e.body.position.x,y:anvilSupportY(e)-p.ammo.size/2});
  world.M.Body.setVelocity(p.body,{x:0,y:0});
+}
+export function anvilSupportY(e){
+ // mobs.mjs moves the Shulker lid by 9 model units at its 2.7 sprite scale.
+ return e.body.position.y-e.dimensions.height/2-(e.skin==='shulker'?24.3*(e.shellAmount||0):0);
 }
 
 export function advanceWeapon(world,p,dt){
@@ -46,19 +50,29 @@ export function advanceWeapon(world,p,dt){
  if(p.expiresAt<=world.time){world.remove(p);return;}
  if(p.restingOnEnemy){
   const target=world.enemies.find(e=>e.id===p.restingOnEnemy&&!e.dead&&e.alive);
-  if(target){M.Body.setPosition(b,{x:target.body.position.x,y:target.body.position.y-target.dimensions.height/2-p.ammo.size/2});return;}
+  if(target){M.Body.setPosition(b,{x:target.body.position.x,y:anvilSupportY(target)-p.ammo.size/2});return;}
   p.restingOnEnemy=null;p.expiresAt=Infinity;M.Body.setStatic(b,false);b.isSensor=false;
  }
  if(!p.plunging||p.planted)return;
  // Descend at a visible pace, clearing only the next thin slice each step.
  const velocity=210,half=p.ammo.size/2,left=Math.floor((b.position.x-half)/world.s),right=Math.ceil((b.position.x+half)/world.s);
  const top=Math.max(0,Math.floor((b.position.y-half)/world.s)),bottom=Math.min(world.grid.height,Math.ceil((b.position.y+half+velocity*dt)/world.s));
- let bedrock=Infinity,removed=0;
- for(let gy=top;gy<bottom;gy++)for(let gx=left;gx<right;gx++)if(isIndestructible(world.sample((gx+.5)*world.s,(gy+.5)*world.s)))bedrock=Math.min(bedrock,gy*world.s);
+ let bedrock=Infinity,removed=0,touchingMaterial=false;
+ // One extra pixel bridges the subpixel gap left by the previous voxel slice.
+ const touchBottom=Math.min(world.grid.height,bottom+1);
+ for(let gy=top;gy<touchBottom;gy++)for(let gx=left;gx<right;gx++){
+  const material=world.debris.length?world.sample((gx+.5)*world.s,(gy+.5)*world.s):world.grid.get(gx,gy);
+  if(material)touchingMaterial=true;
+  if(gy<bottom&&isIndestructible(material))bedrock=Math.min(bedrock,gy*world.s);
+ }
+ // Moving debris pixels need not line up with the terrain's sample centres.
+ if(!touchingMaterial&&world.debris.length)touchingMaterial=world.drillDebrisStrip(left*world.s,top*world.s,right*world.s,touchBottom*world.s,true)>0;
+ if(!touchingMaterial){p.plunging=false;b.isSensor=false;return;}
  for(let gy=top;gy<bottom&&gy*world.s<bedrock;gy++)for(let gx=left;gx<right;gx++){
   const material=world.grid.get(gx,gy);if(!material||isIndestructible(material))continue;
   world.removeTerrainPixel(gx,gy);removed++;if(removed%24===0)world.emitPixel((gx+.5)*world.s,(gy+.5)*world.s,material);
  }
+ if(world.debris.length)removed+=world.drillDebrisStrip(left*world.s,top*world.s,right*world.s,Math.min(bottom*world.s,bedrock));
  world.stats.removed+=removed;
  if(removed&&world.time>=(p.nextClink??0)){
   world.events.push({type:'impact',x:b.position.x,y:b.position.y+half,sound:'anvil_land',speed:550});p.nextClink=world.time+.22;
