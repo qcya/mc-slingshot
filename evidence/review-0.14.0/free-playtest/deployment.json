@@ -1,0 +1,22 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.14.0/index.html",
+  "publicUrl": "https://qcya.fun:8443/mc-block-launch/assets/playtest-0.14.0/index.html",
+  "version": "0.14.0 free playtest",
+  "gameSha256": "43cf65a7430e7cb8dfb5ceb3bc262f2fe7fa9fec93e60be177db963a6195f791",
+  "formalSaveUnchanged": true,
+  "formalReleaseUnchanged": true,
+  "bothServicePIDsUnchanged": true,
+  "newPortsOpened": false,
+  "saves": "ephemeral memory only; no profile/result/leaderboard requests",
+  "checks": {
+    "nodePassed": 306,
+    "targetedBrowserPassed": 11,
+    "realServerDeviceSizes": [
+      "1280x800",
+      "844x390"
+    ],
+    "realServerJsErrors": 0,
+    "formalApiRequests": 0,
+    "httpsWithValidCertificate": 200
+  }
+}
