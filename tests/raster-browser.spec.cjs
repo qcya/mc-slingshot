@@ -53,8 +53,8 @@ test('real anvil carving reuses raster buffers and reduces work versus the previ
   for(const count of [0,1,2])for(let run=0;run<5;run++){
    const scene=buildLevel(7),world=new SiegeWorld(Matter,scene);for(const a of scene.enemies)world.addEnemy(a.x,a.feet,a.skin,a);
    for(const r of [old,current]){r.reset(scene);r.draw(world,state);}
-   // Begin at ground contact, then use the actual weapon state machine and Matter.
-   for(let n=0;n<count;n++){const p=world.spawnProjectile('anvil',540+n*90,651,0,0);p.plunging=true;p.body.isSensor=true;}
+   // Let real Matter contact initiate the bounded floor impact; no injected drill state.
+   for(let n=0;n<count;n++)world.spawnProjectile('anvil',540+n*90,620,0,180);
    for(let frame=0;frame<30;frame++){
     world.step(1/120);world.step(1/120);world.events.length=0;
     const dirty=current.version!==world.grid.version;

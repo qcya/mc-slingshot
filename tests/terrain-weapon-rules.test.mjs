@@ -99,12 +99,12 @@ test('stone impact and a physically triggered End Crystal preserve obsidian and 
  }
 });
 
-test('anvil drills overburden, stops on obsidian, and never deletes the destructible layer beneath',()=>{
- const w=makeWorld(),x=300,plateY=360;w.grid.fill(60,80,80,40,3);w.grid.fill(60,120,80,6,40);w.grid.fill(60,126,80,54,3);w.grid.fill(0,180,320,16,7);w.synchronize();
+test('anvil crushes thin overburden, stops on obsidian, and never deletes the destructible layer beneath',()=>{
+ const w=makeWorld(),x=300,plateY=360;w.grid.fill(60,108,80,12,3);w.grid.fill(60,120,80,6,40);w.grid.fill(60,126,80,54,3);w.grid.fill(0,180,320,16,7);w.synchronize();
  const protectedLayer=[];for(let gy=126;gy<180;gy++)for(let gx=60;gx<140;gx++)protectedLayer.push([gx,gy,w.grid.get(gx,gy)]);
  const obsidian=count(w.grid.cells,40),p=w.spawnProjectile('anvil',x,180,0,350);
  until(w,()=>p.planted,7);
- assert.ok(w.stats.removed>0,'anvil must reach and drill the actual stone overburden');
+ assert.ok(w.stats.removed>0,'anvil must crush the actual stone overburden');
  assert.ok(Math.abs(p.body.bounds.max.y-plateY)<1,'anvil must rest at the first obsidian top surface');
  assert.equal(count(w.grid.cells,40),obsidian);
  for(const[gx,gy,m]of protectedLayer)assert.equal(w.grid.get(gx,gy),m,`below-obsidian layer changed at ${gx},${gy}`);
@@ -112,10 +112,10 @@ test('anvil drills overburden, stops on obsidian, and never deletes the destruct
 });
 
 test('anvil also stops at a real obsidian debris platform before reaching stone beneath it',()=>{
- const w=makeWorld();w.grid.fill(60,80,80,40,3);w.grid.fill(60,126,80,54,3);w.grid.fill(0,180,320,16,7);w.synchronize();
+ const w=makeWorld();w.grid.fill(60,108,80,12,3);w.grid.fill(60,126,80,54,3);w.grid.fill(0,180,320,16,7);w.synchronize();
  const platform=w.addDebris(new Uint8Array(80*6).fill(40),80,6,{x:180,y:360});M.Body.setStatic(platform.body,true);
  const p=w.spawnProjectile('anvil',300,180,0,350);until(w,()=>p.planted,7);
- assert.ok(w.stats.removed>0,'must drill actual grid overburden before encountering the debris platform');
+ assert.ok(w.stats.removed>0,'must crush actual grid overburden before encountering the debris platform');
  assert.ok(Math.abs(p.body.bounds.max.y-360)<1,'first sampled indestructible debris surface stops the anvil');
  assert.equal(platform.dead,undefined);assert.equal(count(platform.mask,40),80*6);assert.ok(platform.hp.every(v=>v===Infinity));
  for(let y=126;y<180;y++)for(let x=60;x<140;x++)assert.equal(w.grid.get(x,y),3,'stone beneath obsidian debris must remain intact');

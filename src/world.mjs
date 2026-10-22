@@ -305,13 +305,13 @@ export class SiegeWorld {
       }
       if(kind==='anvil'){
         const velocity=this.before.get(ammo.body.id)||ammo.body.velocity;
-        if(!ammo.restingOnEnemy&&(otherBody.plugin.terrain||other?.type==='debris')&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>ammo.body.position.y+ammo.ammo.size*.15){
-          ammo.plunging=true;ammo.body.isSensor=true;
+        if(!ammo.restingOnEnemy&&!ammo.planted&&!ammo.plunging&&(otherBody.plugin.terrain||other?.type==='debris')&&velocity.y>0&&Math.abs(n.y)>.5&&point.y>ammo.body.position.y+ammo.ammo.size*.15){
+          ammo.plunging=true;ammo.crushFront=Math.round(point.y/this.s)*this.s;ammo.crushBottom=ammo.crushFront+TILE;ammo.body.isSensor=true;
           // Matter caches sensor state on existing pairs; changing the body alone
           // leaves the first debris contact physically blocking the new drill.
           for(const contact of this.engine.pairs.list)if(contact.bodyA.parent===ammo.body||contact.bodyB.parent===ammo.body)contact.isSensor=true;
         }
-        // Only the gradual downward drill removes blocks.
+        // One bounded block is crushed for each actual downward floor impact.
         return;
       }
       if(['cobble','tnt','trident'].includes(kind)&&(otherBody.plugin.glass||pair.glassContact)){this.shatterGlass(otherBody,point,speed);return;}

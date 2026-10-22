@@ -127,22 +127,23 @@ test('an anvil striking a side obstacle while rising does not start a downward d
  assert.notEqual(p.plunging,true);
 });
 
-test('an anvil drills progressively with repeated clinks, preserves the shaft sides, and fades at bedrock',()=>{
- const w=world(),cx=300,gx=cx/w.s,bedrockY=600;
+test('an anvil crushes one whole block across materials, preserves deeper ground and sides, then fades',()=>{
+ const w=world(),cx=300,gx=cx/w.s;
  w.grid.fill(40,100,140,100,3);
  Object.keys(MATERIALS).map(Number).filter(m=>Number.isFinite(MATERIALS[m].hard)).forEach((m,i)=>w.grid.fill(40,100+i,140,1,m));
  w.grid.fill(40,200,140,8,7);w.grid.fill(40,208,140,12,40);w.synchronize();
  const neighbor=w.grid.get(gx-8,120),p=w.spawnProjectile('anvil',cx,180,0,350);
- until(w,()=>p.plunging,3);advance(w,.35);
- assert.ok(w.stats.removed>0);assert.notEqual(p.planted,true,'a deep shaft cannot be cleared in one instant');
- assert.notEqual(w.grid.get(gx,195),0,'deep material remains until the anvil reaches it');
+ until(w,()=>p.plunging,3);advance(w,.05);
+ assert.ok(w.stats.removed>0);assert.notEqual(p.planted,true,'the crush advances visibly through the one block');
+ assert.notEqual(w.grid.get(gx,115),0,'the bottom of the impact block has not yet been reached');
  until(w,()=>p.planted,6);
- assert.ok(Math.abs(Math.max(...p.body.vertices.map(v=>v.y))-bedrockY)<.1);
- for(let y=100;y<200;y++)for(let x=gx-7;x<gx+7;x++)assert.equal(w.grid.get(x,y),0,`shaft pixel ${x},${y}`);
- assert.equal(w.grid.get(gx-8,120),neighbor);assert.equal(w.grid.get(gx,200),7);assert.equal(w.grid.get(gx,208),40);
- assert.ok(w.events.filter(e=>e.sound==='anvil_land').length>=3,'each section of drilling produces another clink');
+ assert.ok(Math.abs(Math.max(...p.body.vertices.map(v=>v.y))-348)<.1);
+ for(let y=100;y<116;y++)for(let x=gx-8;x<gx+8;x++)assert.equal(w.grid.get(x,y),0,`impact block pixel ${x},${y}`);
+ assert.equal(w.grid.get(gx-9,105),6);assert.equal(w.grid.get(gx+8,105),6);
+ assert.equal(w.grid.get(gx-8,120),neighbor);assert.equal(w.grid.get(gx,195),3);assert.equal(w.grid.get(gx,200),7);assert.equal(w.grid.get(gx,208),40);
+ assert.equal(w.stats.removed,256);assert.ok(w.events.some(e=>e.sound==='anvil_land'));
  until(w,()=>p.dead||projectileOpacity(p,w.time)<.99,2);
- assert.notEqual(p.dead,true,'the bedrock stop visibly fades before disappearing');
+ assert.notEqual(p.dead,true,'the one-block stop visibly fades before disappearing');
  assert.ok(projectileOpacity(p,w.time)>0&&projectileOpacity(p,w.time)<1);
  until(w,()=>p.dead,3);
  assert.equal(w.projectiles.includes(p),false);assert.equal(M.Composite.allBodies(w.engine.world).includes(p.body),false);

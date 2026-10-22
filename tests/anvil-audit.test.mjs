@@ -28,14 +28,15 @@ test('audit: an anvil rising into the underside of a surviving elite does not te
  assert.ok(p.body.position.y>e.body.position.y,'the upward shot is still below the target at contact');
 });
 
-test('audit: a downward anvil clears a shaft through supported destructible debris rather than passing through intact wood',()=>{
+test('audit: a downward anvil crushes one block of thick supported debris and stops above the remaining wood',()=>{
  const w=fixture();w.grid.fill(0,200,w.grid.width,400,7);w.synchronize();
  const debris=w.addDebris(new Uint8Array(80*20).fill(4),80,20,{x:180,y:540});advance(w,.5);
  const original=debris.count,p=w.spawnProjectile('anvil',300,400,0,350);
  until(w,()=>p.planted,5);
  const remaining=w.debris.filter(e=>!e.dead).reduce((n,e)=>n+e.count,0);
- assert.ok(remaining<original,'the drill must remove the actual wood pixels it crosses');
- assert.ok(w.stats.removed>0);assert.ok(w.events.filter(e=>e.sound==='anvil_land').length>=2);
+ assert.equal(original-remaining,256,'one 48 by 48 block of actual wood pixels is removed');
+ assert.equal(w.stats.removed,256);assert.ok(w.events.some(e=>e.sound==='anvil_land'));
+ assert.ok(p.body.bounds.max.y<600,'thick debris stops the anvil before bedrock');
 });
 
 test('audit: a falling anvil rests on a surviving head without freezing the target and drops after its death',()=>{
@@ -67,11 +68,12 @@ test('audit: a rising side-wall contact cannot start drilling',()=>{
  assert.notEqual(p.plunging,true);assert.equal(w.stats.removed,0);
 });
 
-test('audit: thin and thick layered terrain drill gradually to obsidian without destroying the protected layer',()=>{
+test('audit: layered terrain stops at the first protected surface or at the one-block impact budget',()=>{
  for(const thickness of [1,8,48]){
   const w=fixture();w.grid.fill(80,100,80,thickness,3);w.grid.fill(80,100+thickness,80,4,40);w.grid.fill(80,104+thickness,80,10,4);w.synchronize();
   const p=w.spawnProjectile('anvil',300,200,0,400);until(w,()=>p.planted,5);
-  assert.ok(Math.abs(p.body.position.y+p.ammo.size/2-(100+thickness)*3)<.1);
+  assert.ok(Math.abs(p.body.position.y+p.ammo.size/2-Math.min(348,(100+thickness)*3))<.1);
+  if(thickness>16)assert.equal(w.grid.get(100,116),3,'touching deeper stone remains intact');
   assert.equal(w.grid.get(100,100+thickness),40);assert.equal(w.grid.get(100,104+thickness),4);
   until(w,()=>p.dead,2);
  }

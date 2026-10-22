@@ -25,11 +25,19 @@ export function projectileGravity(M,body,ammo,gravity){
  const extra=(ammo.gravityScale??1)-1;if(!extra)return;
  M.Body.applyForce(body,body.position,{x:body.mass*gravity.x*gravity.scale*extra,y:body.mass*gravity.y*gravity.scale*extra});
 }
-function random(e){e.combatSeed=(Math.imul(e.combatSeed,1664525)+1013904223)>>>0;return e.combatSeed/4294967296;}
+function random(e,key='combatSeed'){e[key]=(Math.imul(e[key],1664525)+1013904223)>>>0;return e[key]/4294967296;}
+function shellSeed(id){
+ // Avalanche nearby IDs before the first draw: the old linear seeds made
+ // adjacent shells open just 39 ms apart. Keep this stream actor-local so
+ // pausing one shell cannot affect siblings or Enderman teleport choices.
+ let seed=(id^0x7368756c)>>>0;
+ seed=Math.imul(seed^(seed>>>16),0x7feb352d);seed=Math.imul(seed^(seed>>>15),0x846ca68b);
+ return (seed^(seed>>>16))>>>0;
+}
 export function initCombat(e,time,options){
  e.combatSeed=(e.id*2654435761)>>>0;e.hitSources=new Set();e.frozen=false;
  initEncounter(e,time,options);
- if(e.skin==='shulker'){e.stationary=true;e.shellOpen=false;e.shellUntil=time+2.4+random(e)*1.8;e.shellAmount=0;}
+ if(e.skin==='shulker'){e.stationary=true;e.shellSeed=shellSeed(e.id);e.shellOpen=false;e.shellUntil=time+2.4+random(e,'shellSeed')*1.8;e.shellAmount=0;}
  if(e.skin==='enderman'){e.teleportCount=0;e.teleportSpots=(options.teleportSpots||[]).map(p=>({...p}));}
 }
 export function freezeEnemy(world,e){
@@ -53,7 +61,7 @@ export function thawEnemy(world,e){
 }
 export function advanceCombat(world,e,dt){
  if(e.skin==='shulker'){
-  if(world.time>=e.shellUntil){e.shellOpen=!e.shellOpen;e.shellUntil=world.time+(e.shellOpen?1.8:2.4)+random(e)*1.8;world.events.push({type:'ambient',sound:e.shellOpen?'shulker_open':'shulker_close'});}
+  if(world.time>=e.shellUntil){e.shellOpen=!e.shellOpen;e.shellUntil=world.time+(e.shellOpen?1.8:2.4)+random(e,'shellSeed')*1.8;world.events.push({type:'ambient',enemyId:e.id,x:e.body.position.x,y:e.body.position.y,sound:e.shellOpen?'shulker_open':'shulker_close'});}
   e.shellAmount+=(Number(e.shellOpen)-e.shellAmount)*Math.min(1,dt*8);
   e.pose={...e.pose,openAmount:e.shellAmount};
  }

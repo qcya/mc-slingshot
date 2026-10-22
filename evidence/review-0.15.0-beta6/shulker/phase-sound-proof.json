@@ -1,0 +1,843 @@
+{
+  "scope": "Real SiegeWorld, authored End 6, 20 seconds at 120 Hz. Sound events are measured; native browser playback is not measured here.",
+  "rootCause": "Linear first LCG draws clustered adjacent IDs within 39 milliseconds.",
+  "fix": "Actor-local hashed shell RNG. Enderman combat RNG unchanged. Renderer consumes each transition ambient event; Assets.play clones each audio clip independently.",
+  "initial": [
+    {
+      "enemyId": 1,
+      "oldFirstOpenAt": 2.8642177848145365,
+      "newFirstOpenAt": 2.922251656651497
+    },
+    {
+      "enemyId": 2,
+      "oldFirstOpenAt": 2.9035132185090333,
+      "newFirstOpenAt": 3.8850686439312994
+    },
+    {
+      "enemyId": 3,
+      "oldFirstOpenAt": 2.94280865220353,
+      "newFirstOpenAt": 2.6332561880350114
+    },
+    {
+      "enemyId": 6,
+      "oldFirstOpenAt": 3.0606949532870202,
+      "newFirstOpenAt": 3.517880738340318
+    }
+  ],
+  "counts": [
+    {
+      "enemyId": 1,
+      "open": 3,
+      "close": 3
+    },
+    {
+      "enemyId": 2,
+      "open": 3,
+      "close": 3
+    },
+    {
+      "enemyId": 3,
+      "open": 3,
+      "close": 3
+    },
+    {
+      "enemyId": 6,
+      "open": 3,
+      "close": 3
+    }
+  ],
+  "transitions": [
+    {
+      "time": 2.6333,
+      "enemyId": 3,
+      "sound": "shulker_open",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        }
+      ]
+    },
+    {
+      "time": 2.925,
+      "enemyId": 1,
+      "sound": "shulker_open",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.917
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        }
+      ]
+    },
+    {
+      "time": 3.525,
+      "enemyId": 6,
+      "sound": "shulker_open",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.994
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.999
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        }
+      ]
+    },
+    {
+      "time": 3.8917,
+      "enemyId": 2,
+      "sound": "shulker_open",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.955
+        }
+      ]
+    },
+    {
+      "time": 5.0917,
+      "enemyId": 1,
+      "sound": "shulker_close",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 5.6167,
+      "enemyId": 3,
+      "sound": "shulker_close",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.012
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 6.9917,
+      "enemyId": 6,
+      "sound": "shulker_close",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        }
+      ]
+    },
+    {
+      "time": 7.2083,
+      "enemyId": 2,
+      "sound": "shulker_close",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.155
+        }
+      ]
+    },
+    {
+      "time": 7.8167,
+      "enemyId": 1,
+      "sound": "shulker_open",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.006
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.001
+        }
+      ]
+    },
+    {
+      "time": 8.8833,
+      "enemyId": 3,
+      "sound": "shulker_open",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        }
+      ]
+    },
+    {
+      "time": 9.5583,
+      "enemyId": 6,
+      "sound": "shulker_open",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.997
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        }
+      ]
+    },
+    {
+      "time": 10.2333,
+      "enemyId": 2,
+      "sound": "shulker_open",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.997
+        }
+      ]
+    },
+    {
+      "time": 10.6,
+      "enemyId": 1,
+      "sound": "shulker_close",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.955
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 11.2667,
+      "enemyId": 3,
+      "sound": "shulker_close",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.004
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 12.5083,
+      "enemyId": 2,
+      "sound": "shulker_close",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 12.9583,
+      "enemyId": 6,
+      "sound": "shulker_close",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.022
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        }
+      ]
+    },
+    {
+      "time": 14.0917,
+      "enemyId": 1,
+      "sound": "shulker_open",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        }
+      ]
+    },
+    {
+      "time": 14.3667,
+      "enemyId": 3,
+      "sound": "shulker_open",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.904
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        }
+      ]
+    },
+    {
+      "time": 15.6167,
+      "enemyId": 6,
+      "sound": "shulker_open",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        }
+      ]
+    },
+    {
+      "time": 15.6917,
+      "enemyId": 2,
+      "sound": "shulker_open",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": true,
+          "visibleOpenAmount": 0.067
+        },
+        {
+          "enemyId": 3,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 0.498
+        }
+      ]
+    },
+    {
+      "time": 17.275,
+      "enemyId": 3,
+      "sound": "shulker_close",
+      "x": 1152,
+      "y": 456.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 17.65,
+      "enemyId": 1,
+      "sound": "shulker_close",
+      "x": 960,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.042
+        },
+        {
+          "enemyId": 6,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        }
+      ]
+    },
+    {
+      "time": 18.4417,
+      "enemyId": 6,
+      "sound": "shulker_close",
+      "x": 1200,
+      "y": 600.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.001
+        },
+        {
+          "enemyId": 2,
+          "open": true,
+          "changed": false,
+          "visibleOpenAmount": 1
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        }
+      ]
+    },
+    {
+      "time": 18.85,
+      "enemyId": 2,
+      "sound": "shulker_close",
+      "x": 1344,
+      "y": 360.01,
+      "states": [
+        {
+          "enemyId": 1,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 2,
+          "open": false,
+          "changed": true,
+          "visibleOpenAmount": 0.933
+        },
+        {
+          "enemyId": 3,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0
+        },
+        {
+          "enemyId": 6,
+          "open": false,
+          "changed": false,
+          "visibleOpenAmount": 0.032
+        }
+      ]
+    }
+  ]
+}
