@@ -13,6 +13,6 @@ for(const skin of ['zombie','pillager','warden'])test(`${skin} walking into a re
 });
 for(const skin of ['zombie','pillager','warden'])test(`a flying pearl still damages ${skin}`,()=>{
  const w=world();w.engine.gravity.scale=0;const e=w.addEnemy(160,166,skin,{stationary:true}),hp=e.hp;
- w.spawnProjectile('ender',100,e.body.position.y,80,0);advance(w,.8);
+ w.spawnProjectile('ender',100,e.body.position.y,300,0);advance(w,.8);
  assert.equal(e.hp,skin==='warden'?hp-75:hp-250);assert.equal(e.alive,skin==='warden');
 });

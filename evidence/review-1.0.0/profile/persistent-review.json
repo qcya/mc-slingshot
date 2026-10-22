@@ -1,0 +1,17 @@
+{
+  "before": {
+    "mc-block-launch.music.v1": "off",
+    "mc-block-launch.best-times.v2": "[7777,7777,7777,7777,7777,7777,7777,7777,7777,7777]",
+    "mc-block-launch.audio.v1": "{\"enabled\":false,\"volume\":0.1}",
+    "mc-block-launch.profile.v1": "{\"nickname\":\"Formal player\"}"
+  },
+  "after": {
+    "mc-block-launch.best-times.v2": "[7777,7777,7777,7777,7777,7777,7777,7777,7777,7777]",
+    "mc-block-launch.profile.v1": "{\"nickname\":\"Formal player\"}",
+    "mc-block-launch.music.v1": "off",
+    "mc-block-launch.audio.v1": "{\"enabled\":false,\"volume\":0.1}"
+  },
+  "errors": [],
+  "network": [],
+  "progressSurvivedReload": true
+}

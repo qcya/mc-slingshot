@@ -1,0 +1,29 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta4/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "healingCrystals": 2,
+      "tridentWallRemovedPixels": 0,
+      "tridentReturned": true,
+      "maxAnvilX": 842.4930186890294,
+      "anvilDisappeared": true,
+      "endBossWon": true,
+      "endBossThrows": 7,
+      "siftTridentOnlyWon": true
+    },
+    {
+      "name": "phone",
+      "healingCrystals": 2,
+      "tridentWallRemovedPixels": 0,
+      "tridentReturned": true,
+      "maxAnvilX": 842.4930186890281,
+      "anvilDisappeared": true,
+      "endBossWon": true,
+      "endBossThrows": 7,
+      "siftTridentOnlyWon": true
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}

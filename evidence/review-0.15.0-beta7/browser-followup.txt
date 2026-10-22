@@ -1,0 +1,19 @@
+
+Running 4 tests using 2 workers
+
+node.exe : (node:31996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+所在位置 C:\Users\Administrator\AppData\Roaming\npm\npx.ps1:24 字符: 5
++     & "node$exe"  "$basedir/node_modules/npm/bin/npx-cli.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:31996) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 tests\bucket-art.spec.cjs:4:1 › native bucket sprite stays readable at 28px in flight and in the pouch (1.2s)
+  ok 1 tests\boss-specials.spec.cjs:21:1 › Dragon healing crystals appear in the shipped browser without consuming inventory or launching a shot (2.0s)
+  ok 3 tests\lava-bucket-ui.spec.cjs:10:101 › one lava bucket becomes an unusable empty bucket on desktop (3.1s)
+  ok 4 tests\lava-bucket-ui.spec.cjs:10:101 › one lava bucket becomes an unusable empty bucket on phone (2.7s)
+
+  4 passed (8.5s)

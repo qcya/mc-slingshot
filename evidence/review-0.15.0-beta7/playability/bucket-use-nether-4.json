@@ -1,0 +1,229 @@
+{
+  "dimension": "nether",
+  "level": 4,
+  "history": [
+    {
+      "kind": "lava_bucket",
+      "angle": 0.02,
+      "pull": 1,
+      "input": {
+        "x": 150.026999100012,
+        "y": 547.6998200035999
+      },
+      "pointer": {
+        "x": 150.02699279785156,
+        "y": 547.6998291015625
+      },
+      "origin": {
+        "x": 150.02699927940247,
+        "y": 547.6998289719138
+      },
+      "vx": 1430,
+      "vy": -29.158152896669073,
+      "power": 1,
+      "wait": 10
+    }
+  ],
+  "budget": [
+    8,
+    2,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0
+  ],
+  "remaining": [
+    8,
+    2,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0
+  ],
+  "bucketAt": 0,
+  "impact": {
+    "time": 0.5000000000000007,
+    "x": 848.9100184788851,
+    "y": 658.0125000066595
+  },
+  "sources": [
+    {
+      "x": 69,
+      "y": 52,
+      "id": "ammo:5",
+      "active": true,
+      "potent": true,
+      "seedCells": [
+        {
+          "x": 70,
+          "y": 55
+        },
+        {
+          "x": 69,
+          "y": 55
+        },
+        {
+          "x": 71,
+          "y": 55
+        },
+        {
+          "x": 70,
+          "y": 54
+        },
+        {
+          "x": 69,
+          "y": 54
+        },
+        {
+          "x": 72,
+          "y": 55
+        },
+        {
+          "x": 71,
+          "y": 54
+        },
+        {
+          "x": 70,
+          "y": 53
+        },
+        {
+          "x": 69,
+          "y": 53
+        },
+        {
+          "x": 72,
+          "y": 54
+        },
+        {
+          "x": 71,
+          "y": 53
+        },
+        {
+          "x": 70,
+          "y": 52
+        },
+        {
+          "x": 69,
+          "y": 52
+        },
+        {
+          "x": 72,
+          "y": 53
+        },
+        {
+          "x": 71,
+          "y": 52
+        },
+        {
+          "x": 72,
+          "y": 52
+        }
+      ],
+      "worldRect": {
+        "x": 828,
+        "y": 624,
+        "width": 48,
+        "height": 48
+      }
+    }
+  ],
+  "latched": [
+    {
+      "id": 4,
+      "skin": "zombified_piglin",
+      "hpAtLatch": 100,
+      "time": 4.383333333333341,
+      "x": 937.4809444123078,
+      "y": 722.0125000006944,
+      "sourceId": "ammo:5"
+    }
+  ],
+  "burnKills": [
+    4
+  ],
+  "burnDamage": [
+    {
+      "id": 4,
+      "skin": "zombified_piglin",
+      "time": 4.983333333333371,
+      "amount": 50,
+      "hp": 50
+    },
+    {
+      "id": 4,
+      "skin": "zombified_piglin",
+      "time": 5.5833333333334005,
+      "amount": 50,
+      "hp": 0
+    }
+  ],
+  "maxBurnSeconds": 1.2000000000000597,
+  "remainingEnemies": [
+    {
+      "skin": "zombified_piglin",
+      "hp": 100
+    },
+    {
+      "skin": "zombified_piglin",
+      "hp": 100
+    },
+    {
+      "skin": "hoglin",
+      "hp": 300
+    }
+  ],
+  "hp": 500,
+  "attempts": 1,
+  "useful": true,
+  "finalReplay": {
+    "dimension": "nether",
+    "level": 4,
+    "passed": true,
+    "shots": [
+      {
+        "kind": "lava_bucket",
+        "angle": 0.02,
+        "pull": 1,
+        "pointer": {
+          "x": 150.02699279785156,
+          "y": 547.6998291015625
+        },
+        "wait": 10
+      }
+    ],
+    "latched": [
+      {
+        "id": 4,
+        "skin": "zombified_piglin",
+        "hp": 100,
+        "time": 4.266666666666668
+      }
+    ],
+    "kills": [
+      {
+        "id": 4,
+        "skin": "zombified_piglin",
+        "hpBefore": 50,
+        "hpAfter": 0,
+        "time": 5.466666666666728,
+        "burnSeconds": 1.2000000000000597
+      }
+    ],
+    "sourceRect": {
+      "x": 828,
+      "y": 624,
+      "width": 48,
+      "height": 48
+    },
+    "seedCells": 16,
+    "bucketRemaining": 0,
+    "hpRemaining": 500,
+    "maxBurnSeconds": 1.2000000000000597
+  }
+}

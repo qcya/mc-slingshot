@@ -19,10 +19,14 @@ async function main(){
    await page.goto(url);await page.waitForFunction(()=>window.MCBlockLaunch);
    if(await page.title()!=='拉满的石 · Stone at Full Draw'||await page.locator('#levelMenu h1').textContent()!=='选择关卡')throw Error('Game title/menu not deployed.');
    await page.locator('#startScreen').click();await page.locator('#levelMenu').waitFor({state:'visible'});
-   await page.locator('#leaderboardBtn').click();await page.waitForFunction(()=>!document.querySelector('#leaderboardStatus').textContent.startsWith('正在'));
-   if(!await page.locator('#rankingTable').isVisible()||await page.locator('#rankingRows tr').count()>100||await page.locator('#rankingRows tr.self').count())throw Error('Public ranking visibility or full-clear/top-100 restriction failed.');
-   const sample=page.locator('#rankingRows tr').filter({hasText:'星海_Astra'});if(await sample.count()!==1||await sample.locator('td').nth(1).textContent()!=='星海_Astra'||!(await sample.textContent()).includes('06:37.000')||await page.locator('.demo-badge').count())throw Error('Live demo entry mismatch.');
-   await page.screenshot({path:`evidence/live-${mobile?'android':'desktop'}-ranking.png`});await page.locator('#leaderboardBack').click();await page.locator('#level-0').click();
+   await page.locator('#leaderboardBtn').click();const boards=[];
+   for(const id of ['overworld','nether','end']){
+    await page.locator(`#leaderboardMenu [data-world="${id}"]`).click();await page.waitForFunction(()=>!document.querySelector('#leaderboardStatus').textContent.startsWith('正在'));
+    const message=await page.locator('#leaderboardStatus').textContent();
+    if(!await page.locator('#rankingTable').isVisible()||await page.locator('#rankingRows tr').count()>100||await page.locator('#rankingRows tr.self').count()||message.includes('连接不上'))throw Error('Public ranking failed: '+id+' '+message);
+    boards.push({world:id,rows:await page.locator('#rankingRows tr').count(),status:message});
+   }
+   await page.screenshot({path:`evidence/live-${mobile?'android':'desktop'}-ranking.png`});await page.locator('#leaderboardBack').click();await page.locator('#levelMenu [data-world="overworld"]').click();await page.locator('#level-0').click();
    const box=await page.locator('#stage').boundingBox(),p=await page.evaluate(()=>MCBlockLaunch.getStatus().launcher),x=box.x+p.x*box.width/1536,y=box.y+p.y*box.height/864;
    if(mobile){
     const cdp=await context.newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-38,y:y+18,id:1}]});
@@ -34,7 +38,7 @@ async function main(){
    }
    await page.waitForFunction(()=>MCBlockLaunch.getDiagnostics().music?.playing&&MCBlockLaunch.getDiagnostics().music.time>.2);
    const status=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());if(status.launched!==0||status.launcher.phase!=='ready'||status.physics!=='Matter.js'||status.music.lastError||status.music.duration<180||errors.length||failed.length||blockedWrites.length)throw Error(JSON.stringify({status,errors,failed,blockedWrites}));
-   await page.screenshot({path:`evidence/live-${mobile?'android':'desktop'}-play.png`});reports.push({mobile,url,physics:status.physics,screen:status.screen,previewPoints:5,cancelledWithoutFiring:status.launched===0,serverWrites:blockedWrites.length,music:status.music,errors,failed});await context.close();
+   await page.screenshot({path:`evidence/live-${mobile?'android':'desktop'}-play.png`});reports.push({mobile,url,boards,physics:status.physics,screen:status.screen,previewPoints:5,cancelledWithoutFiring:status.launched===0,serverWrites:blockedWrites.length,music:status.music,errors,failed});await context.close();
   }
   fs.writeFileSync('evidence/live-browser.json',JSON.stringify(reports,null,2)+'\n');console.log(JSON.stringify(reports));
  }finally{await browser.close();}

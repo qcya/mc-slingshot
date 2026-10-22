@@ -1,0 +1,17 @@
+{
+  "same": true,
+  "size": 28,
+  "full": [
+    16,
+    16
+  ],
+  "empty": [
+    16,
+    16
+  ],
+  "iconIsNative": true,
+  "legacyAnvil": true,
+  "soundLoaded": true,
+  "duration": 0.8293333333333334,
+  "errors": []
+}

@@ -1,0 +1,106 @@
+{
+  "findings": [],
+  "errors": [],
+  "launches": [
+    {
+      "world": "nether",
+      "level": 0,
+      "slot": 4,
+      "selected": "snowball",
+      "launched": 1,
+      "countBefore": 2,
+      "countAfter": 1,
+      "ammo": [
+        {
+          "id": "snowball",
+          "x": 185.00000610351563,
+          "y": 580.0000122070312,
+          "angle": 0,
+          "speed": 1144.2394667573635,
+          "sleeping": false,
+          "uses": 0
+        }
+      ]
+    },
+    {
+      "world": "nether",
+      "level": 3,
+      "slot": 5,
+      "selected": "wind",
+      "launched": 1,
+      "countBefore": 2,
+      "countAfter": 1,
+      "ammo": [
+        {
+          "id": "wind",
+          "x": 185.00000610351563,
+          "y": 580.0000122070312,
+          "angle": 0,
+          "speed": 1144.2394667573635,
+          "sleeping": false,
+          "uses": 0
+        }
+      ]
+    },
+    {
+      "world": "nether",
+      "level": 6,
+      "slot": 6,
+      "selected": "water",
+      "launched": 1,
+      "countBefore": 2,
+      "countAfter": 1,
+      "ammo": [
+        {
+          "id": "water",
+          "x": 185.00000610351563,
+          "y": 580.0000122070312,
+          "angle": 0,
+          "speed": 1144.2394667573635,
+          "sleeping": false,
+          "uses": 0
+        }
+      ]
+    },
+    {
+      "world": "end",
+      "level": 0,
+      "slot": 7,
+      "selected": "slimeball",
+      "launched": 1,
+      "countBefore": 2,
+      "countAfter": 1,
+      "ammo": [
+        {
+          "id": "slimeball",
+          "x": 202.97976006861848,
+          "y": 573.9153769903619,
+          "angle": 0,
+          "speed": 1137.1287077382865,
+          "sleeping": false,
+          "uses": 0
+        }
+      ]
+    },
+    {
+      "world": "end",
+      "level": 3,
+      "slot": 8,
+      "selected": "anvil",
+      "launched": 1,
+      "countBefore": 1,
+      "countAfter": 0,
+      "ammo": [
+        {
+          "id": "anvil",
+          "x": 185.00000610351563,
+          "y": 580.0000122070312,
+          "angle": 0,
+          "speed": 1144.2394667573635,
+          "sleeping": false,
+          "uses": 0
+        }
+      ]
+    }
+  ]
+}

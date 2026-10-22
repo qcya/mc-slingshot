@@ -1,0 +1,36 @@
+{
+  "version": "0.14.0",
+  "nodeTests": {
+    "passed": 306,
+    "failed": 0
+  },
+  "browser": {
+    "fullSuitePassed": 99,
+    "additionalTestsPassed": [
+      "five rank tabs are independent of four sequential gameplay worlds",
+      "a real first-level kill plays the original pillager death clip"
+    ],
+    "uniquePassed": 101
+  },
+  "campaigns": {
+    "overworld": 10,
+    "nether": 10,
+    "end": 10,
+    "sift": 10
+  },
+  "boards": {
+    "overworld": 2,
+    "nether": 3,
+    "end": 4,
+    "sift": 5,
+    "total": 1
+  },
+  "saveSeason": "three-dimensions-v2",
+  "cloudGroups": [
+    "mcslingshot_save_v2",
+    "mcslingshot_dimensions_v2",
+    "mcslingshot_sift_v1"
+  ],
+  "toyPublished": false,
+  "notes": "Native SDK/cloud tested with isolated simulated accounts; no production score or save changes."
+}

@@ -1,0 +1,82 @@
+
+Running 2 tests using 1 worker
+
+node.exe : (node:57684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+所在位置 C:\Users\Administrator\AppData\Roaming\npm\npx.ps1:24 字符: 5
++     & "node$exe"  "$basedir/node_modules/npm/bin/npx-cli.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:57684) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS false) (7.5s)
+(node:53744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  2 tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS true) (7.5s)
+
+
+  1) tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS false)
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('#loadState')
+    Expected: hidden
+    Received: visible
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('#loadState') with timeout 7000ms
+      - waiting for locator('#loadState')
+        17 × locator resolved to <div role="status" class="error" id="loadState">游戏未能启动：Failed to execute 'getImageData' on 'Canva…</div>
+           - unexpected value "visible"
+
+
+      23 |   await page.addInitScript(()=>{globalThis.toy={getUserProfile:async()=>({toyOpenId:'cdn-player',nickname:'CDN tester'}),getCloudStorage:async()=>({}),setCloudStorage:async()=>{},getRankList:async()=>({list:[]}),getMyRank:async()=>({score:0})};});
+      24 |   await page.goto(base+prefix+'index.html');
+    > 25 |   await expect(page.locator('#loadState')).toBeHidden({timeout:7000});
+         |                                            ^
+      26 |   await expect(page.locator('#startScreen')).toBeVisible();
+      27 |   const pixels=await page.locator('#stage').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data.length);
+      28 |   expect(pixels).toBe(1536*864*4);
+        at C:\Users\Administrator\Desktop\mc-block-launch\tests\toy-canvas-origin.spec.cjs:25:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\toy-canvas-origin-Toy-canv-4d06b--a-separate-CDN-CORS-false-\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\toy-canvas-origin-Toy-canv-4d06b--a-separate-CDN-CORS-false-\error-context.md
+
+  2) tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS true)
+
+    Error: expect(locator).toBeHidden() failed
+
+    Locator:  locator('#loadState')
+    Expected: hidden
+    Received: visible
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toBeHidden" locator('#loadState') with timeout 7000ms
+      - waiting for locator('#loadState')
+        17 × locator resolved to <div role="status" class="error" id="loadState">游戏未能启动：Failed to execute 'getImageData' on 'Canva…</div>
+           - unexpected value "visible"
+
+
+      23 |   await page.addInitScript(()=>{globalThis.toy={getUserProfile:async()=>({toyOpenId:'cdn-player',nickname:'CDN tester'}),getCloudStorage:async()=>({}),setCloudStorage:async()=>{},getRankList:async()=>({list:[]}),getMyRank:async()=>({score:0})};});
+      24 |   await page.goto(base+prefix+'index.html');
+    > 25 |   await expect(page.locator('#loadState')).toBeHidden({timeout:7000});
+         |                                            ^
+      26 |   await expect(page.locator('#startScreen')).toBeVisible();
+      27 |   const pixels=await page.locator('#stage').evaluate(canvas=>canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data.length);
+      28 |   expect(pixels).toBe(1536*864*4);
+        at C:\Users\Administrator\Desktop\mc-block-launch\tests\toy-canvas-origin.spec.cjs:25:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\toy-canvas-origin-Toy-canv-97181-o-a-separate-CDN-CORS-true-\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\toy-canvas-origin-Toy-canv-97181-o-a-separate-CDN-CORS-true-\error-context.md
+
+  2 failed
+    tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS false)
+    tests\toy-canvas-origin.spec.cjs:9:32 › Toy canvas remains readable when PNGs redirect to a separate CDN (CORS true)

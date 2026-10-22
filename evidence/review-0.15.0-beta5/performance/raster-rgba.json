@@ -1,0 +1,242 @@
+[
+  {
+    "dimension": "overworld",
+    "label": "initial",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "initial",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "removed pixels and neighbour shading",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "removed pixels and neighbour shading",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "material recolour",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "material recolour",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "rear-only removal",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "rear-only removal",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "level reset",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "overworld",
+    "label": "level reset",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "initial",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "initial",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "removed pixels and neighbour shading",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "removed pixels and neighbour shading",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "material recolour",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "material recolour",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "rear-only removal",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "rear-only removal",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "level reset",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "nether",
+    "label": "level reset",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "initial",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "initial",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "removed pixels and neighbour shading",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "removed pixels and neighbour shading",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "material recolour",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "material recolour",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "rear-only removal",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "rear-only removal",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "level reset",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "end",
+    "label": "level reset",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "initial",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "initial",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "removed pixels and neighbour shading",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "removed pixels and neighbour shading",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "material recolour",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "material recolour",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "rear-only removal",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "rear-only removal",
+    "layer": "rear",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "level reset",
+    "layer": "foreground",
+    "mismatch": null
+  },
+  {
+    "dimension": "sift",
+    "label": "level reset",
+    "layer": "rear",
+    "mismatch": null
+  }
+]

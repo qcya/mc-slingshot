@@ -1,0 +1,47 @@
+[
+  {
+    "skin": "hoglin",
+    "frozen": true,
+    "consumed": true,
+    "pose": {
+      "walkBlend": 0,
+      "headYaw": 0.15534653915643828,
+      "headPitch": 0.06106488376414904,
+      "gesture": 0.017328882443641058
+    }
+  },
+  {
+    "skin": "warden",
+    "frozen": true,
+    "consumed": true,
+    "pose": {
+      "walkBlend": 0,
+      "headYaw": 0.15658204098594494,
+      "headPitch": 0.061737046481946334,
+      "gesture": 0.03440100854936334
+    }
+  },
+  {
+    "skin": "pillager",
+    "frozen": true,
+    "consumed": true,
+    "pose": {
+      "walkBlend": 0,
+      "headYaw": 0.1577879394897387,
+      "headPitch": 0.06238451520430049,
+      "gesture": 0.05093586305804587
+    }
+  },
+  {
+    "skin": "shulker",
+    "frozen": true,
+    "consumed": true,
+    "pose": {
+      "walkBlend": 0,
+      "headYaw": 0.07008303072311256,
+      "headPitch": -0.026725846615748367,
+      "gesture": 0,
+      "openAmount": 0.9221316925346438
+    }
+  }
+]

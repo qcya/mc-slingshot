@@ -1,0 +1,27 @@
+{
+  "version": "0.13.0",
+  "release": "/srv/mc-block-launch/releases/0.13.0-review-20261020T083758Z",
+  "previous": "/srv/mc-block-launch/releases/0.12.1-review-20261018T121539Z",
+  "privateBackup": "/srv/mc-block-launch/backups/0.13.0-review-20261020T083758Z-leaderboard.json",
+  "archiveSha256": "598517e687893ce4f09d9c30c46651ace1f10b405261a1c672b842b2aa38ac47",
+  "dataBefore": "ad4163c86d72844de24e4be8fa5c398741effb5f1854707b55a91feb8ce3a1d3",
+  "dataAfter": "15c4b4fcbfb96fc9352d4df64e88e35d9eaea1461da6f883b58bd532a2cedfa2",
+  "scoreSeason": "three-dimensions-v2",
+  "schema": 4,
+  "preservedIdentities": 32,
+  "legacyScoresArchived": true,
+  "freshBoards": ["overworld", "nether", "end"],
+  "port": 8770,
+  "otherGame": {
+    "service": "mc-deep-mine.service",
+    "port": 8771,
+    "unchangedRelease": "/srv/mc-deep-mine/releases/20261020T081037Z-6f7074c8d924",
+    "activeBeforeAndAfter": true
+  },
+  "lan": "http://192.168.1.4:8770/",
+  "public": "https://qcya.fun:8443/mc-block-launch/",
+  "publicTlsHealth": "verified using trusted domain TLS and LAN DNS override; external mobile-data routing not tested",
+  "publicFilesVerified": 167,
+  "readOnlyBrowserChecks": ["desktop", "Android touch simulation"],
+  "browserServerWrites": 0
+}

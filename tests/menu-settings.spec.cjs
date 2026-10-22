@@ -1,6 +1,6 @@
 const{test,expect}=require('@playwright/test');const{ready}=require('./browser-helpers.cjs');
 test('recorded times, full level titles and item buttons fit one centered line at every menu size',async({page})=>{
- await page.addInitScript(()=>localStorage.setItem('mc-block-launch.best-times.v1',JSON.stringify([4058,14625,30875,17217,49450,39417,44967,59542,39258,133667])));await ready(page);await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();
+ await page.addInitScript(()=>localStorage.setItem('mc-block-launch.best-times.v2',JSON.stringify([4058,14625,30875,17217,49450,39417,44967,59542,39258,133667])));await ready(page);await page.keyboard.press('Escape');await page.locator('#levelMenuBtn').click();
  for(const size of [{width:1536,height:1100},{width:1000,height:700},{width:670,height:520},{width:568,height:320},{width:390,height:844},{width:320,height:568}]){
   await page.setViewportSize(size);
   for(let n=0;n<2;n++){

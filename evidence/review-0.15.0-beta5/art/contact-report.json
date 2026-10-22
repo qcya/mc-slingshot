@@ -1,0 +1,1786 @@
+{
+  "builtFrom": "local source captured before beta5 edits",
+  "errors": [],
+  "results": [
+    {
+      "id": "end5-side",
+      "world": "end",
+      "level": 4,
+      "dx": -132,
+      "dy": 28,
+      "before": {
+        "time": 0,
+        "launcher": {
+          "x": 153,
+          "y": 573,
+          "vx": 1425.6000000000001,
+          "vy": -302.40000000000003,
+          "angle": 0,
+          "phase": "aim",
+          "type": "slingshot"
+        },
+        "preview": []
+      },
+      "snapshots": [
+        {
+          "t": 0.35,
+          "time": 0.3416666666666669,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 583.0169443635858,
+              "y": 533.618692958945,
+              "angle": 0,
+              "speed": 1242.7410910600047,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1144.6568999999974,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1373.0148000000017,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.45,
+          "time": 0.43333333333333385,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 696.1544466895756,
+              "y": 546.912553650713,
+              "angle": 0,
+              "speed": 1244.8815913386488,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1142.6867999999968,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1374.9849000000024,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.5,
+          "time": 0.483333333333334,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 757.4733840621903,
+              "y": 558.3570263973768,
+              "angle": 0,
+              "speed": 1250.044544272539,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1141.6121999999964,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.01253080192,
+              "y": 558.0165033340678
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.55,
+          "time": 0.5500000000000005,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 838.8037526440896,
+              "y": 578.1920011466229,
+              "angle": 0,
+              "speed": 1261.1647172089652,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1140.179399999996,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716099,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.6,
+          "time": 0.591666666666667,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 889.38789378928,
+              "y": 593.2317982945222,
+              "angle": 0,
+              "speed": 1270.4878745845485,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1139.2838999999956,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.65,
+          "time": 0.6416666666666668,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1138.2092999999952,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.7,
+          "time": 0.6916666666666667,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1137.1346999999948,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.75,
+          "time": 0.7416666666666665,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1136.0128985735444,
+              "y": 558.0130814856856
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.8,
+          "time": 0.783333333333333,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1135.0252613891132,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.9,
+          "time": 0.8833333333333326,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1132.8760613891125,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 1.1,
+          "time": 1.0916666666666652,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1128.398561389111,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 1.5,
+          "time": 1.4916666666666638,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1133.9506613891128,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 2.5,
+          "time": 2.483333333333327,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": true,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1155.2635613891202,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 3.5,
+          "time": 3.491666666666657,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": true,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1159.0246613891213,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0125,
+              "y": 558.0167482364023
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        }
+      ]
+    },
+    {
+      "id": "end5-contact",
+      "world": "end",
+      "level": 4,
+      "dx": -125,
+      "dy": 45,
+      "before": {
+        "time": 0,
+        "launcher": {
+          "x": 160,
+          "y": 590,
+          "vx": 1350,
+          "vy": -486.00000000000006,
+          "angle": 0,
+          "phase": "aim",
+          "type": "slingshot"
+        },
+        "preview": []
+      },
+      "snapshots": [
+        {
+          "t": 0.35,
+          "time": 0.3416666666666669,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 566.9990948906627,
+              "y": 483.6717955978808,
+              "angle": 0,
+              "speed": 1178.3391754294885,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1144.6568999999974,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1373.0148000000017,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.45,
+          "time": 0.4416666666666672,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 683.7715295193559,
+              "y": 479.4603445811156,
+              "angle": 0,
+              "speed": 1162.984485879414,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1142.5076999999967,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1375.1640000000025,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.5,
+          "time": 0.49166666666666736,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 741.7646732156163,
+              "y": 481.8569964480807,
+              "angle": 0,
+              "speed": 1159.9776340568912,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1141.4330999999963,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0228265342605,
+              "y": 558.0125481347361
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.55,
+          "time": 0.5333333333333339,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 789.8932652249042,
+              "y": 486.13392683125625,
+              "angle": 0,
+              "speed": 1159.8400130741222,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1140.537599999996,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563712102,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.6,
+          "time": 0.5833333333333337,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 847.4097556177352,
+              "y": 493.99030163687024,
+              "angle": 0,
+              "speed": 1162.481737611791,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1139.4629999999956,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.65,
+          "time": 0.6333333333333335,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 904.6679066141631,
+              "y": 504.80576959960746,
+              "angle": 0,
+              "speed": 1168.1262641822645,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1138.3883999999953,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.7,
+          "time": 0.6833333333333333,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 961.6688785639126,
+              "y": 518.5670397426561,
+              "angle": 0,
+              "speed": 1176.6901423797028,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1137.313799999995,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.75,
+          "time": 0.7416666666666665,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 1027.8465075523256,
+              "y": 538.3273729448681,
+              "angle": 0,
+              "speed": 1190.2333190517966,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1136.0128985735444,
+              "y": 558.0130814856856
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.8,
+          "time": 0.7916666666666663,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 1026.2818475466408,
+              "y": 551.54959471537,
+              "angle": 0,
+              "speed": 334.84209337267635,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1134.8461613891131,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 0.9,
+          "time": 0.8916666666666659,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 1005.4614273933,
+              "y": 584.0476571742312,
+              "angle": 0,
+              "speed": 431.6539295160576,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1132.6969613891124,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 1.1,
+          "time": 1.083333333333332,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1128.577661389111,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 1.5,
+          "time": 1.4833333333333305,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": false,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1133.7715613891128,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 2.5,
+          "time": 2.4916666666666605,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": true,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1155.4426613891203,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0234563716112,
+              "y": 558.0125455409568
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        },
+        {
+          "t": 3.5,
+          "time": 3.4833333333333236,
+          "ammo": [
+            {
+              "id": "anvil",
+              "x": 960,
+              "y": 555.0125000006944,
+              "angle": 0,
+              "speed": 0,
+              "sleeping": true,
+              "uses": 0,
+              "ignited": false,
+              "returning": false,
+              "planted": false,
+              "placed": false,
+              "healingOwner": null,
+              "echoReflectedBy": null,
+              "opacity": 1
+            }
+          ],
+          "removed": 0,
+          "enemies": [
+            {
+              "skin": "shulker",
+              "hp": 150,
+              "alive": true,
+              "x": 960,
+              "y": 600.0125000006944
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1159.0246613891213,
+              "y": 558.0125000006944
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1248,
+              "y": 408.01250000069444
+            },
+            {
+              "skin": "enderman",
+              "hp": 200,
+              "alive": true,
+              "x": 1376.0125,
+              "y": 558.0167482364023
+            },
+            {
+              "skin": "shulker",
+              "hp": 300,
+              "alive": true,
+              "x": 1464,
+              "y": 600.0125000006944
+            }
+          ],
+          "screen": "play",
+          "ended": false
+        }
+      ]
+    }
+  ]
+}

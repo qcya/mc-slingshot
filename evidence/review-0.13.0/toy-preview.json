@@ -1,0 +1,33 @@
+{
+  "title": "拉满的石",
+  "version": "0.13.0",
+  "action": "create",
+  "slug": "stone-at-full-draw",
+  "preview_url": "https://www.bilibili.com/toy/preview/preview_DUQCMenK/index.html",
+  "build": "dist/toy-HoaugK",
+  "files": 129,
+  "bytes": 6240947,
+  "doctor": {
+    "errors": 0,
+    "warnings": [
+      "Three JS/CSS filenames have no content fingerprint"
+    ]
+  },
+  "submitted": false,
+  "newToyId": null,
+  "oldToy": {
+    "id": "45155222811648",
+    "slug": "Stone_at_Full_Draw",
+    "deleted": false
+  },
+  "deletionBlocker": "Saved browser permission denies www.bilibili.com; official CLI 0.6.3 exposes no delete/reset command. No workaround attempted.",
+  "ranking": {
+    "overworld": 1,
+    "nether": 2,
+    "end": 3
+  },
+  "freshIdRequired": true,
+  "platformLivePlaytest": false,
+  "submissionRequiresPreviewConfirmation": true,
+  "gameSha256": "067f694ee95a0375dd3d57d3398e65f61cd51f11c957dcb30d393378b82854ed"
+}

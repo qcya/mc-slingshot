@@ -1,0 +1,80 @@
+﻿[
+    {
+        "file":  "assets/sfx/enderman_hurt.ogg",
+        "source":  "minecraft/sounds/mob/endermen/hit1.ogg",
+        "sha1":  "a6edf57f2e84d56a45c1936f34f88da69184ebb4",
+        "url":  "https://resources.download.minecraft.net/a6/a6edf57f2e84d56a45c1936f34f88da69184ebb4"
+    },
+    {
+        "file":  "assets/sfx/enderman_idle.ogg",
+        "source":  "minecraft/sounds/mob/endermen/idle1.ogg",
+        "sha1":  "7c42f197c2b4dfd98ffb6a30b50ee2777db18bef",
+        "url":  "https://resources.download.minecraft.net/7c/7c42f197c2b4dfd98ffb6a30b50ee2777db18bef"
+    },
+    {
+        "file":  "assets/sfx/water_splash.ogg",
+        "source":  "minecraft/sounds/liquid/splash.ogg",
+        "sha1":  "264ae650cce4cea0cd4cb1757624a9d51653499b",
+        "url":  "https://resources.download.minecraft.net/26/264ae650cce4cea0cd4cb1757624a9d51653499b"
+    },
+    {
+        "file":  "assets/sfx/anvil_land.ogg",
+        "source":  "minecraft/sounds/random/anvil_land.ogg",
+        "sha1":  "781d4bfc6ee0aff2a61b0d78f0da34610a28aa62",
+        "url":  "https://resources.download.minecraft.net/78/781d4bfc6ee0aff2a61b0d78f0da34610a28aa62"
+    },
+    {
+        "file":  "assets/sfx/hoglin_hurt.ogg",
+        "source":  "minecraft/sounds/mob/hoglin/hurt1.ogg",
+        "sha1":  "73276c997c63d4595d7dc2f6623f35aa5d2e485f",
+        "url":  "https://resources.download.minecraft.net/73/73276c997c63d4595d7dc2f6623f35aa5d2e485f"
+    },
+    {
+        "file":  "assets/sfx/shulker_idle.ogg",
+        "source":  "minecraft/sounds/entity/shulker/ambient1.ogg",
+        "sha1":  "95dca0416258364d90649392592d470eb800b17c",
+        "url":  "https://resources.download.minecraft.net/95/95dca0416258364d90649392592d470eb800b17c"
+    },
+    {
+        "file":  "assets/sfx/shulker_close.ogg",
+        "source":  "minecraft/sounds/entity/shulker/close1.ogg",
+        "sha1":  "5561ce870837ae106a6ff0b6186d04f726aeafc6",
+        "url":  "https://resources.download.minecraft.net/55/5561ce870837ae106a6ff0b6186d04f726aeafc6"
+    },
+    {
+        "file":  "assets/sfx/wind_burst.ogg",
+        "source":  "minecraft/sounds/entity/wind_charge/wind_burst1.ogg",
+        "sha1":  "22b61f8192748c33e482b973edd993eed7c405da",
+        "url":  "https://resources.download.minecraft.net/22/22b61f8192748c33e482b973edd993eed7c405da"
+    },
+    {
+        "file":  "assets/sfx/shulker_hurt.ogg",
+        "source":  "minecraft/sounds/entity/shulker/hurt1.ogg",
+        "sha1":  "05b10bf6d4554c28cb2fbd0ed85a505e92140e2e",
+        "url":  "https://resources.download.minecraft.net/05/05b10bf6d4554c28cb2fbd0ed85a505e92140e2e"
+    },
+    {
+        "file":  "assets/sfx/zombified_piglin_idle.ogg",
+        "source":  "minecraft/sounds/mob/zombified_piglin/zpig1.ogg",
+        "sha1":  "ac0f71eb6911c31abfc398c0a5ccfe6911715745",
+        "url":  "https://resources.download.minecraft.net/ac/ac0f71eb6911c31abfc398c0a5ccfe6911715745"
+    },
+    {
+        "file":  "assets/sfx/zombified_piglin_hurt.ogg",
+        "source":  "minecraft/sounds/mob/zombified_piglin/zpighurt1.ogg",
+        "sha1":  "7be727ea16b9a261665b8419397115f13a0966b6",
+        "url":  "https://resources.download.minecraft.net/7b/7be727ea16b9a261665b8419397115f13a0966b6"
+    },
+    {
+        "file":  "assets/sfx/shulker_open.ogg",
+        "source":  "minecraft/sounds/entity/shulker/open1.ogg",
+        "sha1":  "39dd58da1447613afebbfbd099a551663ac442bc",
+        "url":  "https://resources.download.minecraft.net/39/39dd58da1447613afebbfbd099a551663ac442bc"
+    },
+    {
+        "file":  "assets/sfx/hoglin_idle.ogg",
+        "source":  "minecraft/sounds/mob/hoglin/idle1.ogg",
+        "sha1":  "d908e7f4a29d27e67d57260b2efa2d876c30613b",
+        "url":  "https://resources.download.minecraft.net/d9/d908e7f4a29d27e67d57260b2efa2d876c30613b"
+    }
+]

@@ -1,0 +1,69 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta1/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "initialInventory": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      "anvil": {
+        "id": "anvil",
+        "x": 843.0125000660216,
+        "y": 795,
+        "angle": 0,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 0,
+        "ignited": false,
+        "returning": false,
+        "planted": true,
+        "placed": false,
+        "opacity": 1
+      },
+      "win": "result",
+      "throws": 3,
+      "remainingDurability": 0
+    },
+    {
+      "name": "phone",
+      "initialInventory": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      "anvil": {
+        "id": "anvil",
+        "x": 843.0125000660217,
+        "y": 795,
+        "angle": 0,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 0,
+        "ignited": false,
+        "returning": false,
+        "planted": true,
+        "placed": false,
+        "opacity": 1
+      },
+      "win": "result",
+      "throws": 3,
+      "remainingDurability": 0
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}

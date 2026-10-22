@@ -29,7 +29,7 @@ test('TNT 固定四秒引信，撞击木材不挖洞，爆炸才破坏具体像�
 
 test('圆石与珍珠直接碰怪击杀，TNT 接触不伤怪、爆炸才伤怪', () => {
   for(const kind of ['cobble','tnt','ender']){
-    const w=fixture(),e=w.addEnemy(160,256);w.spawnProjectile(kind,125,210,80,0);step(w,.35);
+    const w=fixture(),e=w.addEnemy(160,256);w.spawnProjectile(kind,125,210,300,0);step(w,.35);
     assert.equal(e.alive,kind==='tnt',kind);
     if(kind==='tnt'){assert.equal(e.hp,100);w.blast(e.body.position.x,e.body.position.y);assert.equal(e.alive,false);}
   }

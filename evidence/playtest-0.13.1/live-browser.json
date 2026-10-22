@@ -1,0 +1,78 @@
+[
+  {
+    "mobile": false,
+    "url": "http://192.168.1.4:8770/",
+    "boards": [
+      {
+        "world": "overworld",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      },
+      {
+        "world": "nether",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      },
+      {
+        "world": "end",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      }
+    ],
+    "physics": "Matter.js",
+    "screen": "play",
+    "previewPoints": 5,
+    "cancelledWithoutFiring": true,
+    "serverWrites": 0,
+    "music": {
+      "track": "C418 — Sweden",
+      "enabled": true,
+      "playing": true,
+      "loop": true,
+      "volume": 0.18,
+      "time": 0.217367,
+      "duration": 185.72576,
+      "lastError": ""
+    },
+    "errors": [],
+    "failed": []
+  },
+  {
+    "mobile": true,
+    "url": "http://192.168.1.4:8770/",
+    "boards": [
+      {
+        "world": "overworld",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      },
+      {
+        "world": "nether",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      },
+      {
+        "world": "end",
+        "rows": 0,
+        "status": "还没有全通成绩，来成为第一位挑战者。"
+      }
+    ],
+    "physics": "Matter.js",
+    "screen": "play",
+    "previewPoints": 5,
+    "cancelledWithoutFiring": true,
+    "serverWrites": 0,
+    "music": {
+      "track": "C418 — Sweden",
+      "enabled": true,
+      "playing": true,
+      "loop": true,
+      "volume": 0.18,
+      "time": 0.200013,
+      "duration": 185.72576,
+      "lastError": ""
+    },
+    "errors": [],
+    "failed": []
+  }
+]

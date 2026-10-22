@@ -14,8 +14,8 @@ test('新存档锁关，实际圆石通关解锁TNT，第二关解锁珍珠并�
   await expect(page.locator('#resultFlag')).toHaveText('挑战成功',{timeout:12000});
   await expect(page.locator('#resultTitle')).toContainText(level===0?'TNT':'末影珍珠');
   expect(await page.evaluate(()=>MCBlockLaunch.getStatus().unlocked)).toBe(level+2);
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v1')).filter(Number.isInteger).length)).toBe(level+1);
-  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.pending.v2')||'[]'))).toEqual([]);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.best-times.v2')).filter(Number.isInteger).length)).toBe(level+1);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mc-block-launch.pending.v3')||'[]'))).toEqual([]);
   await page.screenshot({path:`evidence/campaign-reward-${level+1}.png`});reports.push(await page.evaluate(()=>MCBlockLaunch.getDiagnostics()));
   if(level===0){await page.locator('#nextBtn').click();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([5,1,0,0]);}
  }

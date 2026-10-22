@@ -1,0 +1,8 @@
+{
+  "target": "/srv/mc-block-launch/releases/0.13.1-review-20261020T100810Z/assets/release-1.0.0",
+  "files": 187,
+  "gameSha256": "8552c584b0d6622ab13df850bcd60c4e314c72e66a4fce1680d2ce71aa10e6d0",
+  "url": "http://192.168.1.4:8770/assets/release-1.0.0/index.html",
+  "publicUrl": "https://qcya.fun:8443/mc-block-launch/assets/release-1.0.0/index.html",
+  "existingGameAndDataUnchanged": true
+}

@@ -1,0 +1,18 @@
+{
+  "version": "0.13.0",
+  "unit": {
+    "command": "npm test",
+    "passed": 266,
+    "failed": 0
+  },
+  "browser": {
+    "command": "npm run test:browser",
+    "passed": 75,
+    "failed": 0,
+    "skipped": 0,
+    "duration": "11.3m",
+    "port": 18773,
+    "storage": "fresh isolated temporary directory"
+  },
+  "note": "Includes 30 real mouse finite-inventory stage completions. Toy uses local test host, not live platform."
+}

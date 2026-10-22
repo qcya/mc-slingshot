@@ -1,0 +1,31 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta2/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "anvilDrilledAndDisappeared": true,
+      "anvilRemovedPixels": 720,
+      "summoning": {
+        "bossHp": 300,
+        "skeletons": 1
+      },
+      "tridentThrows": 1,
+      "remainingDurability": 2,
+      "won": "result"
+    },
+    {
+      "name": "phone",
+      "anvilDrilledAndDisappeared": true,
+      "anvilRemovedPixels": 720,
+      "summoning": {
+        "bossHp": 300,
+        "skeletons": 1
+      },
+      "tridentThrows": 1,
+      "remainingDurability": 2,
+      "won": "result"
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}

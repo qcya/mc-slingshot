@@ -1,0 +1,84 @@
+{
+  "baseline": "199d3e3",
+  "note": "Headless Edge, real assets and Canvas; same live anvil world; medians over warmed dirty frames, with pixel counters; no timing threshold",
+  "results": [
+    {
+      "anvils": 0,
+      "renderer": "old",
+      "frames": 108,
+      "dirtyFrames": 0,
+      "drawMs": 0.4000000059604645,
+      "cacheGridMs": 0,
+      "drawRearMs": 0,
+      "cacheGridPixels": 0,
+      "drawRearPixels": 0,
+      "imageCalls": 0,
+      "imageBytes": 0
+    },
+    {
+      "anvils": 0,
+      "renderer": "current",
+      "frames": 108,
+      "dirtyFrames": 0,
+      "drawMs": 0.4000000059604645,
+      "cacheGridMs": 0,
+      "drawRearMs": 0,
+      "cacheGridPixels": 0,
+      "drawRearPixels": 0,
+      "imageCalls": 0,
+      "imageBytes": 0
+    },
+    {
+      "anvils": 1,
+      "renderer": "old",
+      "frames": 108,
+      "dirtyFrames": 108,
+      "drawMs": 6.799999982118607,
+      "cacheGridMs": 1.0999999940395355,
+      "drawRearMs": 5.199999988079071,
+      "cacheGridPixels": 41448,
+      "drawRearPixels": 37352,
+      "imageCalls": 2,
+      "imageBytes": 1179648
+    },
+    {
+      "anvils": 1,
+      "renderer": "current",
+      "frames": 108,
+      "dirtyFrames": 108,
+      "drawMs": 0.6000000238418579,
+      "cacheGridMs": 0.09999999403953552,
+      "drawRearMs": 0.09999999403953552,
+      "cacheGridPixels": 20,
+      "drawRearPixels": 0,
+      "imageCalls": 0,
+      "imageBytes": 0
+    },
+    {
+      "anvils": 2,
+      "renderer": "old",
+      "frames": 108,
+      "dirtyFrames": 108,
+      "drawMs": 7.299999982118607,
+      "cacheGridMs": 1.0999999940395355,
+      "drawRearMs": 5.5999999940395355,
+      "cacheGridPixels": 41042,
+      "drawRearPixels": 36946,
+      "imageCalls": 2,
+      "imageBytes": 1179648
+    },
+    {
+      "anvils": 2,
+      "renderer": "current",
+      "frames": 108,
+      "dirtyFrames": 108,
+      "drawMs": 0.699999988079071,
+      "cacheGridMs": 0.09999999403953552,
+      "drawRearMs": 0.09999999403953552,
+      "cacheGridPixels": 82,
+      "drawRearPixels": 16,
+      "imageCalls": 0,
+      "imageBytes": 0
+    }
+  ]
+}

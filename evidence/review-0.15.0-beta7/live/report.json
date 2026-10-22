@@ -1,0 +1,33 @@
+{
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta7/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "bucketUsedOnce": true,
+      "emptyLabel": "6. 空桶 · 本关已用完",
+      "lavaSourcesAdded": 1,
+      "enemiesKilledBySingleBucket": 2,
+      "terrainRemovedByBucket": 0,
+      "pourAudio": 1,
+      "dragonHasNoBucket": true,
+      "endBossWon": true,
+      "endBossThrows": 9,
+      "siftTridentOnlyWon": true
+    },
+    {
+      "name": "phone",
+      "bucketUsedOnce": true,
+      "emptyLabel": "6. 空桶 · 本关已用完",
+      "lavaSourcesAdded": 1,
+      "enemiesKilledBySingleBucket": 2,
+      "terrainRemovedByBucket": 0,
+      "pourAudio": 1,
+      "dragonHasNoBucket": true,
+      "endBossWon": true,
+      "endBossThrows": 9,
+      "siftTridentOnlyWon": true
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}

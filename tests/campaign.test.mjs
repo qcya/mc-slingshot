@@ -15,7 +15,7 @@ test('original five-clear save migrates to stage six; invalid entries are filter
 test('four finite ammo slots unlock TNT, pearl and fire after stages one, two and three',()=>{
  assert.equal(LOADOUTS.length,10);assert.deepEqual(inventoryFor(0),[5,0,0,0]);assert.deepEqual(inventoryFor(1),[5,1,0,0]);
  assert.equal(inventoryFor(2)[3],0);assert.ok(inventoryFor(3)[3]>0);
- assert.deepEqual([0,1,2,3].map(rewardFor),['TNT','末影珍珠','烈焰弹',null]);
+ assert.deepEqual([0,1,2,3].map(level=>rewardFor(level)),['TNT','末影珍珠','烈焰弹',null]);
  const ammo=inventoryFor(1);assert.equal(spendAmmo(ammo,1),true);assert.equal(spendAmmo(ammo,1),false);
  assert.equal(totalAmmo(ammo),5);assert.deepEqual(inventoryFor(1),[5,1,0,0]);
  for(const loadout of LOADOUTS){assert.equal(loadout.length,4);assert.ok(loadout.every(n=>Number.isInteger(n)&&n>=0));}
@@ -24,6 +24,6 @@ test('four finite ammo slots unlock TNT, pearl and fire after stages one, two an
 
 test('early and middle stages keep a measured finite retry allowance',()=>{
  assert.equal(totalAmmo(inventoryFor(0)),5,'the opening now emphasizes ordinary stones');
- for(const loadout of LOADOUTS){assert.ok(totalAmmo(loadout)>0&&totalAmmo(loadout)<18);assert.ok(loadout.filter(n=>n>0).length<=3);}
- assert.deepEqual(inventoryFor(9),[7,4,2,0],'final-stage thirteen-shot budget shifts from explosives to stones');
+ for(const loadout of LOADOUTS){assert.ok(totalAmmo(loadout)>0&&totalAmmo(loadout)<18);assert.ok(loadout.filter(n=>n>0).length<=4);}
+ assert.deepEqual(inventoryFor(9),[9,4,2,0],'final-stage fifteen-shot budget keeps ordinary stones as the main retry allowance');
 });

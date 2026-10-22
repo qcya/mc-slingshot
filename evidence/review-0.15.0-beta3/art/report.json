@@ -1,0 +1,296 @@
+{
+  "source": "Production buildLevel(9), SiegeWorld physics, and Renderer; no mocked actors or effect state",
+  "swordGallery": "sword-grip-gallery.png",
+  "errors": [],
+  "frames": [
+    {
+      "name": "nether-summon",
+      "time": 0.41666666666666713,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "zombified_piglin",
+          "hp": 100,
+          "alive": true
+        },
+        {
+          "id": 2,
+          "skin": "zombified_piglin",
+          "hp": 100,
+          "alive": true
+        },
+        {
+          "id": 3,
+          "skin": "hoglin",
+          "hp": 300,
+          "alive": true
+        },
+        {
+          "id": 4,
+          "skin": "wither",
+          "hp": 450,
+          "alive": true,
+          "phase": "hover"
+        },
+        {
+          "id": 5,
+          "skin": "wither_skeleton",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        }
+      ],
+      "crystals": [],
+      "reflected": 0
+    },
+    {
+      "name": "dragon-healing",
+      "time": 0.4000000000000004,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "shulker",
+          "hp": 300,
+          "alive": true
+        },
+        {
+          "id": 2,
+          "skin": "shulker",
+          "hp": 300,
+          "alive": true
+        },
+        {
+          "id": 3,
+          "skin": "ender_dragon",
+          "hp": 600,
+          "alive": true,
+          "phase": "patrol",
+          "healingCount": 2,
+          "healingActive": true
+        }
+      ],
+      "crystals": [
+        {
+          "id": 4,
+          "owner": 3,
+          "dead": false
+        },
+        {
+          "id": 5,
+          "owner": 3,
+          "dead": false
+        }
+      ],
+      "reflected": 0
+    },
+    {
+      "name": "golem-telegraph",
+      "time": 0.6000000000000003,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 2,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 4,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 5,
+          "skin": "sift_echo_golem",
+          "hp": 450,
+          "alive": true,
+          "phase": "telegraph",
+          "echoShieldActive": false,
+          "echoRecoveryUntil": 0
+        }
+      ],
+      "crystals": [],
+      "reflected": 0
+    },
+    {
+      "name": "golem-shield",
+      "time": 1.4999999999999971,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 2,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 4,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 5,
+          "skin": "sift_echo_golem",
+          "hp": 450,
+          "alive": true,
+          "phase": "shield",
+          "echoShieldActive": true,
+          "echoRecoveryUntil": 0
+        }
+      ],
+      "crystals": [],
+      "reflected": 0
+    },
+    {
+      "name": "golem-core",
+      "time": 4.199999999999998,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 2,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 4,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 5,
+          "skin": "sift_echo_golem",
+          "hp": 450,
+          "alive": true,
+          "phase": "recover",
+          "echoShieldActive": false,
+          "echoRecoveryUntil": 6.316666666666656
+        }
+      ],
+      "crystals": [],
+      "reflected": 0
+    },
+    {
+      "name": "golem-reflected-shards",
+      "time": 1.5999999999999968,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 2,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 4,
+          "skin": "sift_sifter",
+          "hp": 100,
+          "alive": true,
+          "phase": "patrol"
+        },
+        {
+          "id": 5,
+          "skin": "sift_echo_golem",
+          "hp": 450,
+          "alive": true,
+          "phase": "recover",
+          "echoShieldActive": false,
+          "echoRecoveryUntil": 3.9583333333333304
+        }
+      ],
+      "crystals": [],
+      "reflected": 1
+    },
+    {
+      "name": "dragon-crystals-broken",
+      "time": 0.483333333333334,
+      "enemies": [
+        {
+          "id": 1,
+          "skin": "shulker",
+          "hp": 300,
+          "alive": true
+        },
+        {
+          "id": 2,
+          "skin": "shulker",
+          "hp": 300,
+          "alive": true
+        },
+        {
+          "id": 3,
+          "skin": "ender_dragon",
+          "hp": 600,
+          "alive": true,
+          "phase": "patrol",
+          "healingCount": 0,
+          "healingActive": false
+        }
+      ],
+      "crystals": [],
+      "reflected": 0
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "world": "end",
+  "stages": [
+    {
+      "level": 1,
+      "shots": 3,
+      "remaining": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "timeMs": 13558
+    },
+    {
+      "level": 2,
+      "shots": 5,
+      "remaining": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "timeMs": 26608
+    },
+    {
+      "level": 3,
+      "shots": 6,
+      "remaining": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 32475
+    },
+    {
+      "level": 4,
+      "shots": 6,
+      "remaining": [
+        5,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 33025
+    },
+    {
+      "level": 5,
+      "shots": 7,
+      "remaining": [
+        6,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 38208
+    },
+    {
+      "level": 6,
+      "shots": 8,
+      "remaining": [
+        5,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 44208
+    },
+    {
+      "level": 7,
+      "shots": 3,
+      "remaining": [
+        8,
+        1,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 14242
+    },
+    {
+      "level": 8,
+      "shots": 7,
+      "remaining": [
+        7,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 38158
+    },
+    {
+      "level": 9,
+      "shots": 5,
+      "remaining": [
+        8,
+        3,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 25858
+    },
+    {
+      "level": 10,
+      "shots": 11,
+      "remaining": [
+        6,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "timeMs": 62350
+    }
+  ],
+  "submissions": [
+    {
+      "board": 3,
+      "score": 9967131
+    }
+  ]
+}

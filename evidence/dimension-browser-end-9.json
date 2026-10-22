@@ -1,0 +1,915 @@
+{
+  "world": "end",
+  "level": 9,
+  "timeline": [
+    {
+      "input": {
+        "x": 217.41938888356754,
+        "y": 620.3951158970495
+      },
+      "launcher": {
+        "x": 217.4193878173828,
+        "y": 620.3951416015625,
+        "vx": 729.8706115722657,
+        "vy": -814.2675292968751,
+        "angle": 0,
+        "phase": "aim",
+        "type": "slingshot"
+      },
+      "beforeTime": 0,
+      "after": {
+        "time": 6.000000000000088,
+        "removed": 0,
+        "backgroundRemoved": 0,
+        "explosions": 0,
+        "portals": 1,
+        "physics": "Matter.js",
+        "bodies": 141,
+        "debris": 0,
+        "enemiesAlive": 5,
+        "lava": {
+          "sources": 0,
+          "cells": 0,
+          "settling": false
+        },
+        "lavaCells": 0,
+        "lavaCooled": 0,
+        "projectiles": 1,
+        "particlesPending": 0,
+        "ready": true,
+        "dimension": "end",
+        "titleScene": false,
+        "level": 9,
+        "shots": 16,
+        "inventory": [
+          10,
+          3,
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        "ammoCounts": {
+          "cobble": 10,
+          "tnt": 3,
+          "ender": 1,
+          "fire": 0,
+          "snowball": 0,
+          "wind": 1,
+          "water": 0,
+          "slimeball": 1,
+          "anvil": 0
+        },
+        "screen": "play",
+        "unlocked": 9,
+        "launched": 1,
+        "selected": "ender",
+        "selectedSlot": 2,
+        "paused": false,
+        "ended": false,
+        "particles": 0,
+        "burning": 0,
+        "ammoBodies": [
+          {
+            "id": "ender",
+            "x": 1169.3762473418656,
+            "y": 754.0853642285716,
+            "angle": 21.63447985619399,
+            "speed": 19.49016367107073,
+            "sleeping": false,
+            "uses": 1
+          }
+        ],
+        "restingBlocks": 0,
+        "fps": 63,
+        "stepMs": 0,
+        "maxStepMs": 0,
+        "launcher": {
+          "x": 285,
+          "y": 545,
+          "vx": 729.8706115722657,
+          "vy": -814.2675292968751,
+          "angle": 0,
+          "phase": "ready",
+          "type": "slingshot"
+        }
+      }
+    },
+    {
+      "input": {
+        "x": 208.87966992448438,
+        "y": 611.7626980371117
+      },
+      "launcher": {
+        "x": 208.87966918945312,
+        "y": 611.7626953125,
+        "vx": 822.0995727539063,
+        "vy": -721.037109375,
+        "angle": 0,
+        "phase": "aim",
+        "type": "slingshot"
+      },
+      "beforeTime": 6.000000000000088,
+      "after": {
+        "time": 11.99999999999996,
+        "removed": 0,
+        "backgroundRemoved": 0,
+        "explosions": 0,
+        "portals": 1,
+        "physics": "Matter.js",
+        "bodies": 141,
+        "debris": 0,
+        "enemiesAlive": 4,
+        "lava": {
+          "sources": 0,
+          "cells": 0,
+          "settling": false
+        },
+        "lavaCells": 0,
+        "lavaCooled": 0,
+        "projectiles": 2,
+        "particlesPending": 0,
+        "ready": true,
+        "dimension": "end",
+        "titleScene": false,
+        "level": 9,
+        "shots": 15,
+        "inventory": [
+          10,
+          3,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "ammoCounts": {
+          "cobble": 10,
+          "tnt": 3,
+          "ender": 1,
+          "fire": 0,
+          "snowball": 0,
+          "wind": 1,
+          "water": 0,
+          "slimeball": 0,
+          "anvil": 0
+        },
+        "screen": "play",
+        "unlocked": 9,
+        "launched": 2,
+        "selected": "slimeball",
+        "selectedSlot": 7,
+        "paused": false,
+        "ended": false,
+        "particles": 0,
+        "burning": 0,
+        "ammoBodies": [
+          {
+            "id": "ender",
+            "x": 1191.755231152544,
+            "y": 754.1099748758816,
+            "angle": 23.22821461661796,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 1
+          },
+          {
+            "id": "slimeball",
+            "x": 875.4147603327011,
+            "y": 661.1501021878282,
+            "angle": 9.948004415429228,
+            "speed": 614.551052971798,
+            "sleeping": false,
+            "uses": 0
+          }
+        ],
+        "restingBlocks": 1,
+        "fps": 63,
+        "stepMs": 0,
+        "maxStepMs": 0,
+        "launcher": {
+          "x": 285,
+          "y": 545,
+          "vx": 822.0995727539063,
+          "vy": -721.037109375,
+          "angle": 0,
+          "phase": "ready",
+          "type": "slingshot"
+        }
+      }
+    },
+    {
+      "input": {
+        "x": 191.68216765437376,
+        "y": 617.4244281393619
+      },
+      "launcher": {
+        "x": 191.6821746826172,
+        "y": 617.4244384765625,
+        "vx": 1007.8325134277344,
+        "vy": -782.1839355468751,
+        "angle": 0,
+        "phase": "aim",
+        "type": "slingshot"
+      },
+      "beforeTime": 11.99999999999996,
+      "after": {
+        "time": 17.99999999999962,
+        "removed": 0,
+        "backgroundRemoved": 0,
+        "explosions": 0,
+        "portals": 2,
+        "physics": "Matter.js",
+        "bodies": 141,
+        "debris": 0,
+        "enemiesAlive": 3,
+        "lava": {
+          "sources": 0,
+          "cells": 0,
+          "settling": false
+        },
+        "lavaCells": 0,
+        "lavaCooled": 0,
+        "projectiles": 3,
+        "particlesPending": 0,
+        "ready": true,
+        "dimension": "end",
+        "titleScene": false,
+        "level": 9,
+        "shots": 14,
+        "inventory": [
+          10,
+          3,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "ammoCounts": {
+          "cobble": 10,
+          "tnt": 3,
+          "ender": 0,
+          "fire": 0,
+          "snowball": 0,
+          "wind": 1,
+          "water": 0,
+          "slimeball": 0,
+          "anvil": 0
+        },
+        "screen": "play",
+        "unlocked": 9,
+        "launched": 3,
+        "selected": "ender",
+        "selectedSlot": 2,
+        "paused": false,
+        "ended": false,
+        "particles": 0,
+        "burning": 0,
+        "ammoBodies": [
+          {
+            "id": "ender",
+            "x": 1191.755231152544,
+            "y": 754.1099748758816,
+            "angle": 23.22821461661796,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 1
+          },
+          {
+            "id": "slimeball",
+            "x": 1098.1751738255275,
+            "y": 754.0633589133063,
+            "angle": 50.63226241315845,
+            "speed": 56.940457653352404,
+            "sleeping": false,
+            "uses": 0
+          },
+          {
+            "id": "ender",
+            "x": 1426.0474413988695,
+            "y": 562.176810623315,
+            "angle": 19.90069174859897,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 1
+          }
+        ],
+        "restingBlocks": 2,
+        "fps": 63,
+        "stepMs": 0,
+        "maxStepMs": 0,
+        "launcher": {
+          "x": 285,
+          "y": 545,
+          "vx": 1007.8325134277344,
+          "vy": -782.1839355468751,
+          "angle": 0,
+          "phase": "ready",
+          "type": "slingshot"
+        }
+      }
+    },
+    {
+      "input": {
+        "x": 192.5497447933788,
+        "y": 586.2857458722815
+      },
+      "launcher": {
+        "x": 192.54974365234375,
+        "y": 586.2857666015625,
+        "vx": 998.4627685546876,
+        "vy": -445.88627929687505,
+        "angle": 0,
+        "phase": "aim",
+        "type": "slingshot"
+      },
+      "beforeTime": 17.99999999999962,
+      "after": {
+        "time": 23.99999999999928,
+        "removed": 189,
+        "backgroundRemoved": 112,
+        "explosions": 0,
+        "portals": 2,
+        "physics": "Matter.js",
+        "bodies": 139,
+        "debris": 0,
+        "enemiesAlive": 1,
+        "lava": {
+          "sources": 0,
+          "cells": 0,
+          "settling": false
+        },
+        "lavaCells": 0,
+        "lavaCooled": 0,
+        "projectiles": 3,
+        "particlesPending": 0,
+        "ready": true,
+        "dimension": "end",
+        "titleScene": false,
+        "level": 9,
+        "shots": 13,
+        "inventory": [
+          9,
+          3,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "ammoCounts": {
+          "cobble": 9,
+          "tnt": 3,
+          "ender": 0,
+          "fire": 0,
+          "snowball": 0,
+          "wind": 1,
+          "water": 0,
+          "slimeball": 0,
+          "anvil": 0
+        },
+        "screen": "play",
+        "unlocked": 9,
+        "launched": 4,
+        "selected": "cobble",
+        "selectedSlot": 0,
+        "paused": false,
+        "ended": false,
+        "particles": 0,
+        "burning": 0,
+        "ammoBodies": [
+          {
+            "id": "slimeball",
+            "x": 1195.3566014176952,
+            "y": 754.2445173909836,
+            "angle": 57.623178525960945,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 0
+          },
+          {
+            "id": "ender",
+            "x": 1426.0474413988695,
+            "y": 562.176810623315,
+            "angle": 19.90069174859897,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 1
+          },
+          {
+            "id": "cobble",
+            "x": 908.1109442938516,
+            "y": 766.0109787543236,
+            "angle": 10.992835592443033,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 0
+          }
+        ],
+        "restingBlocks": 3,
+        "fps": 63,
+        "stepMs": 0,
+        "maxStepMs": 0,
+        "launcher": {
+          "x": 285,
+          "y": 545,
+          "vx": 998.4627685546876,
+          "vy": -445.88627929687505,
+          "angle": 0,
+          "phase": "ready",
+          "type": "slingshot"
+        }
+      }
+    },
+    {
+      "input": {
+        "x": 169.20932801588376,
+        "y": 614.4083588731703
+      },
+      "launcher": {
+        "x": 169.20934201250594,
+        "y": 614.4083822230656,
+        "vx": 1250.539106264936,
+        "vy": -749.6105280091084,
+        "angle": 0,
+        "phase": "aim",
+        "type": "slingshot"
+      },
+      "beforeTime": 23.99999999999928,
+      "after": {
+        "time": 25.858333333332506,
+        "removed": 192,
+        "backgroundRemoved": 112,
+        "explosions": 0,
+        "portals": 2,
+        "physics": "Matter.js",
+        "bodies": 138,
+        "debris": 0,
+        "enemiesAlive": 0,
+        "lava": {
+          "sources": 0,
+          "cells": 0,
+          "settling": false
+        },
+        "lavaCells": 0,
+        "lavaCooled": 0,
+        "projectiles": 3,
+        "particlesPending": 0,
+        "ready": true,
+        "dimension": "end",
+        "titleScene": false,
+        "level": 9,
+        "shots": 12,
+        "inventory": [
+          8,
+          3,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "ammoCounts": {
+          "cobble": 8,
+          "tnt": 3,
+          "ender": 0,
+          "fire": 0,
+          "snowball": 0,
+          "wind": 1,
+          "water": 0,
+          "slimeball": 0,
+          "anvil": 0
+        },
+        "screen": "result",
+        "unlocked": 10,
+        "launched": 5,
+        "selected": "cobble",
+        "selectedSlot": 0,
+        "paused": true,
+        "ended": true,
+        "particles": 0,
+        "burning": 0,
+        "ammoBodies": [
+          {
+            "id": "ender",
+            "x": 1426.0474413988695,
+            "y": 562.176810623315,
+            "angle": 19.90069174859897,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 1
+          },
+          {
+            "id": "cobble",
+            "x": 908.1109442938516,
+            "y": 766.0109787543236,
+            "angle": 10.992835592443033,
+            "speed": 0,
+            "sleeping": true,
+            "uses": 0
+          },
+          {
+            "id": "cobble",
+            "x": 965.7432459858181,
+            "y": 364.76640838545586,
+            "angle": -1.019285183815036,
+            "speed": 20.5695073624167,
+            "sleeping": false,
+            "uses": 0
+          }
+        ],
+        "restingBlocks": 2,
+        "fps": 63,
+        "stepMs": 0,
+        "maxStepMs": 0,
+        "launcher": {
+          "x": 285,
+          "y": 545,
+          "vx": 0,
+          "vy": 0,
+          "angle": 0,
+          "phase": "ready",
+          "type": "slingshot"
+        }
+      }
+    }
+  ],
+  "final": {
+    "assets": [
+      "grass_block_side",
+      "crimson_stem",
+      "warped_stem",
+      "glowstone",
+      "end_stone",
+      "end_stone_bricks",
+      "purpur_block",
+      "purpur_pillar",
+      "obsidian",
+      "tnt_side",
+      "ender_pearl",
+      "fire_charge",
+      "snowball",
+      "wind_charge",
+      "dirt",
+      "splash_water",
+      "stone",
+      "oak_log",
+      "stone_bricks",
+      "glass",
+      "bedrock",
+      "oak_leaves",
+      "slime_ball",
+      "iron_ore",
+      "oak_planks",
+      "deepslate",
+      "dark_oak_log",
+      "dark_oak_planks",
+      "spruce_log",
+      "spruce_planks",
+      "cobblestone",
+      "ladder",
+      "oak_door_top",
+      "tnt_top",
+      "oak_door_bottom",
+      "spruce_leaves",
+      "crafting_table_front",
+      "furnace_front",
+      "bookshelf",
+      "netherrack",
+      "nether_bricks",
+      "blackstone",
+      "red_nether_bricks",
+      "polished_blackstone_bricks",
+      "basalt_side",
+      "soul_soil",
+      "cherry_log",
+      "crimson_planks",
+      "warped_planks",
+      "cherry_leaves",
+      "grass_block_side_overlay",
+      "zombie",
+      "pillager",
+      "warden",
+      "fire_0",
+      "zombified_piglin",
+      "hoglin",
+      "shulker",
+      "enderman",
+      "lava_still",
+      "lava_flow",
+      "anvil_base",
+      "anvil_top",
+      "crossbow_standby",
+      "anvil",
+      "ladder_wall"
+    ],
+    "time": 25.858333333332506,
+    "removed": 192,
+    "backgroundRemoved": 112,
+    "explosions": 0,
+    "portals": 2,
+    "physics": "Matter.js",
+    "bodies": 138,
+    "debris": 0,
+    "enemiesAlive": 0,
+    "lava": {
+      "sources": 0,
+      "cells": 0,
+      "settling": false
+    },
+    "lavaCells": 0,
+    "lavaCooled": 0,
+    "projectiles": 3,
+    "particlesPending": 0,
+    "ready": true,
+    "dimension": "end",
+    "titleScene": false,
+    "level": 9,
+    "shots": 12,
+    "inventory": [
+      8,
+      3,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "ammoCounts": {
+      "cobble": 8,
+      "tnt": 3,
+      "ender": 0,
+      "fire": 0,
+      "snowball": 0,
+      "wind": 1,
+      "water": 0,
+      "slimeball": 0,
+      "anvil": 0
+    },
+    "screen": "result",
+    "unlocked": 10,
+    "launched": 5,
+    "selected": "cobble",
+    "selectedSlot": 0,
+    "paused": true,
+    "ended": true,
+    "particles": 0,
+    "burning": 0,
+    "ammoBodies": [
+      {
+        "id": "ender",
+        "x": 1426.0474413988695,
+        "y": 562.176810623315,
+        "angle": 19.90069174859897,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 1
+      },
+      {
+        "id": "cobble",
+        "x": 908.1109442938516,
+        "y": 766.0109787543236,
+        "angle": 10.992835592443033,
+        "speed": 0,
+        "sleeping": true,
+        "uses": 0
+      },
+      {
+        "id": "cobble",
+        "x": 965.7432459858181,
+        "y": 364.76640838545586,
+        "angle": -1.019285183815036,
+        "speed": 20.5695073624167,
+        "sleeping": false,
+        "uses": 0
+      }
+    ],
+    "restingBlocks": 2,
+    "fps": 63,
+    "stepMs": 0,
+    "maxStepMs": 0,
+    "launcher": {
+      "x": 285,
+      "y": 545,
+      "vx": 0,
+      "vy": 0,
+      "angle": 0,
+      "phase": "ready",
+      "type": "slingshot"
+    },
+    "enemies": [
+      {
+        "skin": "shulker",
+        "hp": -50,
+        "alive": false,
+        "dead": true,
+        "stationary": true,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 1020.4410547453504,
+        "y": 360.01250000069444,
+        "facing": 1,
+        "walkDistance": 0,
+        "turns": 0,
+        "behavior": "idle",
+        "pose": {
+          "walkBlend": 0,
+          "headYaw": 0.16597152415900673,
+          "headPitch": 0.06753231862608598,
+          "gesture": 0,
+          "openAmount": 2.0448677259796055e-9
+        }
+      },
+      {
+        "skin": "shulker",
+        "hp": 0,
+        "alive": false,
+        "dead": true,
+        "stationary": true,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 1394.4768735725747,
+        "y": 360.01250000069444,
+        "facing": -1,
+        "walkDistance": 0,
+        "turns": 0,
+        "behavior": "idle",
+        "pose": {
+          "walkBlend": 0,
+          "headYaw": 0.17101379103472536,
+          "headPitch": -0.04115837914184402,
+          "gesture": 0,
+          "openAmount": 0.9999959577814378
+        }
+      },
+      {
+        "skin": "enderman",
+        "hp": 0,
+        "alive": false,
+        "dead": true,
+        "stationary": false,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 726.3452986925158,
+        "y": 606.0125000006947,
+        "facing": 1,
+        "walkDistance": 198.58811322346742,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.9999999999564206,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "enderman",
+        "hp": 0,
+        "alive": false,
+        "dead": true,
+        "stationary": false,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 628.9872802120507,
+        "y": 606.0125000006883,
+        "facing": 1,
+        "walkDistance": 276.1259838037331,
+        "turns": 5,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.9780754206503073,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      },
+      {
+        "skin": "shulker",
+        "hp": 0,
+        "alive": false,
+        "dead": true,
+        "stationary": true,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": 1.5707963267948966,
+          "visible": false
+        },
+        "x": 1055.8263704676751,
+        "y": 744.0125000006944,
+        "facing": 1,
+        "walkDistance": 0,
+        "turns": 0,
+        "behavior": "idle",
+        "pose": {
+          "walkBlend": 0,
+          "headYaw": 0.14866383592019794,
+          "headPitch": 0.0637432857002013,
+          "gesture": 0.27974341743627806,
+          "openAmount": 0.9998727139056074
+        }
+      },
+      {
+        "skin": "enderman",
+        "hp": 0,
+        "alive": false,
+        "dead": true,
+        "stationary": false,
+        "burningUntil": 0,
+        "appearance": {
+          "hurt": false,
+          "angle": -1.5707963267948966,
+          "visible": false
+        },
+        "x": 517.5647556156459,
+        "y": 606.0125000006944,
+        "facing": -1,
+        "walkDistance": 287.7256802845065,
+        "turns": 0,
+        "behavior": "walk",
+        "pose": {
+          "walkBlend": 0.9988669679884217,
+          "headYaw": 0,
+          "headPitch": 0,
+          "gesture": 0
+        }
+      }
+    ],
+    "whiteParticles": 0,
+    "drawSound": {
+      "active": false,
+      "starts": 50,
+      "stops": 50,
+      "state": "running",
+      "signalRms": 0,
+      "source": "minecraft:crossbow_loading",
+      "failed": false
+    },
+    "preview": [],
+    "backgroundPixels": 35984,
+    "movingBackgroundPixels": 0,
+    "terrainPixels": 34368,
+    "debrisPixels": 0,
+    "music": {
+      "track": "C418 — Sweden",
+      "enabled": true,
+      "playing": true,
+      "loop": true,
+      "volume": 0.18,
+      "time": 119.780051,
+      "duration": 185.72576,
+      "lastError": ""
+    },
+    "sound": {
+      "played": {
+        "bow": 50,
+        "enderman_hurt": 36,
+        "portal": 24,
+        "enderman_idle": 26,
+        "shulker_open": 83,
+        "shulker_hurt": 52,
+        "shulker_close": 59,
+        "stone": 53,
+        "fuse": 11,
+        "explode": 11,
+        "anvil_land": 13
+      },
+      "failed": 0,
+      "lastError": null,
+      "enabled": true,
+      "volume": 1
+    },
+    "physicsParts": 171
+  }
+}

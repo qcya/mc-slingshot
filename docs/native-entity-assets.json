@@ -1,0 +1,104 @@
+[
+  {
+    "file": "assets/models/sift_blub.geo.json",
+    "jarPath": "assets/the_sift/geckolib/models/entity/blub.geo.json",
+    "sha256": "1288618e23871900fefa9eaa5fe32ed2f9b40e23f3ae9c0e2db004f9a4f4e701"
+  },
+  {
+    "file": "assets/textures/sift_blub.png",
+    "jarPath": "assets/the_sift/textures/entity/blub.png",
+    "sha256": "037daca215a0716f8b066ab3fca1a8614bdab2029cc83c42fddd623596d8b9a9"
+  },
+  {
+    "file": "assets/models/sift_sifter.geo.json",
+    "jarPath": "assets/the_sift/geckolib/models/entity/sifter.geo.json",
+    "sha256": "e01007a77da4d26af80ba1a29892f417ff3247ba8f218fa26b329184e4011b92"
+  },
+  {
+    "file": "assets/textures/sift_sifter.png",
+    "jarPath": "assets/the_sift/textures/entity/sifter.png",
+    "sha256": "d7edbb229e69d170d7bc644fec9b76c5400e92248061fa3d2c77352d8d035d9f"
+  },
+  {
+    "file": "assets/models/sift_singer.geo.json",
+    "jarPath": "assets/the_sift/geckolib/models/entity/singer.geo.json",
+    "sha256": "e1d8664db4432cf7986343f54b906cb91f75ef7ab778968e81b525f3e7e7b1b9"
+  },
+  {
+    "file": "assets/textures/sift_singer.png",
+    "jarPath": "assets/the_sift/textures/entity/singer.png",
+    "sha256": "a616e88d56be848837fffc30a518662171873e1b8f8be06616205bf7c52e31d3"
+  },
+  {
+    "file": "assets/models/sift_echo_golem.geo.json",
+    "jarPath": "assets/the_sift/geckolib/models/entity/echo_golem.geo.json",
+    "sha256": "785bae49685e3b5c860534d6b4d73b13d5e9e653cf8b60013d760a3ac160bd93"
+  },
+  {
+    "file": "assets/textures/sift_echo_golem.png",
+    "jarPath": "assets/the_sift/textures/entity/echo_golem.png",
+    "sha256": "fbb2047dc6738a0b4580ea41b719fe69ca6c58ebe7a5e95ff155cd731b4ec100"
+  },
+  {
+    "file": "assets/sfx/sift_singer_hurt.ogg",
+    "jarPath": "assets/the_sift/sounds/entity/singer/hurt_0.ogg",
+    "sha256": "28c39d27550a383a90ca90090dc705a9c3c11315bb57d620b5438f11fa253e6f"
+  },
+  {
+    "file": "assets/sfx/sift_singer_death.ogg",
+    "jarPath": "assets/the_sift/sounds/entity/singer/death_0.ogg",
+    "sha256": "6582bc80e1448d0c38634aae3ab12bb65516a33ae251689e2bbfe2b53baa3d85"
+  },
+  {
+    "file": "assets/sfx/sift_singer_idle.ogg",
+    "jarPath": "assets/the_sift/sounds/entity/singer/idle_0.ogg",
+    "sha256": "18945bc997409cf1366f320126396c30b46be8094ac3b19379db819221492784"
+  },
+  {
+    "file": "assets/models/wither.geo.json",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/models/entity/wither_boss.geo.json",
+    "sha256": "de2097edee50db825ca0d325fb9ec983e131ff249f5a39df3e1ec6e89cd3aae2"
+  },
+  {
+    "file": "assets/textures/wither.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/wither_boss/wither.png",
+    "sha256": "cb4d8aeabd1f0a258aa2fc9cab01e6a124cbc75cd9676d25d13ea98a00875a05"
+  },
+  {
+    "file": "assets/models/end_crystal_entity.geo.json",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/models/entity/ender_crystal.geo.json",
+    "sha256": "82c3d8f773d906801545f00b97e721826a1d75fe6e684b8091ec6c2ee2a756bd"
+  },
+  {
+    "file": "assets/textures/end_crystal_entity.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/endercrystal/endercrystal.png",
+    "sha256": "e6a0abecf29754b03d01ea03ca08474057cef3ca8fa6af88eb850426e8c51061"
+  },
+  {
+    "file": "assets/models/ender_dragon.geo.json",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/models/entity/ender_dragon.geo.json",
+    "sourceSha256": "07c9333dc913e046ed041143624a5eb30a33cb340fa07b10d507a8c95be608c6",
+    "sha256": "07c9333dc913e046ed041143624a5eb30a33cb340fa07b10d507a8c95be608c6"
+  },
+  {
+    "file": "assets/textures/ender_dragon.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/dragon/dragon.tga",
+    "sourceSha256": "097dd793c27d263fd6ef2804356a2f4ac15a7c3b520a5400a2359fdb459e78c9",
+    "sha256": "7ca6c926415ea88c1cf85e42c12bba44ff6a458b60334ccb22b257cc7bcb0a09"
+  },
+  {
+    "file": "assets/textures/wither_skeleton.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/entity/skeleton/wither_skeleton.png",
+    "sha256": "fdfae927fd8ad6e4fc991f756488d5ca00b83e8a894f4c28eceb33475ce8f9b1"
+  },
+  {
+    "file": "assets/textures/stone_sword.png",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/textures/items/stone_sword.png",
+    "sha256": "675495afbe03f3c63a78e72b581743314f0ac02a12e43b24a5b2bd1267fce949"
+  },
+  {
+    "file": "assets/models/wither_skeleton.geo.json",
+    "url": "https://raw.githubusercontent.com/Mojang/bedrock-samples/46ba6ea985fb5a92d79a9419198f10dda14c199d/resource_pack/models/entity/wither_skeleton.geo.json",
+    "sha256": "9a0a512aa7cc834852bcc44765c0fbd39993f44bc47b80e7d797cb867b9480f3"
+  }
+]

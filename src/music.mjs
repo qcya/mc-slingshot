@@ -1,9 +1,10 @@
+import {preferencesStorage} from './playtest.mjs';
 const SAVE_KEY='mc-block-launch.music.v1';
 export class BackgroundMusic{
  constructor(){
   this.audio=new Audio('assets/music/sweden.ogg');this.audio.loop=true;this.audio.volume=.18;this.audio.preload='metadata';
   this.enabled=true;this.unlocked=false;this.pending=null;this.lastError='';
-  try{this.enabled=localStorage.getItem(SAVE_KEY)!=='off';}catch{}
+  try{this.enabled=preferencesStorage().getItem(SAVE_KEY)!=='off';}catch{}
   this.audio.addEventListener('error',()=>{this.lastError='背景音乐暂时无法加载';});
   // Browsers require a real user gesture. Retry on later gestures if blocked.
   const unlock=()=>{this.unlocked=true;void this.resume();};
@@ -18,7 +19,7 @@ export class BackgroundMusic{
   finally{this.pending=null;}
  }
  setEnabled(enabled){
-  this.enabled=enabled;try{localStorage.setItem(SAVE_KEY,enabled?'on':'off');}catch{}
+  this.enabled=enabled;try{preferencesStorage().setItem(SAVE_KEY,enabled?'on':'off');}catch{}
   if(!enabled)this.audio.pause();else{this.unlocked=true;void this.resume();}
  }
  diagnostics(){return {track:'C418 — Sweden',enabled:this.enabled,playing:!this.audio.paused,loop:this.audio.loop,volume:this.audio.volume,time:this.audio.currentTime,duration:Number.isFinite(this.audio.duration)?this.audio.duration:0,lastError:this.lastError};}

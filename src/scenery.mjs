@@ -28,12 +28,64 @@ export function driftingClouds(ctx,time){
  }
 }
 
+// Stable, noncolliding dimension scenery. Every silhouette is assembled from
+// the same original block textures as the foreground, then pushed into haze.
+export function dimensionLandscape(ctx,assets,dimension='overworld'){
+ if(dimension==='overworld'){skyAndLandscape(ctx,assets);return;}
+ ctx.fillStyle=dimension==='nether'?'#260d12':'#100c1d';ctx.fillRect(0,0,WIDTH,HEIGHT);
+ const texture=(name,x,y,size)=>{const im=assets.images[name];if(im)ctx.drawImage(im,x,y,size,size);};
+ const layer=(paint,tint,alpha)=>{
+  const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
+  paint(c);c.globalCompositeOperation='source-atop';c.globalAlpha=alpha;c.fillStyle=tint;c.fillRect(0,0,WIDTH,HEIGHT);ctx.drawImage(canvas,0,0);
+ };
+ if(dimension==='sift'){
+  const sky=ctx.createLinearGradient(0,0,0,HEIGHT);sky.addColorStop(0,'#253c50');sky.addColorStop(.65,'#658d91');sky.addColorStop(1,'#263d48');ctx.fillStyle=sky;ctx.fillRect(0,0,WIDTH,HEIGHT);
+  layer(c=>{
+   for(const [start,profile]of [[-1,[9,8,7,7,8,10]],[11,[12,11,10,10,11,12]],[25,[10,9,8,8,7,7,8]]])for(let dx=0;dx<profile.length;dx++)for(let y=profile[dx];y<18;y++)c.drawImage(assets.images.sift_siftslate,(start+dx)*48,y*48,48,48);
+  },'#637c86',.78);
+  layer(c=>{
+   for(const [x,top]of [[70,320],[560,420],[1360,260]]){
+    for(let y=top+32;y<700;y+=32)c.drawImage(assets.images.sift_overgrown_willow_log,x,y,32,32);
+    for(const [dy,lo,hi]of [[0,-2,2],[1,-3,3],[2,-2,2]])for(let dx=lo;dx<=hi;dx++)c.drawImage(assets.images.sift_healthy_sculk,x+dx*32,top+dy*32,32,32);
+   }
+  },'#406b76',.7);
+ }else if(dimension==='nether'){
+  const glow=ctx.createLinearGradient(0,280,0,HEIGHT);glow.addColorStop(0,'#260d1200');glow.addColorStop(1,'#9c391b88');ctx.fillStyle=glow;ctx.fillRect(0,0,WIDTH,HEIGHT);
+  layer(c=>{
+   const floor=[13,13,12,12,11,10,10,9,9,10,10,11,12,12,12,11,10,9,9,10,10,11,12,12,11,10,10,11,12,13,13,13];
+   const ceiling=[4,4,4,3,3,3,2,2,2,2,2,2,3,3,3,4,4,4,4,4,3,3,3,2,2,2,2,2,3,3,4,4];
+   for(let x=0;x<32;x++){
+    for(let y=floor[x];y<18;y++)c.drawImage(assets.images.netherrack,x*48,y*48,48,48);
+    for(let y=0;y<ceiling[x];y++)c.drawImage(assets.images.netherrack,x*48,y*48,48,48);
+   }
+  },'#37151e',.82);
+  layer(c=>{
+   // Broad connected cliff faces, with no fake platforms or decorative lava.
+   for(const [start,heights]of [[0,[11,11,12,12,13,14]],[23,[14,13,13,12,11,11,10,10,10]]])for(let dx=0;dx<heights.length;dx++)for(let y=heights[dx];y<18;y++)c.drawImage(assets.images.basalt_side,(start+dx)*48,y*48,48,48);
+  },'#25131b',.84);
+ }else{
+  for(let i=0;i<55;i++){ctx.fillStyle=i%4?'#4a385c':'#6d5585';const x=(i*283+71)%WIDTH,y=(i*137+43)%540;ctx.fillRect(Math.floor(x/3)*3,Math.floor(y/3)*3,3,3);}
+  layer(c=>{
+   for(const [x,y,w] of [[-48,510,7],[350,570,6],[750,460,5],[1110,550,8]]){
+    for(let dx=0;dx<w;dx++)c.drawImage(assets.images.end_stone,x+dx*24,y,24,24);
+    for(let dy=1;dy<4;dy++)for(let dx=dy;dx<w-dy;dx++)c.drawImage(assets.images.end_stone,x+dx*24,y+dy*24,24,24);
+   }
+  },'#41354e',.77);
+ }
+ // End cavities reveal the same void as the sky beneath floating islands.
+ if(dimension!=='end'){
+  const under=dimension==='nether'?'blackstone':'sift_siftslate';
+  for(let x=0;x<32;x++)for(let y=14;y<18;y++)texture(under,x*48,y*48,48);
+  ctx.fillStyle=dimension==='nether'?'#17090bd9':'#100b1cdd';ctx.fillRect(0,672,WIDTH,HEIGHT-672);
+ }
+}
+
 export function rearPixel(assets,m,x,y,world,visual){
   const p=assets.pixel(m,x,y);
   const average=assets.averages[MATERIALS[m].sprite];
   // Muted appliances stay legible against the darker, noncolliding back wall.
   // Neither layer brightens when foreground pixels disappear.
-  const shade=[19,20,21].includes(m)?.65:.42;
+ const shade=[19,20,21,48,49,50].includes(m)?.65:m===45?.5:.42;
   return [0,1,2].map(c=>(average[c]*.35+p[c]*.65)*shade).concat(p[3]);
 }
 
