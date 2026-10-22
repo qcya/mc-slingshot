@@ -248,6 +248,18 @@ export class SiegeWorld {
     const bvx=vb.x-omegaB*(point.y-b.position.y),bvy=vb.y+omegaB*(point.x-b.position.x);
     const speed=Math.abs((avx-bvx)*n.x+(avy-bvy)*n.y)*60;
     const crystal=ea?.ammo?.id==='crystal'?ea:eb?.ammo?.id==='crystal'?eb:null;
+    // Resolve a bucket first even when it strikes an older projectile. The
+    // exposed side points from the contact back toward the incoming bucket.
+    const bucket=ea?.ammo?.id==='lava_bucket'?ea:eb?.ammo?.id==='lava_bucket'?eb:null;
+    if(bucket){
+      const other=bucket===ea?eb:ea;
+      const sign=(bucket.body.position.x-point.x)*n.x+(bucket.body.position.y-point.y)*n.y>=0?1:-1;
+      const velocity=this.before.get(bucket.body.id)||bucket.body.velocity;
+      this.lava.pourBucket(point.x,point.y,{normal:{x:n.x*sign,y:n.y*sign},sourceId:`ammo:${bucket.id}`,enemy:other?.type==='enemy'?other:null});
+      bucket.uses=1;this.remove(bucket);
+      if(crystal&&Math.hypot(velocity.x,velocity.y)*60>=180)this.detonateCrystals([crystal]);
+      return;
+    }
     if(crystal){
       const striker=crystal===ea?eb:ea,solid=crystal===ea?b:a;
       if(striker?.type==='debris'||striker?.type==='ammo'&&striker.ammo.id!=='crystal'){
@@ -396,7 +408,7 @@ export class SiegeWorld {
     this.synchronize();
     if(this.cooldowns.size>1000)for(const [key,t] of this.cooldowns)if(this.time-t>1)this.cooldowns.delete(key);
   }
-  active(){return this.lava.settling||this.fires.length>0||this.enemies.some(e=>e.alive&&(e.burnTicks.length>0||e.lavaDamageAt>this.time))||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||p.ammo.id==='trident'||p.ammo.id==='anvil'&&p.expiresAt<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
+  active(){return this.lava.settling||this.fires.length>0||this.enemies.some(e=>e.alive&&(e.bucketBurn||e.burnTicks.length>0||e.lavaDamageAt>this.time))||this.projectiles.some(p=>!p.dead&&(p.fuse<Infinity||p.ammo.id==='trident'||p.ammo.id==='anvil'&&p.expiresAt<Infinity||(!p.body.isSleeping&&Math.hypot(p.body.velocity.x,p.body.velocity.y)>.15)))||this.debris.some(e=>!e.body.isSleeping&&e.body.speed>.25);}
   snapshot(){return {time:this.time,removed:this.stats.removed,backgroundRemoved:this.stats.backgroundRemoved,explosions:this.stats.explosions,portals:this.stats.portals,
     physics:'Matter.js',bodies:this.M.Composite.allBodies(this.engine.world).length,
     debris:this.debris.length,enemiesAlive:this.enemies.filter(e=>e.alive).length,lava:this.lava.snapshot(),lavaCells:this.lava.cells.size,lavaCooled:this.stats.lavaCooled,

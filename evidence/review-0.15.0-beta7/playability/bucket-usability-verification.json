@@ -1,0 +1,315 @@
+{
+  "method": "Independent replay through native Matter and pullSling; no patched world methods, enemy relocation, contact injection, extra ammunition, or canonical route mutation.",
+  "sourceSha256": {
+    "src/lava.mjs": "9c52d80e669ad1de7e1ffee17d4028eab2721dd996f3fc6c6768bfb80cdfe6c3",
+    "src/fire.mjs": "65041201d84e88cd7080fb8596e55178065f0ca18420aeb57919b869987bb9a6",
+    "src/world.mjs": "8f0c05fcf37f4553465bf2272a7037991dc1ffcbab335222be7f82b5b25b58ac"
+  },
+  "passed": true,
+  "results": [
+    {
+      "dimension": "end",
+      "level": 4,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 0.1,
+          "pull": 1,
+          "pointer": {
+            "x": 150.6744384765625,
+            "y": 558.4775390625
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 1,
+          "skin": "shulker",
+          "hp": 300,
+          "time": 0.8916666666666659
+        },
+        {
+          "id": 4,
+          "skin": "enderman",
+          "hp": 200,
+          "time": 1.4916666666666638
+        }
+      ],
+      "kills": [
+        {
+          "id": 4,
+          "skin": "enderman",
+          "hpBefore": 100,
+          "hpAfter": 0,
+          "time": 2.6916666666666598,
+          "burnSeconds": 1.199999999999996
+        },
+        {
+          "id": 1,
+          "skin": "shulker",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 4.49166666666668,
+          "burnSeconds": 3.600000000000014
+        }
+      ],
+      "sourceRect": {
+        "x": 840,
+        "y": 576,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 16,
+      "bucketRemaining": 0,
+      "hpRemaining": 800,
+      "maxBurnSeconds": 3.600000000000014
+    },
+    {
+      "dimension": "end",
+      "level": 6,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 0.1,
+          "pull": 1,
+          "pointer": {
+            "x": 150.6744384765625,
+            "y": 558.4775390625
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 4,
+          "skin": "enderman",
+          "hp": 200,
+          "time": 0.9249999999999992
+        }
+      ],
+      "kills": [
+        {
+          "id": 4,
+          "skin": "enderman",
+          "hpBefore": 100,
+          "hpAfter": 0,
+          "time": 2.124999999999995,
+          "burnSeconds": 1.199999999999996
+        }
+      ],
+      "sourceRect": {
+        "x": 840,
+        "y": 576,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 16,
+      "bucketRemaining": 0,
+      "hpRemaining": 1400,
+      "maxBurnSeconds": 1.199999999999996
+    },
+    {
+      "dimension": "nether",
+      "level": 4,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 0.02,
+          "pull": 1,
+          "pointer": {
+            "x": 150.02699279785156,
+            "y": 547.6998291015625
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 4,
+          "skin": "zombified_piglin",
+          "hp": 100,
+          "time": 4.266666666666668
+        }
+      ],
+      "kills": [
+        {
+          "id": 4,
+          "skin": "zombified_piglin",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 5.466666666666728,
+          "burnSeconds": 1.2000000000000597
+        }
+      ],
+      "sourceRect": {
+        "x": 828,
+        "y": 624,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 16,
+      "bucketRemaining": 0,
+      "hpRemaining": 500,
+      "maxBurnSeconds": 1.2000000000000597
+    },
+    {
+      "dimension": "nether",
+      "level": 7,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 0.22,
+          "pull": 1,
+          "pointer": {
+            "x": 153.25384521484375,
+            "y": 574.4609985351562
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 1,
+          "skin": "zombified_piglin",
+          "hp": 100,
+          "time": 0.5750000000000004
+        },
+        {
+          "id": 2,
+          "skin": "hoglin",
+          "hp": 300,
+          "time": 1.083333333333332
+        }
+      ],
+      "kills": [
+        {
+          "id": 1,
+          "skin": "zombified_piglin",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 1.7749999999999961,
+          "burnSeconds": 1.1999999999999957
+        },
+        {
+          "id": 2,
+          "skin": "hoglin",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 4.683333333333356,
+          "burnSeconds": 3.6000000000000236
+        }
+      ],
+      "sourceRect": {
+        "x": 900,
+        "y": 540,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 12,
+      "bucketRemaining": 0,
+      "hpRemaining": 500,
+      "maxBurnSeconds": 3.6000000000000236
+    },
+    {
+      "dimension": "nether",
+      "level": 9,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 0.06,
+          "pull": 1,
+          "pointer": {
+            "x": 150.242919921875,
+            "y": 553.0951538085938
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 3,
+          "skin": "hoglin",
+          "hp": 300,
+          "time": 0.6250000000000002
+        },
+        {
+          "id": 4,
+          "skin": "zombified_piglin",
+          "hp": 100,
+          "time": 9.833333333333416
+        }
+      ],
+      "kills": [
+        {
+          "id": 3,
+          "skin": "hoglin",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 4.225,
+          "burnSeconds": 3.5999999999999996
+        }
+      ],
+      "sourceRect": {
+        "x": 972,
+        "y": 672,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 16,
+      "bucketRemaining": 0,
+      "hpRemaining": 700,
+      "maxBurnSeconds": 3.5999999999999996
+    },
+    {
+      "dimension": "sift",
+      "level": 6,
+      "passed": true,
+      "shots": [
+        {
+          "kind": "lava_bucket",
+          "angle": 1.06,
+          "pull": 1,
+          "pointer": {
+            "x": 219.0022735595703,
+            "y": 648
+          },
+          "wait": 10
+        }
+      ],
+      "latched": [
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hp": 100,
+          "time": 2.2249999999999948
+        }
+      ],
+      "kills": [
+        {
+          "id": 3,
+          "skin": "sift_blub",
+          "hpBefore": 50,
+          "hpAfter": 0,
+          "time": 3.4249999999999905,
+          "burnSeconds": 1.1999999999999957
+        }
+      ],
+      "sourceRect": {
+        "x": 1392,
+        "y": 360,
+        "width": 48,
+        "height": 48
+      },
+      "seedCells": 16,
+      "bucketRemaining": 0,
+      "hpRemaining": 500,
+      "maxBurnSeconds": 1.1999999999999957
+    }
+  ]
+}

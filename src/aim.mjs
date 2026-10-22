@@ -1,11 +1,11 @@
-﻿import {AMMO} from './config.mjs';
+﻿import {PROJECTILES} from './config.mjs';
 import {projectileBody,projectileGravity} from './combat.mjs';
 import {launchVelocity,speedLimit,anvilFlight} from './weapons.mjs';
 export function aimAngle(point,pivot){return Math.atan2(point.y-pivot.y,point.x-pivot.x);}
 export function arcRevision(world){return String(world.grid.version);}
 // Five nearby samples, covering at most 0.5 seconds of free flight.
 export function predictArc(world,kind,origin,vx,vy){
- const M=world.M,ammo=AMMO.find(a=>a.id===kind),engine=M.Engine.create({gravity:{...world.engine.gravity}});
+ const M=world.M,ammo=PROJECTILES.find(a=>a.id===kind),engine=M.Engine.create({gravity:{...world.engine.gravity}});
  const options={frictionAir:.0015},b=projectileBody(M,ammo,origin.x,origin.y,options);
  M.Body.setMass(b,ammo.mass);M.Body.setVelocity(b,launchVelocity(ammo,vx,vy));M.Composite.add(engine.world,b);
  const samples=[],projectile={body:b,ammo,age:0};

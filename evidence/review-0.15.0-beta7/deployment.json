@@ -1,0 +1,8 @@
+{
+  "target": "/srv/mc-block-launch/releases/0.13.1-review-20261020T100810Z/assets/playtest-0.15.0-beta7",
+  "files": 187,
+  "gameSha256": "a084d61b6b02de8c77fc50c13daaf877876efe80448013275b3c3d17c18cd46c",
+  "url": "http://192.168.1.4:8770/assets/playtest-0.15.0-beta7/index.html",
+  "publicUrl": "https://qcya.fun:8443/mc-block-launch/assets/playtest-0.15.0-beta7/index.html",
+  "existingGameAndDataUnchanged": true
+}

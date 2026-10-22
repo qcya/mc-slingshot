@@ -24,7 +24,7 @@ test('Dragon healing crystals appear in the shipped browser without consuming in
  await page.locator('#levelMenu [data-world="end"]').click();await page.locator('#nextPage').click();await page.locator('#level-9').click();
  await page.clock.runFor(500);
  const first=await page.evaluate(()=>MCBlockLaunch.getDiagnostics());
- expect(first.inventory).toEqual([...Array(8).fill(99),3]);expect(first.launched).toBe(0);
+ expect(first.inventory).toEqual([99,99,99,99,99,0,99,99,3]);expect(first.launched).toBe(0);
  expect(first.ammoBodies.filter(p=>p.id==='crystal'&&p.placed)).toHaveLength(2);
  expect(first.enemies.find(e=>e.skin==='ender_dragon').healingCount).toBe(2);
  await page.clock.runFor(1500);

@@ -44,12 +44,12 @@ test('real anvil carving reuses raster buffers and reduces work versus the previ
  test.skip(!oldRenderer,'The optional performance baseline requires repository commit 199d3e3.');
  await prepare(page);
  const report=await page.evaluate(async()=>{
-  const [{Assets},{Renderer},{Renderer:OldRenderer},{SiegeWorld},{buildLevel},{AMMO}]=await Promise.all([import('/src/assets.mjs'),import('/src/renderer.mjs'),import('/src/__audit-old-renderer.mjs'),import('/src/world.mjs'),import('/src/levels.mjs'),import('/src/config.mjs')]);
+  const [{Assets},{Renderer},{Renderer:OldRenderer},{SiegeWorld},{buildLevel},{PROJECTILES}]=await Promise.all([import('/src/assets.mjs'),import('/src/renderer.mjs'),import('/src/__audit-old-renderer.mjs'),import('/src/world.mjs'),import('/src/levels.mjs'),import('/src/config.mjs')]);
   const assets=await new Assets().load(),make=Type=>{const c=document.createElement('canvas');c.width=1536;c.height=864;return new Type(c,assets);},current=make(Renderer),old=make(OldRenderer);
   let metric=null,pixelCalls=0;const originalPixel=assets.pixel.bind(assets);assets.pixel=(m,x,y)=>{pixelCalls++;return originalPixel(m,x,y);};
   for(const Type of [Renderer,OldRenderer])for(const method of ['cacheGrid','drawRear']){const original=Type.prototype[method];Type.prototype[method]=function(...args){const start=performance.now(),before=pixelCalls,result=original.apply(this,args);if(metric){metric[`${method}Ms`]+=performance.now()-start;metric[`${method}Pixels`]+=pixelCalls-before;}return result;};}
   const originalCreate=CanvasRenderingContext2D.prototype.createImageData;CanvasRenderingContext2D.prototype.createImageData=function(...args){if(metric){metric.imageCalls++;metric.imageBytes+=args[0]*args[1]*4;}return originalCreate.apply(this,args);};
-  const state={pouch:{x:285,y:545},ammo:AMMO.find(a=>a.id==='anvil'),loaded:true,drag:false,vx:0,vy:0},median=a=>a.length?a.sort((a,b)=>a-b)[Math.floor(a.length/2)]:0,rows=[];
+  const state={pouch:{x:285,y:545},ammo:PROJECTILES.find(a=>a.id==='anvil'),loaded:true,drag:false,vx:0,vy:0},median=a=>a.length?a.sort((a,b)=>a-b)[Math.floor(a.length/2)]:0,rows=[];
   for(const count of [0,1,2])for(let run=0;run<5;run++){
    const scene=buildLevel(7),world=new SiegeWorld(Matter,scene);for(const a of scene.enemies)world.addEnemy(a.x,a.feet,a.skin,a);
    for(const r of [old,current]){r.reset(scene);r.draw(world,state);}

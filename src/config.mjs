@@ -59,7 +59,7 @@ export const AMMO=[
   {id:'ender',label:'末影珍珠',sprite:'ender_pearl',size:28,mass:1.1,detail:'无损穿两格墙 · 五秒后淡出，穿墙重新计时'},
   {id:'fire',label:'烈焰弹',sprite:'fire_charge',size:28,mass:1.2,detail:'持续灼烧 · 范围最宽五格'},
   {id:'slimeball',label:'黏液球',sprite:'slime_ball',size:28,mass:2.2,restitution:.88,detail:'高弹性反弹 · 每只生物只伤一次'},
-  {id:'anvil',label:'铁砧',sprite:'anvil',size:42,mass:9,gravityScale:1.2,rangeScale:.95,liftScale:1.15,shape:'box',detail:'一击砸穿一格楼板 · 空隙下落可续砸，连续地面不钻穿'},
+  {id:'lava_bucket',label:'岩浆桶',sprite:'lava_bucket',emptySprite:'bucket',size:28,mass:2.4,shape:'box',uses:1,singleUse:true,detail:'碰撞倾倒一格岩浆 · 只靠岩浆灼烧伤敌'},
   {id:'wind',label:'风弹',sprite:'wind_charge',size:28,mass:.8,detail:'范围击退 · 不破坏地形'},
   {id:'crystal',label:'末地水晶',sprite:'end_crystal',size:28,mass:2.4,shape:'box',detail:'只在地面安放 · 其他弹药或风弹触发连锁爆炸'},
   {id:'trident',label:'三叉戟',sprite:'trident',size:28,mass:3,maxDurability:3,detail:'三次耐久 · 停住或出界后回收，往返伤敌'}
@@ -67,6 +67,7 @@ export const AMMO=[
 // Retain old simulation IDs for imported replays and regression fixtures only.
 // These are no longer supplied or displayed in the nine-slot campaign.
 export const PROJECTILES=[...AMMO,
+ {id:'anvil',label:'铁砧',sprite:'anvil',size:42,mass:9,gravityScale:1.2,rangeScale:.95,liftScale:1.15,shape:'box',detail:'一击砸穿一格楼板 · 空隙下落可续砸，连续地面不钻穿'},
  {id:'snowball',label:'雪球',sprite:'snowball',size:28,mass:.7},
  {id:'water',label:'喷溅型水瓶',sprite:'splash_water',size:28,mass:1}
 ];

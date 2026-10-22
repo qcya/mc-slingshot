@@ -11,10 +11,10 @@ const dimension=process.argv[2]||'sift',requested=(process.argv[3]||'').split(',
 const file=new URL(`../evidence/${dimension}-playability.json`,import.meta.url);
 const result=fs.existsSync(file)?JSON.parse(fs.readFileSync(file)):[];
 const candidates=[];
-for(const kind of ['trident','cobble','anvil','tnt','ender','slimeball'])for(const pull of [1,.875,.75])for(const angle of [.02,.06,.10,.14,.18,.22,.26,.30,.34,.38,.42,.46,.50,.54,.58,.62,.66,.70,.74,.78,.82,.86,.90,.94,.98,1.02,1.06]){
+for(const kind of ['lava_bucket','trident','cobble','tnt','ender','slimeball'])for(const pull of [1,.875,.75])for(const angle of [.02,.06,.10,.14,.18,.22,.26,.30,.34,.38,.42,.46,.50,.54,.58,.62,.66,.70,.74,.78,.82,.86,.90,.94,.98,1.02,1.06]){
  const ideal=pullSling({x:SLING_HOME.x-135*pull*Math.cos(angle),y:SLING_HOME.y+135*pull*Math.sin(angle)});
  const input={...ideal.origin},top=dimension==='sift'?70:118,pointer={x:Math.fround(input.x),y:Math.fround(input.y+top)-top};
- candidates.push({kind,input,pointer,...pullSling(pointer),angle,pull,wait:['tnt','trident','anvil'].includes(kind)?6:4});
+ candidates.push({kind,input,pointer,...pullSling(pointer),angle,pull,wait:kind==='lava_bucket'?12:['tnt','trident'].includes(kind)?6:4});
 }
 function setup(level,history){
  const scene=buildLevel(level,dimension),w=new SiegeWorld(M,scene),bag=inventoryFor(level,dimension);

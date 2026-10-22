@@ -1,0 +1,233 @@
+{
+  "dimension": "sift",
+  "level": 6,
+  "history": [
+    {
+      "kind": "lava_bucket",
+      "angle": 1.06,
+      "pull": 1,
+      "input": {
+        "x": 219.00226894882877,
+        "y": 648
+      },
+      "pointer": {
+        "x": 219.0022735595703,
+        "y": 648
+      },
+      "origin": {
+        "x": 219.0022735595703,
+        "y": 648
+      },
+      "vx": 712.7754455566406,
+      "vy": -1112.4,
+      "power": 0.9061502976230533,
+      "wait": 10
+    }
+  ],
+  "budget": [
+    8,
+    2,
+    2,
+    0,
+    1,
+    1,
+    1,
+    2,
+    3
+  ],
+  "remaining": [
+    8,
+    2,
+    2,
+    0,
+    1,
+    0,
+    1,
+    2,
+    3
+  ],
+  "bucketAt": 0,
+  "impact": {
+    "time": 1.8416666666666626,
+    "x": 1426.0125000217427,
+    "y": 374.4460931837256
+  },
+  "sources": [
+    {
+      "x": 116,
+      "y": 30,
+      "id": "ammo:6",
+      "active": true,
+      "potent": true,
+      "seedCells": [
+        {
+          "x": 119,
+          "y": 32
+        },
+        {
+          "x": 118,
+          "y": 32
+        },
+        {
+          "x": 119,
+          "y": 31
+        },
+        {
+          "x": 119,
+          "y": 33
+        },
+        {
+          "x": 117,
+          "y": 32
+        },
+        {
+          "x": 118,
+          "y": 31
+        },
+        {
+          "x": 118,
+          "y": 33
+        },
+        {
+          "x": 119,
+          "y": 30
+        },
+        {
+          "x": 116,
+          "y": 32
+        },
+        {
+          "x": 117,
+          "y": 31
+        },
+        {
+          "x": 117,
+          "y": 33
+        },
+        {
+          "x": 118,
+          "y": 30
+        },
+        {
+          "x": 116,
+          "y": 31
+        },
+        {
+          "x": 116,
+          "y": 33
+        },
+        {
+          "x": 117,
+          "y": 30
+        },
+        {
+          "x": 116,
+          "y": 30
+        }
+      ],
+      "worldRect": {
+        "x": 1392,
+        "y": 360,
+        "width": 48,
+        "height": 48
+      }
+    }
+  ],
+  "latched": [
+    {
+      "id": 3,
+      "skin": "sift_blub",
+      "hpAtLatch": 100,
+      "time": 2.2249999999999948,
+      "x": 1391.8197000000166,
+      "y": 456.01250000069444,
+      "sourceId": "ammo:6"
+    }
+  ],
+  "burnKills": [
+    3
+  ],
+  "burnDamage": [
+    {
+      "id": 3,
+      "skin": "sift_blub",
+      "time": 2.8249999999999926,
+      "amount": 50,
+      "hp": 50
+    },
+    {
+      "id": 3,
+      "skin": "sift_blub",
+      "time": 3.4249999999999905,
+      "amount": 50,
+      "hp": 0
+    }
+  ],
+  "maxBurnSeconds": 1.1999999999999957,
+  "remainingEnemies": [
+    {
+      "skin": "sift_blub",
+      "hp": 100
+    },
+    {
+      "skin": "sift_sifter",
+      "hp": 100
+    },
+    {
+      "skin": "sift_sifter",
+      "hp": 100
+    },
+    {
+      "skin": "sift_singer",
+      "hp": 200
+    }
+  ],
+  "hp": 500,
+  "attempts": 27,
+  "useful": true,
+  "finalReplay": {
+    "dimension": "sift",
+    "level": 6,
+    "passed": true,
+    "shots": [
+      {
+        "kind": "lava_bucket",
+        "angle": 1.06,
+        "pull": 1,
+        "pointer": {
+          "x": 219.0022735595703,
+          "y": 648
+        },
+        "wait": 10
+      }
+    ],
+    "latched": [
+      {
+        "id": 3,
+        "skin": "sift_blub",
+        "hp": 100,
+        "time": 2.2249999999999948
+      }
+    ],
+    "kills": [
+      {
+        "id": 3,
+        "skin": "sift_blub",
+        "hpBefore": 50,
+        "hpAfter": 0,
+        "time": 3.4249999999999905,
+        "burnSeconds": 1.1999999999999957
+      }
+    ],
+    "sourceRect": {
+      "x": 1392,
+      "y": 360,
+      "width": 48,
+      "height": 48
+    },
+    "seedCells": 16,
+    "bucketRemaining": 0,
+    "hpRemaining": 500,
+    "maxBurnSeconds": 1.1999999999999957
+  }
+}

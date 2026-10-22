@@ -1,0 +1,279 @@
+{
+  "dimension": "nether",
+  "level": 7,
+  "history": [
+    {
+      "kind": "lava_bucket",
+      "angle": 0.22,
+      "pull": 1,
+      "input": {
+        "x": 153.25384434036826,
+        "y": 574.4609991159174
+      },
+      "pointer": {
+        "x": 153.25384521484375,
+        "y": 574.4609985351562
+      },
+      "origin": {
+        "x": 153.25384521484375,
+        "y": 574.4609985351562
+      },
+      "vx": 1422.8584716796877,
+      "vy": -318.1787841796875,
+      "power": 0.9999999927397208,
+      "wait": 10
+    }
+  ],
+  "budget": [
+    8,
+    2,
+    1,
+    0,
+    2,
+    1,
+    0,
+    0,
+    0
+  ],
+  "remaining": [
+    8,
+    2,
+    1,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0
+  ],
+  "bucketAt": 0,
+  "impact": {
+    "time": 0.5750000000000004,
+    "x": 944.3521264572212,
+    "y": 561.1228376909794
+  },
+  "sources": [
+    {
+      "x": 75,
+      "y": 45,
+      "id": "ammo:6",
+      "active": true,
+      "potent": true,
+      "seedCells": [
+        {
+          "x": 78,
+          "y": 46
+        },
+        {
+          "x": 77,
+          "y": 46
+        },
+        {
+          "x": 78,
+          "y": 45
+        },
+        {
+          "x": 78,
+          "y": 47
+        },
+        {
+          "x": 76,
+          "y": 46
+        },
+        {
+          "x": 77,
+          "y": 45
+        },
+        {
+          "x": 77,
+          "y": 47
+        },
+        {
+          "x": 75,
+          "y": 46
+        },
+        {
+          "x": 76,
+          "y": 45
+        },
+        {
+          "x": 76,
+          "y": 47
+        },
+        {
+          "x": 75,
+          "y": 45
+        },
+        {
+          "x": 75,
+          "y": 47
+        }
+      ],
+      "worldRect": {
+        "x": 900,
+        "y": 540,
+        "width": 48,
+        "height": 48
+      }
+    }
+  ],
+  "latched": [
+    {
+      "id": 1,
+      "skin": "zombified_piglin",
+      "hpAtLatch": 100,
+      "time": 0.5750000000000004,
+      "x": 974.334441673916,
+      "y": 530.0125455111115,
+      "sourceId": "ammo:6"
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "hpAtLatch": 300,
+      "time": 1.083333333333332,
+      "x": 1032.747343734071,
+      "y": 534.0125000006944,
+      "sourceId": "ammo:6"
+    }
+  ],
+  "burnKills": [
+    1,
+    2
+  ],
+  "burnDamage": [
+    {
+      "id": 1,
+      "skin": "zombified_piglin",
+      "time": 1.1749999999999983,
+      "amount": 50,
+      "hp": 50
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 1.6833333333333298,
+      "amount": 50,
+      "hp": 250
+    },
+    {
+      "id": 1,
+      "skin": "zombified_piglin",
+      "time": 1.7749999999999961,
+      "amount": 50,
+      "hp": 0
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 2.283333333333328,
+      "amount": 50,
+      "hp": 200
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 2.8833333333333258,
+      "amount": 50,
+      "hp": 150
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 3.4833333333333236,
+      "amount": 50,
+      "hp": 100
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 4.083333333333326,
+      "amount": 50,
+      "hp": 50
+    },
+    {
+      "id": 2,
+      "skin": "hoglin",
+      "time": 4.683333333333356,
+      "amount": 50,
+      "hp": 0
+    }
+  ],
+  "maxBurnSeconds": 3.6000000000000236,
+  "remainingEnemies": [
+    {
+      "skin": "zombified_piglin",
+      "hp": 100
+    },
+    {
+      "skin": "hoglin",
+      "hp": 300
+    },
+    {
+      "skin": "zombified_piglin",
+      "hp": 100
+    }
+  ],
+  "hp": 500,
+  "attempts": 6,
+  "useful": true,
+  "finalReplay": {
+    "dimension": "nether",
+    "level": 7,
+    "passed": true,
+    "shots": [
+      {
+        "kind": "lava_bucket",
+        "angle": 0.22,
+        "pull": 1,
+        "pointer": {
+          "x": 153.25384521484375,
+          "y": 574.4609985351562
+        },
+        "wait": 10
+      }
+    ],
+    "latched": [
+      {
+        "id": 1,
+        "skin": "zombified_piglin",
+        "hp": 100,
+        "time": 0.5750000000000004
+      },
+      {
+        "id": 2,
+        "skin": "hoglin",
+        "hp": 300,
+        "time": 1.083333333333332
+      }
+    ],
+    "kills": [
+      {
+        "id": 1,
+        "skin": "zombified_piglin",
+        "hpBefore": 50,
+        "hpAfter": 0,
+        "time": 1.7749999999999961,
+        "burnSeconds": 1.1999999999999957
+      },
+      {
+        "id": 2,
+        "skin": "hoglin",
+        "hpBefore": 50,
+        "hpAfter": 0,
+        "time": 4.683333333333356,
+        "burnSeconds": 3.6000000000000236
+      }
+    ],
+    "sourceRect": {
+      "x": 900,
+      "y": 540,
+      "width": 48,
+      "height": 48
+    },
+    "seedCells": 12,
+    "bucketRemaining": 0,
+    "hpRemaining": 500,
+    "maxBurnSeconds": 3.6000000000000236
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "dimension": "end",
+  "level": 6,
+  "history": [
+    {
+      "kind": "lava_bucket",
+      "angle": 0.1,
+      "pull": 1,
+      "input": {
+        "x": 150.67443768746654,
+        "y": 558.4775112473218
+      },
+      "pointer": {
+        "x": 150.6744384765625,
+        "y": 558.4775390625
+      },
+      "origin": {
+        "x": 150.67444045834543,
+        "y": 558.4775388636581
+      },
+      "vx": 1430,
+      "vy": -145.5574197275073,
+      "power": 1,
+      "wait": 10
+    }
+  ],
+  "budget": [
+    9,
+    2,
+    1,
+    0,
+    1,
+    1,
+    1,
+    2,
+    0
+  ],
+  "remaining": [
+    9,
+    2,
+    1,
+    0,
+    1,
+    0,
+    1,
+    2,
+    0
+  ],
+  "bucketAt": 0,
+  "impact": {
+    "time": 0.508333333333334,
+    "x": 860.9410265600902,
+    "y": 610.012500055394
+  },
+  "sources": [
+    {
+      "x": 70,
+      "y": 48,
+      "id": "ammo:7",
+      "active": true,
+      "potent": true,
+      "seedCells": [
+        {
+          "x": 72,
+          "y": 51
+        },
+        {
+          "x": 71,
+          "y": 51
+        },
+        {
+          "x": 73,
+          "y": 51
+        },
+        {
+          "x": 72,
+          "y": 50
+        },
+        {
+          "x": 70,
+          "y": 51
+        },
+        {
+          "x": 71,
+          "y": 50
+        },
+        {
+          "x": 73,
+          "y": 50
+        },
+        {
+          "x": 72,
+          "y": 49
+        },
+        {
+          "x": 70,
+          "y": 50
+        },
+        {
+          "x": 71,
+          "y": 49
+        },
+        {
+          "x": 73,
+          "y": 49
+        },
+        {
+          "x": 72,
+          "y": 48
+        },
+        {
+          "x": 70,
+          "y": 49
+        },
+        {
+          "x": 71,
+          "y": 48
+        },
+        {
+          "x": 73,
+          "y": 48
+        },
+        {
+          "x": 70,
+          "y": 48
+        }
+      ],
+      "worldRect": {
+        "x": 840,
+        "y": 576,
+        "width": 48,
+        "height": 48
+      }
+    }
+  ],
+  "latched": [
+    {
+      "id": 4,
+      "skin": "enderman",
+      "hpAtLatch": 200,
+      "time": 1.0166666666666655,
+      "x": 938.010461389096,
+      "y": 558.0125000006944,
+      "sourceId": "ammo:7"
+    }
+  ],
+  "burnKills": [
+    4
+  ],
+  "burnDamage": [
+    {
+      "id": 4,
+      "skin": "enderman",
+      "time": 1.6166666666666634,
+      "amount": 100,
+      "hp": 100
+    },
+    {
+      "id": 4,
+      "skin": "enderman",
+      "time": 2.2166666666666615,
+      "amount": 100,
+      "hp": 0
+    }
+  ],
+  "maxBurnSeconds": 1.199999999999996,
+  "remainingEnemies": [
+    {
+      "skin": "shulker",
+      "hp": 300
+    },
+    {
+      "skin": "shulker",
+      "hp": 300
+    },
+    {
+      "skin": "shulker",
+      "hp": 300
+    },
+    {
+      "skin": "enderman",
+      "hp": 200
+    },
+    {
+      "skin": "shulker",
+      "hp": 300
+    }
+  ],
+  "hp": 1400,
+  "attempts": 3,
+  "useful": true,
+  "finalReplay": {
+    "dimension": "end",
+    "level": 6,
+    "passed": true,
+    "shots": [
+      {
+        "kind": "lava_bucket",
+        "angle": 0.1,
+        "pull": 1,
+        "pointer": {
+          "x": 150.6744384765625,
+          "y": 558.4775390625
+        },
+        "wait": 10
+      }
+    ],
+    "latched": [
+      {
+        "id": 4,
+        "skin": "enderman",
+        "hp": 200,
+        "time": 0.9249999999999992
+      }
+    ],
+    "kills": [
+      {
+        "id": 4,
+        "skin": "enderman",
+        "hpBefore": 100,
+        "hpAfter": 0,
+        "time": 2.124999999999995,
+        "burnSeconds": 1.199999999999996
+      }
+    ],
+    "sourceRect": {
+      "x": 840,
+      "y": 576,
+      "width": 48,
+      "height": 48
+    },
+    "seedCells": 16,
+    "bucketRemaining": 0,
+    "hpRemaining": 1400,
+    "maxBurnSeconds": 1.199999999999996
+  }
+}

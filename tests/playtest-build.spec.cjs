@@ -13,7 +13,7 @@ test('review build opens forty maps and nine items without touching saves or onl
   await expect(page.locator('#levelMenu')).toBeVisible();await expect(page.locator('#profileMenu')).toBeHidden();
   await expect(page.locator('#levelMenu [data-world]')).toHaveCount(4);await expect(page.locator('#levelMenu [data-world="sift"]')).toBeEnabled();
   await page.locator('#levelMenu [data-world="sift"]').click();await page.locator('#nextPage').click();await expect(page.locator('#level-9')).toBeEnabled();await page.locator('#level-9').click();
-  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([...Array(8).fill(99),3]);
+  expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory)).toEqual([99,99,99,99,99,0,99,99,3]);
   await page.keyboard.press('8');await expect(page.locator('#gamehint')).toContainText('末地水晶');
   await page.locator('#playtestItemHelp').click();await expect(page.locator('#guideMenu')).toBeVisible();await expect(page.locator('[data-item="crystal"]')).toBeInViewport();await page.locator('#guideBack').click();
   expect(await page.evaluate(()=>MCBlockLaunch.getStatus().screen)).toBe('play');await aim(page,-110,25);await page.mouse.up();expect(await page.evaluate(()=>MCBlockLaunch.getStatus().inventory[7])).toBe(98);

@@ -82,9 +82,18 @@ export function burnEnemy(world,enemy,sourceId,{totalDamage=null}={}){
  enemy.burningUntil=Math.max(enemy.burningUntil,world.time+1.8);return true;
 }
 
+// Bucket lava is a special attack: one touch latches a burn until death,
+// including creatures immune to ordinary fire or the map's lava.
+export function burnBucketEnemy(world,enemy,sourceId){
+ if(!enemy?.alive||enemy.dead)return false;
+ thawEnemy(world,enemy);
+ if(!enemy.bucketBurn)enemy.bucketBurn={sourceId,nextAt:world.time+.6};
+ enemy.burningUntil=Math.max(enemy.burningUntil||0,world.time+.65);return true;
+}
+
 export function splashWater(world,x,y,radius=96){
  world.fires=world.fires.filter(f=>Math.hypot(f.x+f.size/2-x,f.y+f.size/2-y)>radius+f.size/2);
- for(const enemy of world.enemies){if(Math.hypot(enemy.body.position.x-x,enemy.body.position.y-y)>radius+enemy.dimensions.width/2)continue;enemy.burnTicks.length=0;enemy.burningUntil=0;}
+ for(const enemy of world.enemies){if(Math.hypot(enemy.body.position.x-x,enemy.body.position.y-y)>radius+enemy.dimensions.width/2)continue;enemy.burnTicks.length=0;enemy.burningUntil=enemy.bucketBurn&&enemy.alive?world.time+.65:0;}
  for(const p of world.projectiles)if(p.ignited&&Math.hypot(p.body.position.x-x,p.body.position.y-y)<=radius)p.ignited=false;
  world.lava.cool(x,y,radius);world.events.push({type:'splash',x,y,radius,sound:'water_splash'});
 }
@@ -112,10 +121,18 @@ export function advanceFire(world){
  }
  world.fires=world.fires.filter(f=>world.time<f.endsAt);
  for(const enemy of world.enemies){
-  if(!enemy.alive||enemy.dead){enemy.burnTicks.length=0;enemy.burningUntil=0;continue;}
+  if(!enemy.alive||enemy.dead){enemy.burnTicks.length=0;enemy.burningUntil=0;delete enemy.bucketBurn;continue;}
+  if(enemy.bucketBurn){
+   thawEnemy(world,enemy);
+   while(enemy.alive&&!enemy.dead&&enemy.bucketBurn.nextAt<=world.time+1e-9){
+    enemy.bucketBurn.nextAt+=.6;damageEnemy(world,enemy,50,{kind:'bucket_lava'});
+   }
+   if(!enemy.alive||enemy.dead){enemy.burnTicks.length=0;enemy.burningUntil=0;delete enemy.bucketBurn;continue;}
+   enemy.burningUntil=Math.max(enemy.burningUntil||0,world.time+.65);
+  }
   enemy.burnTicks=enemy.burnTicks.filter(tick=>{
    if(tick.at>world.time+1e-9)return true;damageEnemy(world,enemy,tick.damage,{kind:'fire'});return false;
   });
-  if(!enemy.burnTicks.length)enemy.burningUntil=0;
+  if(!enemy.burnTicks.length&&!enemy.bucketBurn)enemy.burningUntil=0;
  }
 }

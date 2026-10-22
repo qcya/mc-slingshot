@@ -1,0 +1,35 @@
+{
+  "version": "Minecraft Java Edition 1.20.4",
+  "metadata": "https://piston-meta.mojang.com/v1/packages/2c592ccd71ca2d5dadebeb6543ad6b18e6f43305/1.20.4.json",
+  "client": {
+    "url": "https://piston-data.mojang.com/v1/objects/fd19469fed4a4b4c15b2d5133985f0e3e7816a8a/client.jar",
+    "sha1": "fd19469fed4a4b4c15b2d5133985f0e3e7816a8a"
+  },
+  "assetIndex": "https://piston-meta.mojang.com/v1/packages/129fc8163fdedb50c886731a839751c22aa0dbc6/12.json",
+  "assets": [
+    {
+      "file": "assets/textures/bucket.png",
+      "source": "assets/minecraft/textures/item/bucket.png",
+      "sha1": "34b5dbec1fddf91976cd88733b5d61788434ea36",
+      "bytes": 194,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "assets/textures/lava_bucket.png",
+      "source": "assets/minecraft/textures/item/lava_bucket.png",
+      "sha1": "d093f1f8a4e546f2c9c9b71d981de1d5ea469533",
+      "bytes": 218,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "file": "assets/sfx/bucket_empty_lava.ogg",
+      "source": "minecraft/sounds/item/bucket/empty_lava1.ogg",
+      "sha1": "3612c93dfebcedbeb22bc8283e0b85de033d081a",
+      "bytes": 11764,
+      "url": "https://resources.download.minecraft.net/36/3612c93dfebcedbeb22bc8283e0b85de033d081a",
+      "soundKey": "bucket_empty_lava"
+    }
+  ]
+}

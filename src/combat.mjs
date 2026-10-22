@@ -116,7 +116,7 @@ export function damageEnemy(world,e,damage,{source=null,kind='environment'}={}){
 }
 export function projectileDamage(world,target,p,speed){
  const kind=p.ammo.id;
- if(['tnt','fire','snowball','wind','water','crystal'].includes(kind))return;
+ if(['tnt','fire','snowball','wind','water','crystal','lava_bucket'].includes(kind))return;
  const velocity=world.before.get(p.body.id)||p.body.velocity;
  if(Math.hypot(velocity.x,velocity.y)*60<MIN_PROJECTILE_HIT_SPEED)return false;
  if(reflectEncounterProjectile(world,target,p))return false;

@@ -1,5 +1,9 @@
 # Third-party assets
 
+## Native lava bucket
+
+- The full and empty bucket icons are unchanged original Minecraft Java 1.20.4 item PNGs from Mojang's official client archive. The pour sound is original Mojang audio from the same version's official asset index. Exact source URLs, hashes, and rendering scope: [native bucket assets](docs/bucket-assets.md), [manifest](docs/bucket-assets.json). These assets retain upstream rights separately from the game's code license.
+
 ## Alpha 0.13.0 三世界素材
 
 - 新增下界、末地方块保留 Mojang 官方 Java 1.20.4 原始 PNG；来源版本、文件与校验见 [维度材质](docs/dimension-materials.md)。动画菌柄在运行时取首帧，不重绘纹理。
