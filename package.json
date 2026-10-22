@@ -1,6 +1,6 @@
 {
   "name": "stone-at-full-draw",
-  "version": "0.15.0-beta.7",
+  "version": "1.0.0",
   "private": true,
   "description": "拉满的石 / Stone at Full Draw — Minecraft 风格的二维弹弓闯关游戏",
   "scripts": {
@@ -8,7 +8,8 @@
     "test": "node --test tests/*.test.mjs",
     "test:browser": "playwright test",
     "check": "npm test && npm run test:browser",
-    "build:toy": "node scripts/build-toy.cjs"
+    "build:toy": "node scripts/build-toy.cjs",
+    "build:review": "node scripts/build-review.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",

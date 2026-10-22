@@ -6,7 +6,7 @@ test('actual Toy package starts on a plain static host without MJS MIME support'
  await new Promise(r=>server.listen(0,'127.0.0.1',r));try{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(()=>{globalThis.toy={getUserProfile:async()=>({toyOpenId:'static-host'}),getCloudStorage:async()=>({}),setCloudStorage:async()=>{}};});
   // Exercise the actual package and SDK script, with a local host bridge absent.
-  await page.goto(`http://127.0.0.1:${server.address().port}/toy/mc-slingshot/index.html`);await page.waitForFunction(()=>window.MCBlockLaunch,{},{timeout:15000});await require('./browser-helpers.cjs').enterStart(page);await expect(page.locator('#profileMenu')).toBeVisible();await expect(page.locator('#loadState')).toBeHidden();expect(errors).toEqual([]);
+  await page.goto(`http://127.0.0.1:${server.address().port}/toy/mc-slingshot/index.html`);await page.waitForFunction(()=>window.MCBlockLaunch,{},{timeout:15000});expect(await page.evaluate(()=>MCBlockLaunch.getStatus().buildProfile)).toBe('release');expect(await page.evaluate(()=>MCBlockLaunch.getStatus().version)).toBe(require('../package.json').version);await require('./browser-helpers.cjs').enterStart(page);await expect(page.locator('#profileMenu')).toBeVisible();await expect(page.locator('#loadState')).toBeHidden();expect(errors).toEqual([]);
  }finally{server.closeAllConnections();await new Promise(r=>server.close(r));fs.rmSync(temp,{recursive:true,force:true});}
 });
 

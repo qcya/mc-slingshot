@@ -9,6 +9,7 @@ import {makeSlingArt} from './sling-art.mjs';
 import {drawTrident,drawEndCrystal} from './combat-render.mjs';
 import {ENCOUNTER_PROFILES} from './encounters.mjs';
 import {refreshPixelRaster} from './pixel-raster.mjs';
+import {drawFireFrame} from './fire-frames.mjs';
 export class Renderer {
   constructor(canvas,assets){
     this.canvas=canvas;this.ctx=canvas.getContext('2d',{alpha:false});this.assets=assets;
@@ -150,7 +151,7 @@ export class Renderer {
     }
     if(e.alive&&e.burningUntil>world.time){
       const w=e.dimensions.width+12,h=e.dimensions.height*.8,frame=Math.floor(world.time*12+e.id)%32,c=this.ctx;
-      c.save();c.globalAlpha=.85;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
+      c.save();c.globalAlpha=.85;drawFireFrame(c,this.assets.images.fire_0,frame,e.body.position.x-w/2,e.body.bounds.max.y-h,w,h);c.restore();
     }
   }
   echoGuard(e,world){
@@ -240,12 +241,12 @@ export class Renderer {
     for(const e of world.enemies)if(!e.dead)this.mob(e,world);
     for(const fire of world.fires||[]){
       if(world.time<fire.startedAt)continue;const atlas=this.assets.images.fire_0,frame=Math.floor((world.time-fire.startedAt)*12+fire.tx*3+fire.ty)%32;
-      c.save();c.globalAlpha=Math.min(1,(fire.endsAt-world.time)*2);c.drawImage(atlas,0,frame*16,16,16,fire.x,fire.y-12,fire.size,fire.size+12);c.restore();
+      c.save();c.globalAlpha=Math.min(1,(fire.endsAt-world.time)*2);drawFireFrame(c,atlas,frame,fire.x,fire.y-12,fire.size,fire.size+12);c.restore();
     }
     this.launcher(launcher,world);
     for(const p of world.projectiles){if(p.dead)continue;c.save();c.translate(p.body.position.x,p.body.position.y);c.globalAlpha=projectileOpacity(p,world.time);
       c.save();if(p.ammo.id==='trident')drawTrident(c,this.assets.images.trident,p,visualTime);else if(p.ammo.id==='crystal')drawEndCrystal(c,this.assets.images.end_crystal_entity,visualTime,p);else{c.rotate(p.body.angle);this.ball(0,0,p.ammo);}if(p.ammo.id==='tnt'&&tntFlash(p.fuse)){const s=p.ammo.size;c.globalAlpha=.45;c.fillStyle='#fff';c.fillRect(-s/2,-s/2,s,s);}c.restore();
-      if(p.ignited){const frame=Math.floor(world.time*12+p.id)%32;c.drawImage(this.assets.images.fire_0,0,frame*16,16,16,-20,-30,40,46);}c.restore();}
+      if(p.ignited){const frame=Math.floor(world.time*12+p.id)%32;drawFireFrame(c,this.assets.images.fire_0,frame,-20,-30,40,46);}c.restore();}
     for(const p of this.particles){c.globalAlpha=Math.min(1,p.life/(p.poof ? .15 : .8));c.fillStyle=p.color;c.fillRect(Math.round(p.x/3)*3,Math.round(p.y/3)*3,p.size,p.size);}c.globalAlpha=1;
     for(const e of this.effects){
       if(e.type==='explosion'){const frame=Math.min(15,Math.floor((1-e.life/e.total)*16)),size=e.radius*2;c.drawImage(this.assets.explosions[frame],e.x-size/2,e.y-size/2,size,size);}

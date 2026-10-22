@@ -1,0 +1,11 @@
+{
+  "litByLava": true,
+  "atlas": [
+    16,
+    512
+  ],
+  "topRowsTransparent": true,
+  "cases": 96,
+  "visibleFlameCases": 96,
+  "failures": []
+}

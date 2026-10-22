@@ -11,16 +11,16 @@ import {createToyOnlineClient} from './toy-online.mjs';
 import {createToyStorage} from './toy-storage.mjs';
 import {BackgroundMusic} from './music.mjs';
 import {ITEM_GUIDE,MOB_GUIDE} from './guide.mjs';
-import {PLAYTEST,playtestStorage,playtestInventory} from './playtest.mjs';
+import {PLAYTEST,REVIEW,playtestStorage,playtestInventory,reviewStorage} from './playtest.mjs';
 import {buildTitleScene} from './title-scene.mjs';
 import {TIME_SAVE_KEY,TIME_QUEUE_KEY,normalizeTimes,recordBestTime,timeBundle,parseTimeBundle,formatTime} from './timing.mjs';
 const $=s=>document.querySelector(s),canvas=$('#stage'),loadState=$('#loadState');
 const coarsePointer=matchMedia('(pointer:coarse)'),cancelledTouchClicks=new Set();
 const state={playtest:PLAYTEST,world:'overworld',level:0,inventory:inventoryFor(0),shots:5,selected:0,screen:'levels',paused:true,ended:false,drag:false,angle:0,pouch:{...SLING_HOME},power:0,vx:0,vy:0,launch:null,quiet:0,winWait:0,launched:0,usedLavaBucket:false};
 let world,renderer,assets,scene,drawAudio,music,progress,profile,acc=0,previous=0,fps=60,stepMs=0,maxStepMs=0,inventoryUntil=0,nativeImmersive=false,fullscreenBusy=false,levelPage=0;
-const nativeOnline=!PLAYTEST&&globalThis.MC_PLATFORM?.ranking==='toy';
-const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=nativeOnline?createToyOnlineClient({getUser:()=>appStorage.user(),getTimes:id=>readWorld(TIME_SAVE_KEY,[],id)}):createOnlineClient({baseUrl:globalThis.MC_PLATFORM?.apiBaseUrl||'',...(PLAYTEST?{offline:true}:{})});let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
-const appStorage=createToyStorage({enabled:!PLAYTEST&&globalThis.MC_PLATFORM?.toy===true,storage:PLAYTEST?playtestStorage():{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)},onStatus:s=>{const node=$('#cloudState');if(node){node.hidden=!s.enabled;node.textContent=s.lastError?'云存档暂未同步，进度已暂存本机':s.dirty?'云存档正在同步…':'Toy 云存档已连接';}}});
+const nativeOnline=!PLAYTEST&&!REVIEW&&globalThis.MC_PLATFORM?.ranking==='toy';
+const PROFILE_KEY='mc-block-launch.profile.v1',PENDING_KEY=TIME_QUEUE_KEY,online=nativeOnline?createToyOnlineClient({getUser:()=>appStorage.user(),getTimes:id=>readWorld(TIME_SAVE_KEY,[],id)}):createOnlineClient({baseUrl:globalThis.MC_PLATFORM?.apiBaseUrl||'',...((PLAYTEST||REVIEW)?{offline:true}:{})});let profileReturn='levels',syncing=false,profileRevision=0,leaderboardRevision=0,bestTimes;
+const appStorage=createToyStorage({enabled:!PLAYTEST&&!REVIEW&&globalThis.MC_PLATFORM?.toy===true,storage:PLAYTEST?playtestStorage():REVIEW?reviewStorage():{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)},onStatus:s=>{const node=$('#cloudState');if(node){node.hidden=!s.enabled;node.textContent=s.lastError?'云存档暂未同步，进度已暂存本机':s.dirty?'云存档正在同步…':'Toy 云存档已连接';}}});
 function readLocal(key,fallback){try{return JSON.parse(appStorage.getItem(key))||fallback;}catch{return fallback;}}
 function saveLocal(key,value){try{appStorage.setItem(key,JSON.stringify(value));}catch{}}
 function currentWorld(){return state.world||'overworld';}
@@ -207,7 +207,7 @@ function endDrag(e){
 function playtestHint(){const ammo=AMMO[state.selected];$('#gamehint').textContent=ammo.id==='lava_bucket'&&state.usedLavaBucket?'空桶：本关的岩浆已用完，不能再次发射。':`${ammo.label}：${ammo.detail}`;}
 function select(i){if(state.screen!=='play'||state.launch||state.drag||!Number.isInteger(i))return;state.selected=clamp(i,0,8);hud();if(PLAYTEST)playtestHint();revealInventory();}
 function status(){
- const s=world.snapshot();return {...s,ready:true,dimension:currentWorld(),titleScene:!!scene.titleScene,level:state.level+1,shots:state.shots,inventory:[...state.inventory],ammoCounts:Object.fromEntries(AMMO.map((a,i)=>[a.id,state.inventory[i]||0])),tridentDurability:state.inventory[8]||0,lavaBucketUsed:state.usedLavaBucket,screen:state.screen,unlocked:progress.unlocked,
+ const s=world.snapshot();return {...s,ready:true,version:typeof __MC_VERSION__==='undefined'?'1.0.0':__MC_VERSION__,buildProfile:PLAYTEST?'playtest':REVIEW?'review':'release',dimension:currentWorld(),titleScene:!!scene.titleScene,level:state.level+1,shots:state.shots,inventory:[...state.inventory],ammoCounts:Object.fromEntries(AMMO.map((a,i)=>[a.id,state.inventory[i]||0])),tridentDurability:state.inventory[8]||0,lavaBucketUsed:state.usedLavaBucket,screen:state.screen,unlocked:progress.unlocked,
  launched:state.launched,selected:AMMO[state.selected]?.id||'empty',selectedSlot:state.selected,paused:state.paused,ended:state.ended,particles:renderer.particles.length,burning:world.fires.filter(f=>world.time>=f.startedAt).length,projectiles:s.projectiles.length,ammoBodies:s.projectiles,restingBlocks:s.projectiles.filter(p=>p.sleeping).length,
  fps:Math.round(fps),stepMs:+stepMs.toFixed(2),maxStepMs:+maxStepMs.toFixed(2),launcher:{x:state.pouch.x,y:state.pouch.y,vx:state.vx,vy:state.vy,angle:state.angle,phase:state.drag?'aim':state.launch?'recoil':'ready',type:'slingshot'}};
 }

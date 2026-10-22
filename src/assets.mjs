@@ -1,6 +1,7 @@
 import { MATERIALS, AMMO } from './config.mjs';
 import {blockIcon} from './item-icons.mjs';
 import {makeAnvilIcon} from './combat-render.mjs';
+import {preferencesStorage} from './playtest.mjs';
 const ATLASES=['zombie','pillager','warden','fire_0','zombified_piglin','hoglin','shulker','enderman','lava_still','lava_flow','crimson_stem','warped_stem','wither','wither_skeleton','ender_dragon','sift_blub','sift_sifter','sift_singer','sift_echo_golem','end_crystal_entity'];
 const NAMES=[...new Set([...Object.values(MATERIALS).map(m=>m.sprite).filter(n=>n!=='ladder_wall'),...AMMO.map(a=>a.sprite).filter(n=>n&&n!=='anvil'),'ladder','tnt_top',
   'oak_leaves','spruce_leaves','cherry_log','cherry_leaves','grass_block_side_overlay','oak_door_top','oak_door_bottom',...ATLASES,'stone_sword','anvil_base','anvil_top','bucket','crossbow_standby','ice','snowball','splash_water','sift_healthy_sculk'])];
@@ -18,8 +19,8 @@ function tint(im,color){
   x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);return c;
 }
 export class Assets {
-  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.soundVolume=1;this.soundsPaused=false;this.activeSounds=new Map();this.playing=0;this.audioStats={played:{},failed:0,lastError:null};try{const saved=JSON.parse(localStorage.getItem('mc-block-launch.audio.v1'));if(typeof saved?.enabled==='boolean')this.soundOn=saved.enabled;if(Number.isFinite(saved?.volume))this.soundVolume=Math.max(0,Math.min(1,saved.volume));}catch{}}
-  saveAudio(){try{localStorage.setItem('mc-block-launch.audio.v1',JSON.stringify({enabled:this.soundOn,volume:this.soundVolume}));}catch{}for(const[a,clip]of this.activeSounds)a.volume=this.soundOn?clip.base*this.soundVolume:0;}
+  constructor(){this.images={};this.colors={};this.averages={};this.sounds={};this.soundOn=true;this.soundVolume=1;this.soundsPaused=false;this.activeSounds=new Map();this.playing=0;this.audioStats={played:{},failed:0,lastError:null};try{const saved=JSON.parse(preferencesStorage().getItem('mc-block-launch.audio.v1'));if(typeof saved?.enabled==='boolean')this.soundOn=saved.enabled;if(Number.isFinite(saved?.volume))this.soundVolume=Math.max(0,Math.min(1,saved.volume));}catch{}}
+  saveAudio(){try{preferencesStorage().setItem('mc-block-launch.audio.v1',JSON.stringify({enabled:this.soundOn,volume:this.soundVolume}));}catch{}for(const[a,clip]of this.activeSounds)a.volume=this.soundOn?clip.base*this.soundVolume:0;}
   setSoundEnabled(enabled){this.soundOn=!!enabled;this.saveAudio();}
   setSoundVolume(volume){if(!Number.isFinite(volume))return;this.soundVolume=Math.max(0,Math.min(1,volume));this.saveAudio();}
   pauseAll(){

@@ -1,0 +1,39 @@
+{
+  "url": "http://192.168.1.4:8770/assets/release-1.0.0/index.html",
+  "reports": [
+    {
+      "name": "desktop",
+      "version": "1.0.0",
+      "buildProfile": "review",
+      "testToolsAbsent": true,
+      "initialInventory": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "sequentialWorldLocks": true,
+      "finiteWin": true,
+      "reviewProgressPersisted": true,
+      "formalSavePreserved": true
+    },
+    {
+      "name": "phone",
+      "version": "1.0.0",
+      "buildProfile": "review",
+      "testToolsAbsent": true,
+      "initialInventory": [
+        5,
+        0,
+        0,
+        0
+      ],
+      "sequentialWorldLocks": true,
+      "finiteWin": true,
+      "reviewProgressPersisted": true,
+      "formalSavePreserved": true
+    }
+  ],
+  "errors": [],
+  "onlineRequests": []
+}
